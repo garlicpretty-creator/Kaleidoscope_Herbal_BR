@@ -10,7 +10,7 @@ const catalogs={
  herbs:()=>HERBS.map(h=>({key:h.key,fresh:id(h.fresh),dry:id(h.dry),...(h.processed?{processed:id(h.processed)}:{}),wild:id(h.wild),cultivable:h.cultivable})),
  foods:()=>Object.entries(FOOD_EFFECTS).map(([item,data])=>({id:item,heat:HEAT_VALUES.get(item)??0,
   effects:data.effects.map(e=>[e.name,e.ticks,e.amplifier]),...(data.clear?.length?{clear:data.clear}:{})})),
- decoctions:decoctionCatalog,adjuvants:adjuvantCatalog, // v1.2.0
+ decoctions:decoctionCatalog,adjuvants:adjuvantCatalog, // v1.1.0
 };
 // A recipe whose output no installed pack defines would leave the pot holding nothing; if the lookup itself fails, trust the sender.
 function itemExists(item){try{return !!ItemTypes.get(item);}catch{return true;}}

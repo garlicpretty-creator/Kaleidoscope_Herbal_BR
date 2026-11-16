@@ -2,7 +2,7 @@ import {ItemStack} from '@minecraft/server';
 import {HERBS,id} from '../data/herbs.js';
 import {creative,hand,damageTool} from './items.js';
 import {emitEvt} from './bus.js';
-// v1.2.0: breaking any wild herb in survival counts as a harvest for other packs (herb_harvested, docs/API.md).
+// v1.1.0: breaking any wild herb in survival counts as a harvest for other packs (herb_harvested, docs/API.md).
 export function handleWildHarvest(event){
  const type=event.brokenBlockPermutation.type.id,herb=HERBS.find(h=>id(h.wild)===type);
  if(herb&&!creative(event.player))emitEvt('herb_harvested',event.player,{herb:herb.key,wild:true});

@@ -13,9 +13,9 @@ export const activePots=new StationSet();
 const deny=block=>feedback(block,'minecraft:basic_smoke_particle','random.fizz');
 // v1.2.7: no servings block state (nothing drew it; the count lives in the record) - 19,200 -> 3,840 permutations.
 const STAGE=id('stage');
-// v1.2.0: a brew registered by another pack (docs/API.md) may outlive that pack; its output then no longer
+// v1.1.0: a brew registered by another pack (docs/API.md) may outlive that pack; its output then no longer
 // exists and cannot be spawned, so the pot gives bitter dregs instead of jamming.
-// Returns the item that was dropped (v1.2.1), so the served broadcast names what the player really got.
+// Returns the item that was dropped (v1.1.0), so the served broadcast names what the player really got.
 function dropOutput(block,item,count=1){
  try{drop(block,item,count);return item;}catch(error){if(item.startsWith(NS+':'))throw error;drop(block,id('bitter_dregs'),count);return id('bitter_dregs');}
 }
@@ -46,7 +46,7 @@ export function spillPot(block){
  const r=getRecord(block);if(!r||r.type!=='clay_pot')return;
  const items=contentsOnBreak(r);
  // Retain an explicit remaining-drop journal if a spawn throws; never erase failed drops.
- // v1.2.1: another pack's brew may not stack (soups, potions), and a stack of three of those would drop as one or not at
+ // v1.1.0: another pack's brew may not stack (soups, potions), and a stack of three of those would drop as one or not at
  // all; those are dropped one at a time. Our own items stack to 16.
  r.pendingDrops??=items.flatMap(item=>item.id.startsWith(NS+':')||item.count<=1?[item]:Array.from({length:item.count},()=>({id:item.id,count:1})));
  while(r.pendingDrops.length){const item=r.pendingDrops[0];dropOutput(block,item.id,item.count);r.pendingDrops.shift();saveRecord(r);}
@@ -69,7 +69,7 @@ export const clayPot={
   }
   if(r.stage===1&&(HERB_ITEMS.has(held)||isExternalIngredient(held))){
    if(r.ingredients.length>=MAX_INGREDIENTS){refuse(block,'full');return;}
-   // v1.2.1: the pot remembers only which item went in. Another pack's ingredient that is named, enchanted or carries data
+   // v1.1.0: the pot remembers only which item went in. Another pack's ingredient that is named, enchanted or carries data
    // would come back as a plain one when the pot is broken, so it is not taken.
    if(!HERB_ITEMS.has(held)&&!isPlain(slot.getItem())){refuse(block,'wrong');return;}
    r.ingredients.push(held);saveRecord(r);sync(block,r);takeOne(player,slot);feedback(block);return;

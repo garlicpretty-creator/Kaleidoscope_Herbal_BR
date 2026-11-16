@@ -9,7 +9,7 @@
  *   const herbal=connectHerbal(system,{source:'my_pack',heat:[{id:'my_pack:iced_tea',heat:-30}],
  *     onEvent:e=>{if(e.t==='decoction_served')...}});
  *
- * v1.2.0: `recipes` ([{id, ingredients:[{id,count}], servings, time?}]) are brewed by Herbal's clay pot and
+ * v1.1.0: `recipes` ([{id, ingredients:[{id,count}], servings, time?}]) are brewed by Herbal's clay pot and
  * `adjuvants` ([{id, servings?}]) add a serving to any brew; both are sent again on every api_ready, like `heat`.
  */
 export const HERBAL_EVENTS=Object.freeze({ping:'kaleidoscope_herbal:api_ping',ready:'kaleidoscope_herbal:api_ready',

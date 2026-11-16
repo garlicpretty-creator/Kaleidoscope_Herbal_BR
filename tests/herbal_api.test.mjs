@@ -159,7 +159,7 @@ test('every herb goes into at least one formula, dish, tea, wine or the incense 
  for(const h of ['licorice','poria','cordyceps','mugwort'])assert.ok(DECOCTIONS.some(r=>r.ingredients.some(i=>i.includes(h))&&r.result.includes(h==='poria'?'four_gentlemen':h)),h+' has its own formula');
 });
 
-// ---- v1.2.0 (A9/A11): other packs' formulas and adjuvants, the decoctions catalog, pot broadcasts
+// ---- v1.1.0 (A9/A11): other packs' formulas and adjuvants, the decoctions catalog, pot broadcasts
 const tonic=(over={})=>({id:'other_pack:tonic',ingredients:[{id:'other_pack:root',count:2},{id:kh('licorice_slices'),count:1}],servings:2,...over});
 const brew=items=>{ // light the pot the way clayPot.js does, then simmer until done
  const recipe=matchDecoction(items);
@@ -167,7 +167,7 @@ const brew=items=>{ // light the pot the way clayPot.js does, then simmer until 
  while(pot.stage===2)advancePot(pot,'mild');
  return pot;
 };
-test('api_ready lists the v1.2.0 capabilities and limits, which mirror the clay pot',()=>{
+test('api_ready lists the v1.1.0 capabilities and limits, which mirror the clay pot',()=>{
  const w=world();const [ready]=w.call(EVENTS.ping,'x');
  assert.ok(ready.capabilities.includes('external_recipes')&&ready.capabilities.includes('external_adjuvants'));
  for(const key of ['externalHeat','itemsPerMessage','heatAddMax','externalRecipes','recipesPerMessage','recipeIngredients','recipeServingsMax','recipeTimeMin','recipeTimeMax','externalAdjuvants','adjuvantServingsMax'])assert.equal(ready.limits[key],LIMITS[key],key);
@@ -354,7 +354,7 @@ test('a sealed prescription holds one powder formula; the guidebook gives no pow
   const words=JSON.stringify(page);for(const i of f.ingredients)assert.ok(!words.includes(i),f.result+' page names '+i);}
 });
 
-// ---- v1.2.1 fixes
+// ---- v1.1.0 fixes
 test('a reply too long for one script event is cut and says how many refusals were left out',()=>{
  const w=world(),long=i=>'another_quite_long_pack_namespace:some_fairly_long_item_identifier_'+i;
  w.call(EVENTS.heatRegister,{source:'first_pack',items:Array.from({length:32},(_,i)=>({id:long(i),heat:5}))});

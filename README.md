@@ -1,4 +1,4 @@
-# 森羅物語：草本 | Kaleidoscope Herbal（重製版 v1.2）
+# 森羅物語：草本 | Kaleidoscope Herbal（重製版 v1.1）
 
 讓草木的芬芳融入 Minecraft，展開一段充滿自然氣息的草藥生活。
 
@@ -33,6 +33,10 @@ python3 tools/check_refs.py
 
 ```bash
 python3 tools/pbr_audit.py
+```
+
+```bash
+python3 tools/audit.py
 ```
 
 ```bash

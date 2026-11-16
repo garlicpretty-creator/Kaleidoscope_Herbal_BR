@@ -13,10 +13,10 @@ export const EVENTS=Object.freeze({
 });
 export const CAPABILITIES=Object.freeze(['events','catalog','constitution','constitution_write','external_heat','heat_source_tag','external_recipes','external_adjuvants']);
 export const LIMITS=Object.freeze({externalHeat:256,itemsPerMessage:32,heatMax:100,heatAddMax:50,heatAddCooldown:20,packetBytes:1800,
- // v1.2.0: recipeIngredients and recipeServingsMax mirror the clay pot (MAX_INGREDIENTS, MAX_SERVINGS in data/decoctions.js).
+ // v1.1.0: recipeIngredients and recipeServingsMax mirror the clay pot (MAX_INGREDIENTS, MAX_SERVINGS in data/decoctions.js).
  externalRecipes:64,recipesPerMessage:8,recipeIngredients:6,recipeServingsMax:4,recipeTimeMin:200,recipeTimeMax:2400,recipeTimeDefault:600,
  externalAdjuvants:32,adjuvantServingsMax:1,
- // v1.2.1: a reply is cut to fit one script event; a player takes at most this many heat pushes a second from all packs together.
+ // v1.1.0: a reply is cut to fit one script event; a player takes at most this many heat pushes a second from all packs together.
  ackBytes:1900,heatAddsPerPlayer:2});
 // The part of LIMITS a client needs, sent with api_ready.
 const PUBLIC_LIMITS=Object.freeze(Object.fromEntries(['externalHeat','itemsPerMessage','heatAddMax','heatAddsPerPlayer','externalRecipes','recipesPerMessage','recipeIngredients',
@@ -50,9 +50,9 @@ export function createHerbalHost(deps){
  const lastAdd=new Map(),pushes=new Map();
  const out=(id,body)=>{try{send(id,JSON.stringify({api:API,...body}));}catch(error){log('send '+id+': '+error);}};
  const announce=()=>out(EVENTS.ready,{source:NS,version,capabilities:CAPABILITIES,limits:PUBLIC_LIMITS});
- // v1.2.1: req goes back as it came (a number stays a number); a string longer than 32 characters is cut.
+ // v1.1.0: req goes back as it came (a number stays a number); a string longer than 32 characters is cut.
  const req=m=>typeof m.req==='string'?m.req.slice(0,32):Number.isFinite(m.req)?m.req:undefined;
- // v1.2.1: 32 refusals with long ids would pass the 2048-character limit and the reply would be lost; rows are dropped
+ // v1.1.0: 32 refusals with long ids would pass the 2048-character limit and the reply would be lost; rows are dropped
  // off the end until it fits, and `more` says how many.
  function ack(id,body){
   let more=0;
@@ -82,7 +82,7 @@ export function createHerbalHost(deps){
   }
   ack(EVENTS.heatAck,{to:m.source,req:req(m),ok:rejected.length===0,accepted,rejected});
  }
- // v1.2.0, shared by recipe_register and adjuvant_register: the reply lists what was refused and why.
+ // v1.1.0, shared by recipe_register and adjuvant_register: the reply lists what was refused and why.
  function ledger(m,event){
   const rejected=[];let accepted=0;
   return {accept:()=>{accepted++;},reject:(id,code)=>{rejected.push({id:typeof id==='string'?id.slice(0,96):null,code});},
@@ -90,7 +90,7 @@ export function createHerbalHost(deps){
    done:()=>ack(event,{to:m.source,req:req(m),ok:rejected.length===0,accepted,rejected})};
  }
  const reserved=id=>RESERVED.has(id.split(':')[0])||ownsItem(id);
- // v1.2.0: ingredients arrive as [{id,count}] and are kept flat, one entry per item put in the pot.
+ // v1.1.0: ingredients arrive as [{id,count}] and are kept flat, one entry per item put in the pot.
  function flatten(list){
   if(!Array.isArray(list)||!list.length||list.length>LIMITS.recipeIngredients)return undefined;
   const flat=[];
@@ -117,7 +117,7 @@ export function createHerbalHost(deps){
    if(!ingredients){reject(id,'BAD_INGREDIENTS');continue;}
    if(!itemExists(id)){reject(id,'UNKNOWN_ITEM');continue;}
    if(matchBuiltin(ingredients)){reject(id,'BUILTIN');continue;} // our own formulas cannot be shadowed
-   // v1.2.1: sameMix also catches a sliced / unsliced pair of the same herbs, which the pot cannot tell apart.
+   // v1.1.0: sameMix also catches a sliced / unsliced pair of the same herbs, which the pot cannot tell apart.
    let clash=false;
    for(const other of externalRecipes.values())if(other.result!==id&&sameMix(other.ingredients,ingredients)){clash=true;break;}
    if(clash){reject(id,'TAKEN');continue;} // the same mix already brews something else
@@ -147,13 +147,13 @@ export function createHerbalHost(deps){
   const player=typeof m.p==='string'?getPlayer(m.p):undefined;
   if(!player){reply({ok:false,code:'NO_PLAYER'});return;}
   if(!write){reply({ok:true,heat:getHeat(player)});return;}
-  // v1.2.1: round first, so 0.4 is refused instead of being accepted as a push of 0 that uses up the second.
+  // v1.1.0: round first, so 0.4 is refused instead of being accepted as a push of 0 that uses up the second.
   const delta=Number.isFinite(m.delta)?Math.max(-LIMITS.heatAddMax,Math.min(LIMITS.heatAddMax,Math.round(m.delta))):0;
   if(delta===0){reply({ok:false,code:'BAD_DELTA'});return;}
   // One push per pack and player each second, so a looping pack cannot hold a player at the limit.
   const key=m.source+'|'+m.p,tick=now(),prev=lastAdd.get(key);
   if(prev!==undefined&&tick-prev<LIMITS.heatAddCooldown){reply({ok:false,code:'THROTTLED',heat:getHeat(player)});return;}
-  // v1.2.1: `source` is only what the sender calls itself, so a pack could change names every tick; whatever the names,
+  // v1.1.0: `source` is only what the sender calls itself, so a pack could change names every tick; whatever the names,
   // one player takes at most heatAddsPerPlayer pushes a second.
   const recent=(pushes.get(m.p)??[]).filter(t=>tick-t<LIMITS.heatAddCooldown);
   if(recent.length>=LIMITS.heatAddsPerPlayer){reply({ok:false,code:'THROTTLED',heat:getHeat(player)});return;}

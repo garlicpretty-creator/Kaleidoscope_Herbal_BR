@@ -15,7 +15,7 @@
 | 請求必填 | `api: 1`、`source`：你的模組命名空間（`[a-z0-9_.-]`，1–64 字，不可為 `kaleidoscope_herbal`） |
 | 回覆定址 | 事件是廣播，回覆帶 `to: <你的 source>`，請只處理 `to` 等於自己的訊息 |
 | 對應請求 | 請求可帶 `req`（字串或數字），回覆原樣帶回：數字仍是數字；字串超過 32 字時只帶回前 32 字 |
-| 回覆長度 | 登記類的回覆若超過一封的長度，`rejected` 會從尾端省略，並以 `more` 說明省略了幾筆（v1.2.1） |
+| 回覆長度 | 登記類的回覆若超過一封的長度，`rejected` 會從尾端省略，並以 `more` 說明省略了幾筆（v1.1.0） |
 | 不合格的請求 | JSON 壞掉、`api` 不是 1、`source` 不合規 → 不回覆 |
 | 持久性 | 草本不保存任何外部註冊；每次收到 `api_ready` 都要重送一次（重送無副作用） |
 | 沒裝草本 | 不會有任何回覆；你的模組應照常運作 |
@@ -25,7 +25,7 @@
 | 方向 | 事件 | 內容 |
 |---|---|---|
 | → 草本 | `kaleidoscope_herbal:api_ping` | 任意字串（建議放你的 `source`） |
-| ← 草本 | `kaleidoscope_herbal:api_ready` | `{"api":1,"source":"kaleidoscope_herbal","version":"1.2.0","capabilities":[...],"limits":{...}}` |
+| ← 草本 | `kaleidoscope_herbal:api_ready` | `{"api":1,"source":"kaleidoscope_herbal","version":"1.1.0","capabilities":[...],"limits":{...}}` |
 
 草本在世界載入後會主動廣播一次 `api_ready`；較晚載入的模組自己送 `api_ping` 會得到同樣的回覆。
 
@@ -36,14 +36,14 @@
 | `externalHeat` | 256 | 全部模組合計可登記的寒熱物品數 |
 | `itemsPerMessage` | 32 | `heat_register`、`adjuvant_register` 一封的筆數上限 |
 | `heatAddMax` | 50 | `heat_add` 單次 `delta` 的絕對值上限 |
-| `heatAddsPerPlayer` | 2 | 同一玩家每 20 tick 最多接受幾次 `heat_add`，所有模組合計（v1.2.1 新增） |
-| `externalRecipes` | 64 | 全部模組合計可註冊的湯劑方數（v1.2.0 新增） |
-| `recipesPerMessage` | 8 | `recipe_register` 一封的筆數上限（v1.2.0 新增） |
-| `recipeIngredients` | 6 | 一個湯劑方的藥材總份數上限，等於砂鍋容量（v1.2.0 新增） |
-| `recipeServingsMax` | 4 | 一鍋最多幾份（v1.2.0 新增） |
-| `recipeTimeMin` / `recipeTimeMax` | 200 / 2400 | 煎煮時間（tick，文火下）的範圍（v1.2.0 新增） |
-| `externalAdjuvants` | 32 | 全部模組合計可註冊的佐使數（v1.2.0 新增） |
-| `adjuvantServingsMax` | 1 | 一種佐使最多加幾份（v1.2.0 新增） |
+| `heatAddsPerPlayer` | 2 | 同一玩家每 20 tick 最多接受幾次 `heat_add`，所有模組合計（v1.1.0 新增） |
+| `externalRecipes` | 64 | 全部模組合計可註冊的湯劑方數（v1.1.0 新增） |
+| `recipesPerMessage` | 8 | `recipe_register` 一封的筆數上限（v1.1.0 新增） |
+| `recipeIngredients` | 6 | 一個湯劑方的藥材總份數上限，等於砂鍋容量（v1.1.0 新增） |
+| `recipeServingsMax` | 4 | 一鍋最多幾份（v1.1.0 新增） |
+| `recipeTimeMin` / `recipeTimeMax` | 200 / 2400 | 煎煮時間（tick，文火下）的範圍（v1.1.0 新增） |
+| `externalAdjuvants` | 32 | 全部模組合計可註冊的佐使數（v1.1.0 新增） |
+| `adjuvantServingsMax` | 1 | 一種佐使最多加幾份（v1.1.0 新增） |
 
 ### capabilities
 
@@ -55,8 +55,8 @@
 | `constitution_write` | 可調整玩家的寒熱值 |
 | `external_heat` | 可替自己的食物登記寒熱值 |
 | `heat_source_tag` | 砂鍋認得方塊標籤 `kaleidoscope_herbal:heat_sources` |
-| `external_recipes` | 可註冊由草本砂鍋煎煮的湯劑方（v1.2.0 新增） |
-| `external_adjuvants` | 可註冊能替湯劑加份數的佐使（v1.2.0 新增） |
+| `external_recipes` | 可註冊由草本砂鍋煎煮的湯劑方（v1.1.0 新增） |
+| `external_adjuvants` | 可註冊能替湯劑加份數的佐使（v1.1.0 新增） |
 
 新功能只會**增加** capability，不會改動既有訊息的欄位意義；破壞性變更才會升 `api`。
 
@@ -74,8 +74,8 @@
 |---|---|
 | `herbs` | `{key, fresh, dry, processed?, wild, cultivable}`，除 `key` 外皆為完整物品／方塊 ID |
 | `foods` | `{id, heat, effects:[[效果名, ticks, amplifier], ...], clear?:[效果名...]}` |
-| `decoctions` | `{id, ingredients:[[物品 ID, 份數], ...], servings, time, source?}`：`id` 為成品，`time` 為文火下的煎煮 tick；草本內建的方子沒有 `source`，外部註冊的帶註冊者的 `source`（v1.2.0 新增） |
-| `adjuvants` | `{id, servings, source?}`：佐使與它加的份數，`source` 規則同上（v1.2.0 新增） |
+| `decoctions` | `{id, ingredients:[[物品 ID, 份數], ...], servings, time, source?}`：`id` 為成品，`time` 為文火下的煎煮 tick；草本內建的方子沒有 `source`，外部註冊的帶註冊者的 `source`（v1.1.0 新增） |
+| `adjuvants` | `{id, servings, source?}`：佐使與它加的份數，`source` 規則同上（v1.1.0 新增） |
 
 未知的 `kind` 回 `{"ok":false,"code":"UNKNOWN_KIND","kinds":["herbs","foods","decoctions","adjuvants"]}`。
 
@@ -130,7 +130,7 @@
 
 整封不合格（`items` 不是陣列或超過 32 筆）時回 `{"ok":false,"code":"BAD_ITEMS"}`。
 
-## 砂鍋湯劑方 — `external_recipes`（v1.2.0 新增）
+## 砂鍋湯劑方 — `external_recipes`（v1.1.0 新增）
 
 讓草本的砂鍋煎出**你的**物品。請求 `kaleidoscope_herbal:recipe_register`：
 
@@ -172,7 +172,7 @@
 
 整封不合格（`recipes` 不是陣列或超過 8 筆）時回 `{"ok":false,"code":"BAD_RECIPES"}`。
 
-## 佐使 — `external_adjuvants`（v1.2.0 新增）
+## 佐使 — `external_adjuvants`（v1.1.0 新增）
 
 佐使是方子以外多放的藥材，像枸杞、蟲草一樣替整鍋加一份。請求 `kaleidoscope_herbal:adjuvant_register`：
 
@@ -218,11 +218,11 @@
 | `constitution` | `state`: `overheat` \| `chill` | 玩家上火或受寒（v1.1.0 新增） |
 | `powder_mixed` | `id`（成品，配錯時為 `kaleidoscope_herbal:strange_powder`） | 在藥缽配出散劑（v1.1.0 新增） |
 | `formula_learned` | `id`（藥方成品） | 玩家用藥方籤學會一個藥方（v1.1.0 新增） |
-| `herb_harvested` | `herb`（藥材 `key`，同 `catalog` 的 `herbs`）, `wild`（是否為野生） | 玩家採收成熟的栽培藥材，或在生存模式採下野生藥材（v1.2.0 新增） |
-| `decoction_burnt` | `id`（燒掉的成品；配錯時為 `kaleidoscope_herbal:bitter_dregs`） | 砂鍋裡煎好的湯劑沒盛出而燒焦（v1.2.0 新增） |
-| `decoction_bitter` | 無 | 配錯的一鍋煎成了苦藥渣（v1.2.0 新增） |
+| `herb_harvested` | `herb`（藥材 `key`，同 `catalog` 的 `herbs`）, `wild`（是否為野生） | 玩家採收成熟的栽培藥材，或在生存模式採下野生藥材（v1.1.0 新增） |
+| `decoction_burnt` | `id`（燒掉的成品；配錯時為 `kaleidoscope_herbal:bitter_dregs`） | 砂鍋裡煎好的湯劑沒盛出而燒焦（v1.1.0 新增） |
+| `decoction_bitter` | 無 | 配錯的一鍋煎成了苦藥渣（v1.1.0 新增） |
 
-`decoction_burnt` 與 `decoction_bitter` 的 `p` 是**點火的玩家**，當下不一定在線上；v1.2.0 之前就點火的鍋不會送出這兩個事件。
+`decoction_burnt` 與 `decoction_bitter` 的 `p` 是**點火的玩家**，當下不一定在線上；v1.1.0 之前就點火的鍋不會送出這兩個事件。
 挖野生人參會同時送出 `ginseng_dug` 與 `herb_harvested`。原木上的靈芝不分野生或接種，一律 `wild: true`。
 
 ## 草本會聽的外部事件（供參考）
@@ -243,7 +243,7 @@ import {connectHerbal} from './herbal-client.js';
 const herbal = connectHerbal(system, {
   source: 'my_pack',
   heat: [{id: 'my_pack:iced_tea', heat: -30}, {id: 'my_pack:mint_decoction', heat: -20}],
-  // v1.2.0：砂鍋湯劑方與佐使，每次 api_ready 會自動重送
+  // v1.1.0：砂鍋湯劑方與佐使，每次 api_ready 會自動重送
   recipes: [{id: 'my_pack:mint_decoction', servings: 2, time: 600,
     ingredients: [{id: 'my_pack:dried_mint', count: 2}, {id: 'kaleidoscope_herbal:licorice_slices', count: 1}]}],
   adjuvants: [{id: 'my_pack:honey'}],
@@ -259,7 +259,7 @@ const herbal = connectHerbal(system, {
 const herbs = await herbal.requestCatalog('herbs');   // 沒裝草本時為 undefined（等 timeoutTicks 之後）；草本還沒就緒時會等它
 const state = await herbal.requestHeat(player.id);    // {heat} 或 {error}
 await herbal.addHeat(player.id, -20);
-const formulas = await herbal.requestCatalog('decoctions'); // 內建與外部註冊的湯劑方（v1.2.0）
+const formulas = await herbal.requestCatalog('decoctions'); // 內建與外部註冊的湯劑方（v1.1.0）
 // 之後才決定的註冊也可以隨時補送（同樣會在下次 api_ready 重送）；servings 0 為撤回：
 herbal.registerRecipes([{id: 'my_pack:mint_decoction', servings: 0}]);
 herbal.registerAdjuvants([{id: 'my_pack:syrup'}]);

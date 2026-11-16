@@ -13,7 +13,7 @@ export function isActiveHeatSource(block){
  if(!block)return false;
  if(block.typeId==='kaleidoscope_cookery:stove'){try{return block.permutation.getState('kaleidoscope_cookery:lit')===true;}catch{return false;}}
  if(block.typeId==='minecraft:campfire'||block.typeId==='minecraft:soul_campfire'){try{return (block.permutation.getState('extinguished_bit')??block.permutation.getState('extinguished'))!==true;}catch{return true;}}
- // v1.2.1: a `lit` state can only switch a heat source off. It used to count on its own, so a lit candle or copper bulb
+ // v1.1.0: a `lit` state can only switch a heat source off. It used to count on its own, so a lit candle or copper bulb
  // under the pot brewed, which docs/API.md never promised.
  const source=unconditional.has(block.typeId)||legacy.has(block.typeId)||tags.some(tag=>{try{return block.hasTag(tag);}catch{return false;}});
  if(!source)return false;
