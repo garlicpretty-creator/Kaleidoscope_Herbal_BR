@@ -48,8 +48,6 @@ export function feedback(block,particle='minecraft:crop_growth_emitter',sound='d
 //   fizz:  cannot start yet (no heat, empty, busy)
 export const REFUSALS={wrong:['minecraft:basic_smoke_particle','note.bass',.6],full:['minecraft:basic_smoke_particle','random.click',.55],fizz:['minecraft:basic_smoke_particle','random.fizz',1]};
 export function refuse(block,kind='fizz'){const [particle,sound,pitch]=REFUSALS[kind]??REFUSALS.fizz;feedback(block,particle,sound,pitch);}
-// Immersive interaction: no added forms, HUD, actionbar or floating labels.
-export const message=(_player,_key)=>{};
 export function damageTool(player,slot){
  if(creative(player))return;
  const item=slot?.getItem(),durability=item?.getComponent('minecraft:durability');if(!durability)return;

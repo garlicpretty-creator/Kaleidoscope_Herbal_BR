@@ -1,8 +1,7 @@
 import {system,world,EntityInitializationCause} from '@minecraft/server';
 import {id} from '../data/herbs.js';
 import {getRecord,newRecord,saveRecord,removeRecord,loadedBlock,setStates,isRedraw} from '../utils/blockStore.js';
-import {hand,heldId,takeOne,drop,feedback,message,damageTool,refuse} from '../utils/items.js';
-import {stopStationAnimation} from '../utils/stationAnimation.js';
+import {hand,heldId,takeOne,drop,feedback,damageTool,refuse} from '../utils/items.js';
 import {startSetLoop,onBeat,CHECKPOINT_TICKS,StationSet} from '../utils/loops.js';
 import {emitEvt} from '../utils/bus.js';
 import {incenseWeek,WEEK_INCENSE_TICKS} from '../utils/senluoWeek.js';
@@ -110,7 +109,7 @@ export function showRing(block,r){
 }
 
 export function spillBurner(block){
- stopStationAnimation(block);const r=getRecord(block);if(!r||r.type!=='incense_burner')return;
+ const r=getRecord(block);if(!r||r.type!=='incense_burner')return;
  // The portion already burning is spent; every portion not yet started comes back.
  const back=unburntOf(r);if(back>0)drop(block,r.fuel,back);
  untrack(r.key);removeRecord(r.key);
@@ -135,11 +134,9 @@ export const incenseBurner={
    showRing(block,r);return;
   }
   if(r?.type==='incense_burner'&&r.lit&&!held){showRing(block,r);return;}
-  message(player,'incense_hint');
  },
  onPlayerBreak({block}){spillBurner(block);},
 };
-export function tickBurners(){for(const key of [...activeBurners])tickBurner(key);}
 
 const tryEffect=(entity,fn)=>{try{fn();}catch{}};
 function reishiPulse(block,r){
@@ -191,7 +188,7 @@ export function tickBurner(key){
  r.remaining-=20;r.pulse+=20;
  if(onBeat(key,2))try{block.dimension.spawnParticle(id('incense_wisp'),{x:block.x+.5,y:block.y+.51,z:block.z+.5});}catch{}
  if(r.pulse>=100){r.pulse=0;try{pulseBurner(block,r);}catch(error){console.warn('[Herbal] incense pulse: '+error);}}
- if(r.remaining<=0){stopStationAnimation(block);untrack(key);removeRecord(key);setStates(block,{[id('lit')]:false});}
+ if(r.remaining<=0){untrack(key);removeRecord(key);setStates(block,{[id('lit')]:false});}
  else if(r.pulse===0&&r.beats%(CHECKPOINT_TICKS/100)===0)saveRecord(r); // checkpoint every 30 s (v1.2.6, was 5 s)
 }
 export function nearMugwort(dimensionId,location){
@@ -214,7 +211,6 @@ function onSpawn({entity,cause}){
  }catch{}
 }
 let spawnWard;
-export const spawnWardActive=()=>spawnWard!==undefined;
 function wardSpawns(){
  if(mugwortBurners.size&&spawnWard===undefined)spawnWard=world.afterEvents.entitySpawn.subscribe(onSpawn);
  else if(!mugwortBurners.size&&spawnWard!==undefined){try{world.afterEvents.entitySpawn.unsubscribe(spawnWard);}catch{}spawnWard=undefined;}

@@ -1,1 +1,0 @@
-{"format_version":"1.20.10","minecraft:recipe_shaped":{"description":{"identifier":"kaleidoscope_herbal:mortar"},"tags":["crafting_table"],"unlock":{"context":"AlwaysUnlocked"},"pattern":["S S"," S "],"key":{"S":{"item":"minecraft:stone"}},"result":{"item":"kaleidoscope_herbal:mortar","count":1}}}

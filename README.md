@@ -18,12 +18,17 @@
 | `tools/` | PBR 檢查與打包 |
 | `tests/` | 測試 |
 
-需求：Minecraft 基岩版 1.26.1 以上。Cookery、Tavern、A Witch Way、魔女手札為選用聯動。
+需求：Minecraft 基岩版 1.26.1 以上，以及森羅物語：廚房（Cookery）——晾曬、切片、研磨、藥膳與茶都在 Cookery 的器具上完成。
+Tavern、A Witch Way、魔女手札為選用聯動。
 
 ## 開發
 
 ```bash
 node --test tests/*.test.mjs
+```
+
+```bash
+python3 tools/check_refs.py
 ```
 
 ```bash

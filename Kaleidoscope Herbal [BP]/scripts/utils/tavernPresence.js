@@ -1,7 +1,7 @@
 import {system} from '@minecraft/server';
 // Tavern announces itself with api_ready (also in answer to our SDK ping). Until then, Tavern-linked
 // content is treated as absent; listeners hear about it once, when Tavern turns up.
-export const TAVERN_LINKED=new Set(['ginseng_wine','angelica_wine','reishi_wine','goji_wine','jujube_wine','wine_angelica'].map(k=>'kaleidoscope_herbal:'+k));
+export const TAVERN_LINKED=new Set(['ginseng_wine','angelica_wine','reishi_wine','goji_wine','jujube_wine'].map(k=>'kaleidoscope_herbal:'+k));
 let present=false;
 const listeners=[];
 export const isTavernPresent=()=>present;

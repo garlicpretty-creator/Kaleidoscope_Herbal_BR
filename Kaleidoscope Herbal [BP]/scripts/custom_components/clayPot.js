@@ -2,9 +2,8 @@ import {system} from '@minecraft/server';
 import {HERB_ITEMS,id} from '../data/herbs.js';
 import {matchDecoction,advancePot,contentsOnBreak,burnLimit} from '../data/decoctions.js';
 import {getRecord,newRecord,saveRecord,removeRecord,loadedBlock,blockKey,setStates,isRedraw} from '../utils/blockStore.js';
-import {hand,heldId,takeOne,exchangeOne,drop,feedback,message,countItems,removeItems,refuse} from '../utils/items.js';
+import {hand,heldId,takeOne,exchangeOne,drop,feedback,countItems,removeItems,refuse} from '../utils/items.js';
 import {heatBelow} from '../utils/heat.js';
-import {stopStationAnimation} from '../utils/stationAnimation.js';
 import {startSetLoop,onBeat,CHECKPOINT_TICKS,StationSet} from '../utils/loops.js';
 import {shownStates} from '../data/displayItems.js';
 import {emitEvt} from '../utils/bus.js';
@@ -38,7 +37,6 @@ function useSlip(block,player,slot,r){
 }
 export function restorePotVisual(record){const block=loadedBlock(record);if(block?.typeId===id('clay_pot'))sync(block,record);}
 export function spillPot(block){
- stopStationAnimation(block);
  const r=getRecord(block);if(!r||r.type!=='clay_pot')return;
  const items=contentsOnBreak(r);
  // Retain an explicit remaining-drop journal if a spawn throws; never erase failed drops.
@@ -63,13 +61,13 @@ export const clayPot={
   }
   if(r.stage===1&&HERB_ITEMS.has(held)){
    if(r.ingredients.length>=MAX_INGREDIENTS){refuse(block,'full');return;}
-   r.ingredients.push(held);saveRecord(r);sync(block,r);takeOne(player,slot);feedback(block);message(player,'pot_added');return;
+   r.ingredients.push(held);saveRecord(r);sync(block,r);takeOne(player,slot);feedback(block);return;
   }
   if(r.stage===1&&!held&&player.isSneaking){
    // Empty water or a cold hearth fizzles instead of silently wasting the pot.
    if(!r.ingredients.length||!heatBelow(block)){deny(block);return;}
    const recipe=matchDecoction(r.ingredients);
-   Object.assign(r,{stage:2,progress:0,warm:0,everStrong:false,everMild:false,time:recipe?.time??400,result:recipe?.result??id('bitter_dregs'),recipeServings:recipe?.servings??1,bonus:recipe?.bonus??0});
+   Object.assign(r,{stage:2,progress:0,warm:0,time:recipe?.time??400,result:recipe?.result??id('bitter_dregs'),recipeServings:recipe?.servings??1});
    saveRecord(r);sync(block,r);activePots.add(r.key);feedback(block,'minecraft:basic_smoke_particle','fire.ignite');return;
   }
   if((r.stage===3||r.stage===4)&&held==='minecraft:bowl'){
@@ -78,10 +76,6 @@ export const clayPot={
    if(r.servings<=0){removeRecord(r.key);activePots.delete(r.key);sync(block,{stage:0,servings:0});}
    else{saveRecord(r);sync(block,r,true);system.runTimeout(()=>{const current=getRecord(r.key),loaded=current&&loadedBlock(current);if(loaded?.typeId===id('clay_pot'))sync(loaded,current);},12);}return;
   }
-  if(r.stage===2)message(player,heatBelow(block)?'cooking':'paused');
-  else if(r.stage===1)message(player,'start_hint');
-  else if(r.stage===3||r.stage===4)message(player,'bowl_hint');
-  else message(player,'water_hint');
  },
  onPlayerBreak({block}){spillPot(block);},
 };
@@ -104,5 +98,4 @@ export function tickPot(key){
  }
  if(r.stage===4){activePots.delete(key);lastSave.delete(key);}
 }
-export function tickPots(){for(const key of [...activePots])tickPot(key);}
 export function startPotLoop(){startSetLoop(activePots,tickPot,20);}

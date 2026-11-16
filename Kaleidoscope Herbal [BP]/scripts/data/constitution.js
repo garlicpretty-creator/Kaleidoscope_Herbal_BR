@@ -3,6 +3,7 @@ import {id} from './herbs.js';
 export const HEAT_LIMIT=100,HEAT_RESET=60,HEAT_DECAY=5,HEAT_DECAY_TICKS=100;
 const table={
  ginseng_decoction:40,four_herb_decoction:20,reishi_decoction:0,
+ cordyceps_decoction:30,four_gentlemen_decoction:25,mugwort_angelica_decoction:35,licorice_jujube_decoction:0,
  ginseng_chicken_soup:30,angelica_mutton_soup:35,four_herb_chicken:25,goji_chicken_soup:15,goji_jujube_soup:5,jujube_sweet_soup:0,
  ginseng_wine:30,angelica_wine:30,reishi_wine:15,goji_wine:20,jujube_wine:15,
  honeysuckle_tea:-35,honeysuckle_tea_dew:-50,chrysanthemum_tea:-40,goji_tea:5,jujube_tea:0,
@@ -11,8 +12,6 @@ const table={
 export const HEAT_VALUES=new Map();
 for(const [key,value] of Object.entries(table)){
  HEAT_VALUES.set(id(key),value);
- // Decoction grades share their formula's nature.
- if(key.endsWith('_decoction'))for(const tier of ['_low','_high'])HEAT_VALUES.set(id(key+tier),value);
 }
 // The Nether doubles warming tonics; cooling drinks keep their strength.
 // v1.1.0: 寒熱 values other packs registered through the Herbal API (api/herbalHost.js): typeId -> {heat, source}.

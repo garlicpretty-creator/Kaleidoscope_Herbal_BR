@@ -10,15 +10,9 @@ import {activePots,startPotLoop,spillPot,restorePotVisual} from '../custom_compo
 import {trackBurner,startIncenseLoop,spillBurner} from '../custom_components/incenseBurner.js';
 import {startReishiInoculation} from '../custom_components/reishiSpawn.js';
 import {applyHeat,startConstitution} from '../utils/constitution.js';
-import {spillMortar} from '../custom_components/mortar.js';
-import {spillGrinder} from '../custom_components/herbGrinder.js';
-import {spillCutter} from '../custom_components/herbCutter.js';
 import {startStoreSweep} from '../utils/storeSweep.js';
-import {startDisplayMigration} from '../utils/displayMigration.js';
-import {activeBaskets,spillBasket,startBasketLoop} from '../custom_components/dryingBasket.js';
 import {handleGinsengBreak} from '../utils/ginsengHarvest.js';
-import {startStationAnimations} from '../utils/stationAnimation.js';
-import {startCabinetStorage,spillCabinet} from '../custom_components/herbCabinet.js';
+import {spillCabinet} from '../custom_components/herbCabinet.js';
 import {handleHoneysuckleHarvest,handleHoneysuckleExplosion} from '../custom_components/wildHoneysuckle.js';
 import {spillExplodedWine} from '../custom_components/herbalWine.js';
 import {spillExplodedTea} from '../utils/teaDrops.js';
@@ -50,7 +44,6 @@ export function onAwwEvent(event){
  }catch{} // malformed message or player gone: ignore quietly
 }
 export function startEvents(){
- startStationAnimations();
  startReishiInoculation();
  world.afterEvents.itemCompleteUse.subscribe(({source,itemStack})=>applyFood(source,itemStack.typeId));
  // v1.2.11 (B047): A Witch Way's backpack auto-feed does not really eat (it gives Saturation directly), so
@@ -69,25 +62,19 @@ export function startEvents(){
   const type=explodedBlockPermutation.type.id;
   if(type===id('clay_pot'))spillPot(block);
   if(type===id('herb_cabinet'))spillCabinet(block);
-  if(type===id('mortar'))spillMortar(block);
   if(type===id('incense_burner'))spillBurner(block);
-  if(type===id('herb_grinder_decor'))spillGrinder(block);
-  if(type===id('drying_basket'))spillBasket(block);
-  if(type===id('herb_cutter'))spillCutter(block);
   handleHoneysuckleExplosion({block,explodedBlockPermutation});
   spillExplodedTea({block,explodedBlockPermutation});
   spillExplodedWine({block,explodedBlockPermutation});spillExplodedSoup({block,explodedBlockPermutation});
  });
  system.run(()=>{
   const store=readStore();
-  startDisplayMigration(store);   // v1.2.8, once: redraw grinders, mortars and cutters placed before the upgrade
   for(const record of store.values()){
    if(record.type==='clay_pot')restorePotVisual(record);
    if(record.type==='clay_pot'&&[2,3].includes(record.stage))activePots.add(record.key);
    if(record.type==='incense_burner'&&record.lit)trackBurner(record);
-   if(record.type==='drying_basket'&&!record.done)activeBaskets.add(record.key);
   }
-  startCabinetStorage();startPotLoop();startIncenseLoop();startConstitution();startBasketLoop();startStoreSweep();
+  startPotLoop();startIncenseLoop();startConstitution();startStoreSweep();
  });
 }
 

@@ -119,3 +119,40 @@ test('SDK: a request the host never answers times out to undefined',async()=>{
  w.subs.splice(0,1); // the host goes away
  const pending=client.requestHeat('p1');w.step(12);assert.equal(await pending,undefined);
 });
+
+// ---- v1.1.0 formulas: done or burnt only, every herb has a use
+const {DECOCTIONS,FOOD_EFFECTS,ADJUVANTS,matchDecoction,advancePot,burnLimit}=await load('Kaleidoscope Herbal [BP]/scripts/data/decoctions.js');
+const {HERBS}=await load('Kaleidoscope Herbal [BP]/scripts/data/herbs.js');
+const {COOKERY_RECIPES}=await load('Kaleidoscope Herbal [BP]/scripts/data/cookeryRecipes.js');
+const {HERBAL_WINES}=await load('Kaleidoscope Herbal [BP]/scripts/data/tavernRecipes.js');
+const kh=name=>'kaleidoscope_herbal:'+name;
+test('a brew is done or burnt: no grades, no quality bookkeeping',()=>{
+ assert.ok(Object.keys(FOOD_EFFECTS).every(k=>!/_(low|high)$/.test(k)));
+ const recipe=matchDecoction([kh('ginseng_slices'),kh('dried_ginseng'),kh('licorice_slices')]);
+ const pot={stage:2,progress:0,warm:0,time:recipe.time,result:recipe.result,recipeServings:recipe.servings,ingredients:[]};
+ while(pot.stage===2)advancePot(pot,'strong');
+ assert.equal(pot.stage,3);assert.equal(pot.output,kh('ginseng_decoction'));assert.equal(pot.servings,2);
+ assert.ok(!('everStrong' in pot)&&!('bonus' in recipe));
+ for(let t=0;t<burnLimit('strong');t+=20)advancePot(pot,'strong');
+ assert.equal(pot.stage,4);assert.equal(pot.output,kh('burnt_dregs'));
+});
+test('formulas match their own herbs, adjuvants only add servings, anything else is refused',()=>{
+ for(const recipe of DECOCTIONS)assert.equal(matchDecoction(recipe.ingredients).result,recipe.result,recipe.id);
+ assert.deepEqual(Object.keys(ADJUVANTS).sort(),[kh('dried_cordyceps'),kh('dried_goji')]);
+ const base=[kh('reishi_powder'),kh('reishi_powder'),kh('licorice_slices')];
+ assert.equal(matchDecoction([...base,kh('dried_goji')]).servings,4);
+ assert.equal(matchDecoction([...base,kh('dried_goji'),kh('dried_cordyceps')]).servings,4); // capped
+ assert.equal(matchDecoction([...base,kh('dried_jujube')]),undefined);                      // no longer an adjuvant
+ assert.equal(matchDecoction([kh('ginseng_slices'),kh('dried_poria'),kh('dried_licorice')]).result,kh('four_gentlemen_decoction'));
+ assert.equal(matchDecoction([kh('dried_cordyceps'),kh('ginseng_slices'),kh('licorice_slices')]).result,kh('cordyceps_decoction'));
+ assert.equal(matchDecoction([kh('dried_cordyceps'),kh('ginseng_slices'),kh('ginseng_slices'),kh('licorice_slices')]).result,kh('ginseng_decoction'));
+});
+test('every herb goes into at least one formula, dish, tea, wine or the incense burner',()=>{
+ const used=new Set();
+ for(const r of DECOCTIONS)for(const i of r.ingredients)used.add(i);
+ for(const e of COOKERY_RECIPES){const r=e.recipe;if(['stockpot','teapot'].includes(e.kind)||r.result&&FOOD_EFFECTS[r.result])for(const i of [r.ingredient,...(r.ingredients??[])].flat().filter(Boolean))used.add(i);}
+ for(const w of HERBAL_WINES)for(const i of w.ingredients)used.add(i);
+ used.add(kh('mugwort_floss')); // incense
+ for(const h of HERBS)assert.ok([h.fresh,h.dry,h.processed].filter(Boolean).some(x=>used.has(kh(x))),h.key+' has no use');
+ for(const h of ['licorice','poria','cordyceps','mugwort'])assert.ok(DECOCTIONS.some(r=>r.ingredients.some(i=>i.includes(h))&&r.result.includes(h==='poria'?'four_gentlemen':h)),h+' has its own formula');
+});

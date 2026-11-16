@@ -1,13 +1,27 @@
 import {id} from './herbs.js';
 export const NEGATIVE_EFFECTS = ['poison','wither','nausea','blindness','darkness','weakness','slowness','mining_fatigue'];
 const effect=(name,seconds,amplifier=0)=>({name,ticks:seconds*20,amplifier});
+// v1.1.0: a brew is either done (熟) or burnt (焦); the 下/中/上 grades are gone. Every herb leads or joins
+// at least one formula or dish. A formula with more specific herbs is listed before the ones it overlaps.
 export const DECOCTIONS = [
   {id:id('ginseng'),ingredients:[id('ginseng_slices'),id('ginseng_slices'),id('licorice_slices')],result:id('ginseng_decoction'),servings:2,time:600,
-    effects:{low:[effect('regeneration',15)],normal:[effect('regeneration',30),effect('absorption',120)],high:[effect('regeneration',30),effect('absorption',120,1)]}},
+    effects:[effect('regeneration',30),effect('absorption',120)]},
   {id:id('four_herb'),ingredients:[id('angelica_slices'),id('angelica_slices'),id('licorice_slices'),id('dried_honeysuckle')],result:id('four_herb_decoction'),servings:3,time:500,
-    effects:{low:[effect('regeneration',15)],normal:[effect('regeneration',45)],high:[effect('regeneration',30,1)]}},
+    effects:[effect('regeneration',45)]},
   {id:id('reishi'),ingredients:[id('reishi_powder'),id('reishi_powder'),id('licorice_slices')],result:id('reishi_decoction'),servings:3,time:700,clear:NEGATIVE_EFFECTS,
-    effects:{low:[],normal:[effect('resistance',60)],high:[effect('resistance',120)]}},
+    effects:[effect('resistance',60)]},
+  // 蟲草湯: 補肺 — breath under water.
+  {id:id('cordyceps'),ingredients:[id('dried_cordyceps'),id('ginseng_slices'),id('licorice_slices')],result:id('cordyceps_decoction'),servings:2,time:800,
+    effects:[effect('water_breathing',180),effect('regeneration',20)]},
+  // 四君子湯: 補氣健脾 — a sturdier body.
+  {id:id('four_gentlemen'),ingredients:[id('ginseng_slices'),id('poria_slices'),id('licorice_slices')],result:id('four_gentlemen_decoction'),servings:3,time:600,
+    effects:[effect('health_boost',120),effect('regeneration',10)]},
+  // 艾歸湯: 溫經驅寒 — warmth back in the limbs.
+  {id:id('mugwort_angelica'),ingredients:[id('dried_mugwort'),id('dried_mugwort'),id('angelica_slices')],result:id('mugwort_angelica_decoction'),servings:3,time:500,clear:['slowness','weakness'],
+    effects:[effect('strength',60)]},
+  // 甘棗湯: 甘草解毒 — settles the stomach.
+  {id:id('licorice_jujube'),ingredients:[id('licorice_slices'),id('licorice_slices'),id('dried_jujube')],result:id('licorice_jujube_decoction'),servings:3,time:400,clear:['poison','hunger','nausea'],
+    effects:[effect('regeneration',20)]},
 ];
 export const FOOD_EFFECTS = {
   [id('bitter_dregs')]: {effects:[effect('nausea',5)]},
@@ -28,60 +42,41 @@ export const FOOD_EFFECTS = {
   [id('goji_wine')]: {effects:[effect('night_vision',60)]},
   [id('jujube_wine')]: {effects:[effect('absorption',60)]},
 };
-for(const recipe of DECOCTIONS) for(const quality of ['low','normal','high']) {
-  FOOD_EFFECTS[recipe.result+(quality==='normal'?'':'_'+quality)]={effects:recipe.effects[quality],clear:recipe.clear};
-}
-// Prepared (炮製) forms count as their base herb and lift the brew one grade.
-export const PREPARED = new Set(['honey_licorice','wine_angelica'].map(id));
+for(const recipe of DECOCTIONS)FOOD_EFFECTS[recipe.result]={effects:recipe.effects,clear:recipe.clear};
+// Unsliced forms count as their base herb (a slice is one third of a dried root, so slicing still pays).
 const variants = {
  [id('ginseng_slices')]:['ginseng_slices','dried_ginseng','dried_broken_ginseng','broken_ginseng_root'].map(id),
- [id('angelica_slices')]:['angelica_slices','dried_angelica','wine_angelica'].map(id),
- [id('licorice_slices')]:['licorice_slices','dried_licorice','honey_licorice'].map(id),
+ [id('angelica_slices')]:['angelica_slices','dried_angelica'].map(id),
+ [id('licorice_slices')]:['licorice_slices','dried_licorice'].map(id),
+ [id('poria_slices')]:['poria_slices','dried_poria'].map(id),
 };
-// 佐使: optional supporting herbs. Each kind counts once; at most two may join a formula.
+// 佐使: optional supporting herbs, each adding one serving. Each kind counts once; at most two may join a formula.
 export const ADJUVANTS = {
- [id('dried_jujube')]:{quality:1},
  [id('dried_goji')]:{servings:1},
- [id('poria_slices')]:{quality:1},
- [id('dried_poria')]:{quality:1},
- [id('dried_cordyceps')]:{quality:1,servings:1},
+ [id('dried_cordyceps')]:{servings:1},
 };
 export const MAX_ADJUVANTS=2,MAX_SERVINGS=4;
-export const multisetKey=items=>[...items].sort().join('|');
 function take(rest,options){const i=rest.findIndex(x=>options.includes(x));if(i<0)return false;rest.splice(i,1);return true;}
 export function matchDecoction(items){
  for(const recipe of DECOCTIONS){
   const rest=[...items];
   if(!recipe.ingredients.every(slot=>take(rest,variants[slot]??[slot])))continue;
   if(rest.length>MAX_ADJUVANTS||!rest.every(x=>ADJUVANTS[x]))continue;
-  const kinds=new Set(rest),bonus={quality:0,servings:0};
-  for(const kind of kinds){bonus.quality+=ADJUVANTS[kind].quality??0;bonus.servings+=ADJUVANTS[kind].servings??0;}
-  return {...recipe,servings:Math.min(MAX_SERVINGS,recipe.servings+bonus.servings),bonus:bonus.quality};
+  let servings=recipe.servings;
+  for(const kind of new Set(rest))servings+=ADJUVANTS[kind].servings??0;
+  return {...recipe,servings:Math.min(MAX_SERVINGS,servings)};
  }
  return undefined;
-}
-export function qualityOf(ingredients,everStrong=false,everMild=true,bonus=0){
- let score=1;
- if(everMild&&!everStrong)score++;
- const roots=ingredients.filter(x=>/ginseng|angelica|licorice/.test(x));
- if(roots.length&&roots.every(x=>x.endsWith('_slices')||PREPARED.has(x)))score++;
- if(ingredients.some(x=>PREPARED.has(x)))score++;
- if(ingredients.some(x=>x===id('broken_ginseng_root')||x===id('dried_broken_ginseng')))score-=2;
- if(everStrong)score--;
- score+=bonus;
- return {score,tier:score<=1?'low':score>=4?'high':'normal'};
 }
 export const burnLimit=heat=>heat==='strong'?400:1200;
 export function advancePot(record,heat,elapsed=20){
  if(!heat||![2,3].includes(record.stage))return false;
  const speed=heat==='strong'?2:1;
  if(record.stage===2){
-  record.everStrong ||= heat==='strong'; record.everMild ||= heat==='mild';
   record.progress=Math.min(record.time,record.progress+elapsed*speed);
   if(record.progress>=record.time){
    record.stage=3; record.warm=0; record.servings=record.recipeServings;
-   const tier=qualityOf(record.ingredients,record.everStrong,record.everMild,record.bonus??0).tier;
-   record.output=record.result===id('bitter_dregs')?record.result:record.result+(tier==='normal'?'':'_'+tier);
+   record.output=record.result;
   }
  }else{
   record.warm+=elapsed;

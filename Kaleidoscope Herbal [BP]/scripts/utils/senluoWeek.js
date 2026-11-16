@@ -1,7 +1,7 @@
 // v1.2.13: 森羅週曆 (weekly themes). 魔女手札 decides the week's theme and broadcasts it on
 // senluo_link:evt {"v":1,"t":"week","theme":"<id>","week":"YYYY-Www","phase":"start"|"end","until":<Unix s>}.
 // Herbal reacts to two themes; without the broadcast (no 魔女手札, or an older one) nothing changes.
-//  - harvest: crops grow 1.5x and drying baskets dry 1.5x (combined with sky events, crops cap at 2x)
+//  - harvest: crops grow 1.5x (combined with sky events, crops cap at 2x)
 //  - incense: a burner loaded this week burns 9,000 ticks a portion instead of 6,000
 export const WEEK_HARVEST=1.5,WEEK_INCENSE_TICKS=9000;
 let theme,until=0;

@@ -46,7 +46,6 @@ export function shiftHeat(player,delta){
 // v1.2.6: the decay timer runs only while some player's heat is not at balance (was every 5 s for good,
 // polling every player). Eating or drinking starts it; a player who joins with stored heat starts it too.
 let decayLoop;
-export const decayActive=()=>decayLoop!==undefined;
 export function wakeDecay(){if(decayLoop===undefined)decayLoop=system.runInterval(decayAll,HEAT_DECAY_TICKS);}
 function decayAll(){
  let any=false;
