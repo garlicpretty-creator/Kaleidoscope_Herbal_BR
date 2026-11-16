@@ -499,3 +499,6 @@ kh.notebook.pick=Formulas learned:
 kh.notebook.back=Back
 kh.notebook.pot=Brew in the clay pot
 kh.notebook.mortar=Mix in the mortar
+kh.item.sealed_prescription=Sealed Prescription\n§9§oKaleidoscope Herbal§r
+item.kaleidoscope_herbal:sealed_prescription.name=Sealed Prescription\n§9§oKaleidoscope Herbal§r
+kh.name.sealed_prescription=Sealed Prescription

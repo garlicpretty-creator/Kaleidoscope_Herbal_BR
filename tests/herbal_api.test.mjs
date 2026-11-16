@@ -177,3 +177,10 @@ test('a right mix gives its powder in any order; a wrong mix gives a strange pow
  assert.equal(P.parseMark([P.strangeMark(a.mark)]),a.mark);assert.equal(P.parseMark([]),undefined);assert.equal(P.parseMark(['§8✦ 999']),undefined);
  assert.equal(P.mixResult([kh('goji_powder'),kh('goji_powder')],1).item,P.STRANGE); // doubling one powder is not a formula
 });
+test('a sealed prescription holds one powder formula; the guidebook gives no powder formula away',async()=>{
+ for(const roll of [0,.2,.5,.999,1]){const f=P.sealedFormula(roll);assert.equal(f.via,'mortar');assert.equal(P.matchPowder(f.ingredients).result,f.result);}
+ assert.equal(new Set(Array.from({length:80},(_,i)=>P.sealedFormula(i/80).result)).size,P.POWDER_FORMULAS.length);
+ const {GUIDEBOOK}=await load('Kaleidoscope Herbal [BP]/scripts/data/guidebook.js');
+ for(const f of P.POWDER_FORMULAS){const page=GUIDEBOOK.entries.find(e=>e.id===f.result);assert.ok(page,f.result);assert.deepEqual(page.recipes,[]);
+  const words=JSON.stringify(page);for(const i of f.ingredients)assert.ok(!words.includes(i),f.result+' page names '+i);}
+});

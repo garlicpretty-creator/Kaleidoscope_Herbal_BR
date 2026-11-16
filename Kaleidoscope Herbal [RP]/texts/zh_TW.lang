@@ -499,3 +499,6 @@ kh.notebook.pick=已學會的藥方：
 kh.notebook.back=返回
 kh.notebook.pot=砂鍋煎煮
 kh.notebook.mortar=藥缽調配
+kh.item.sealed_prescription=封緘藥籤\n§9§o森羅物語：草本§r
+item.kaleidoscope_herbal:sealed_prescription.name=封緘藥籤\n§9§o森羅物語：草本§r
+kh.name.sealed_prescription=封緘藥籤

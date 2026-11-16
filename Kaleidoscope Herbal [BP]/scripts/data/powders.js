@@ -44,6 +44,12 @@ export function parseMark(lore){
  }
  return undefined;
 }
+// 封緘藥籤 from a chest: the formula written inside, picked by `roll` in [0,1).
+export const SEALED=id('sealed_prescription');
+export function sealedFormula(roll=Math.random()){
+ const f=POWDER_FORMULAS[Math.min(POWDER_FORMULAS.length-1,Math.floor(roll*POWDER_FORMULAS.length))];
+ return {result:f.result,ingredients:[...f.ingredients],via:'mortar'};
+}
 // What mixing the powders in a mortar gives: {item, formula?} for a formula, {item, mark} for a strange powder.
 export function mixResult(items,salt){
  const found=matchPowder(items);

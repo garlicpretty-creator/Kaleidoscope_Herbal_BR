@@ -91,7 +91,7 @@ for p in files(RP,'particles'):
 state_names={s.split(':')[1] for b in blocks.values() for s in b['description'].get('states',{})}
 component_names=set(re.findall(r'"kaleidoscope_herbal:([a-z_]+)"',''.join(json.dumps(b.get('components',{}))+json.dumps(b.get('permutations',[])) for b in blocks.values())))
 for s in set(re.findall(r"\bid\('([a-z_/]+)'\)",script)):
-    if NS+s not in known and s not in state_names and s not in component_names and s not in particles and '/' not in s and s not in('heat','heat_hint','formula','salt','learned','herb','herbal_trowel','ginseng','four_herb','reishi','cordyceps','four_gentlemen','mugwort_angelica','licorice_jujube'):err('script id() names missing',s)
+    if NS+s not in known and s not in state_names and s not in component_names and s not in particles and '/' not in s and s not in('heat','heat_hint','formula','salt','learned','sealed_prescription','herb','herbal_trowel','ginseng','four_herb','reishi','cordyceps','four_gentlemen','mugwort_angelica','licorice_jujube'):err('script id() names missing',s)
 for key in set(re.findall(r"'(kh\.[a-z_]+\.[a-z_.]*[a-z_])'",script)):need_key(key,'script')
 for m in re.finditer(r"translate:`(kh\.[a-z_.]+)\$\{",script):
     for k in list(langs[next(iter(langs))]):

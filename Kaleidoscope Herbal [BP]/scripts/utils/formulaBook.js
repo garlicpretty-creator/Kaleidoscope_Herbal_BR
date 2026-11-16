@@ -1,7 +1,8 @@
-import {world,system} from '@minecraft/server';
+import {world,system,ItemStack,EquipmentSlot} from '@minecraft/server';
 import {ActionFormData} from '@minecraft/server-ui';
 import {id,NS} from '../data/herbs.js';
-import {SLIP,FORMULA,parseFormula,tally} from '../data/prescription.js';
+import {SLIP,FORMULA,parseFormula,slipLore,tally} from '../data/prescription.js';
+import {SEALED,sealedFormula} from '../data/powders.js';
 import {emitEvt} from './bus.js';
 // v1.1.0 藥方手札: what each player has learned. Cookery's guidebook is one book for everybody and cannot
 // show pages per player, so learned formulas live on the player and are read through this notebook.
@@ -42,10 +43,25 @@ async function openNotebook(player){
  const page=await new ActionFormData().title(name(formula.result)).body(formulaPage(formula)).button({translate:'kh.notebook.back'}).show(player);
  if(!page.canceled)openNotebook(player);
 }
+// Breaking the seal turns one sealed slip into a written one. The written slip is made first and the sealed
+// one taken only once it is safely in the inventory or on the ground.
+function unseal(player){
+ const slot=player.getComponent('minecraft:equippable')?.getEquipmentSlot(EquipmentSlot.Mainhand);
+ if(!slot?.hasItem()||slot.typeId!==SEALED)return;
+ const formula=sealedFormula(),slip=new ItemStack(SLIP,1);
+ slip.setDynamicProperty(FORMULA,JSON.stringify(formula));slip.setLore(slipLore(formula));
+ if(slot.amount>1){
+  const left=player.getComponent('minecraft:inventory')?.container?.addItem(slip);
+  if(left)player.dimension.spawnItem(left,player.location);
+  slot.amount--;
+ }else slot.setItem(slip);
+ try{player.playSound('item.book.page_turn',{volume:.6,pitch:.9});}catch{}
+}
 export function startFormulaBook(){
  world.afterEvents.itemUse.subscribe(({source,itemStack})=>{
   if(source?.typeId!=='minecraft:player'||!itemStack)return;
   if(itemStack.typeId===NOTEBOOK){system.run(()=>{openNotebook(source).catch(error=>console.warn('[Herbal] notebook: '+error));});return;}
+  if(itemStack.typeId===SEALED){system.run(()=>{try{unseal(source);}catch(error){console.warn('[Herbal] sealed slip: '+error);}});return;}
   if(itemStack.typeId!==SLIP)return;
   // A slip aimed at a block is being used on that block (pot, mortar); only one used in the open air is read.
   let aimed;try{aimed=source.getBlockFromViewDirection({maxDistance:6});}catch{}
