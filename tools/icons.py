@@ -631,9 +631,19 @@ RD.update({n:'herb' for n in ['angelica_seeds','chrysanthemum_seeds','ginseng_se
  'fresh_poria','dried_poria','reishi','dried_reishi','chrysanthemum','dried_chrysanthemum','honeysuckle','dewy_honeysuckle','dried_honeysuckle',
  'carried_wild_cordyceps','carried_wild_poria']})
 RD.update({'formula_notebook':'paper','prescription_slip':'paper','icon_herbal_curtain':'cloth'})
+# Parts of a redrawn icon that are a different material from the rest, picked out by colour: (test on r,g,b) -> material.
+gold=lambda r,g,b:r>165 and g>120 and b<120 and r-b>70
+RD_PARTS={'icon_paper_lantern':[(lambda r,g,b:r>170 and g<130,'glow')],          # the lit paper
+ 'burnt_dregs':[(lambda r,g,b:r>190 and 60<g<180 and b<100,'glow')],             # embers
+ 'icon_incense_burner':[(gold,'brass')],'icon_steelyard':[(gold,'brass')],
+ 'herbal_trowel':[(lambda r,g,b:abs(r-g)<22 and abs(g-b)<30 and r>110,'iron')]}  # the blade
 def from_rd(name,mat):
     img=Image.open(os.path.join(SRC,'rd',name+'.png')).convert('RGBA');assert img.size==(16,16),(name,img.size)
-    return {(x,y):(img.getpixel((x,y))[:3]+(255,),mat) for y in range(16) for x in range(16) if img.getpixel((x,y))[3]>=128}
+    def material(rgb):
+        for test,part in RD_PARTS.get(name,()):
+            if test(*rgb): return part
+        return mat
+    return {(x,y):(img.getpixel((x,y))[:3]+(255,),material(img.getpixel((x,y))[:3])) for y in range(16) for x in range(16) if img.getpixel((x,y))[3]>=128}
 
 def build():
     out={}

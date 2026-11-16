@@ -16,7 +16,7 @@ SRC=os.path.join(ROOT,'art','retro_diffusion','rest');OUT=os.path.join(ROOT,'too
 CLOSER={'carried_honeysuckle_crop','carried_jujube_crop','carried_chrysanthemum_crop','carried_mugwort_crop','carried_wild_ginseng',
         'icon_incense_burner','burnt_dregs','dried_cordyceps','carried_reishi_spawn','icon_hanging_gourd'}
 def redraw(name):
-    return Image.open(os.path.join(SRC,name+('_s35' if name in CLOSER else '_s50')+'.png')).convert('RGBA')
+    return Image.open(os.path.join(SRC,name+('_s25' if name=='icon_abacus' else '_s35' if name in CLOSER else '_s50')+'.png')).convert('RGBA')
 def clean(im):
     for y in range(16):
         for x in range(16):
@@ -50,7 +50,8 @@ if __name__=='__main__':
     # The 38 icons that were hand-drawn originals (kept in tools/icon_src/original/), redrawn the same way into orig/.
     ORIG=os.path.join(ROOT,'art','retro_diffusion','orig');KEPT=os.path.join(ROOT,'tools','icon_src','original')
     for n in sorted({f.rsplit('_s',1)[0] for f in os.listdir(ORIG) if f.endswith('.png')}):
-        s30=os.path.join(ORIG,n+'_s30.png');out[n]=clean(Image.open(s30 if os.path.exists(s30) else os.path.join(ORIG,n+'_s50.png')).convert('RGBA'))
+        best=next(p for p in (os.path.join(ORIG,n+s+'.png') for s in ('_s20','_s30','_s50')) if os.path.exists(p))   # the redraw closest to the original that exists
+        out[n]=clean(Image.open(best).convert('RGBA'))
     seeds=out['angelica_seeds'].copy()                 # chrysanthemum seeds came out as noise both times: the angelica seeds in grey
     for y in range(16):
         for x in range(16):
