@@ -1,7 +1,7 @@
 import {system,world,ItemTypes} from '@minecraft/server';
 import {VERSION} from '../data/version.js';
 import {HERBS,NS,id} from '../data/herbs.js';
-import {FOOD_EFFECTS,EXTERNAL_RECIPES,EXTERNAL_ADJUVANTS,matchBuiltin,decoctionCatalog,adjuvantCatalog} from '../data/decoctions.js';
+import {FOOD_EFFECTS,EXTERNAL_RECIPES,EXTERNAL_ADJUVANTS,matchBuiltin,sameMix,decoctionCatalog,adjuvantCatalog} from '../data/decoctions.js';
 import {HEAT_VALUES,EXTERNAL_HEAT} from '../data/constitution.js';
 import {getHeat,shiftHeat} from '../utils/constitution.js';
 import {createHerbalHost} from './herbalHostCore.js';
@@ -21,7 +21,7 @@ export function startHerbalHost(){
  const host=createHerbalHost({
   send:(event,message)=>system.sendScriptEvent(event,message),now:()=>system.currentTick,version:VERSION,
   catalogs,externalHeat:EXTERNAL_HEAT,ownsItem:item=>item.startsWith(NS+':'),
-  externalRecipes:EXTERNAL_RECIPES,externalAdjuvants:EXTERNAL_ADJUVANTS,matchBuiltin,itemExists,
+  externalRecipes:EXTERNAL_RECIPES,externalAdjuvants:EXTERNAL_ADJUVANTS,matchBuiltin,sameMix,itemExists,
   getPlayer,getHeat,shiftHeat,log:text=>console.warn('[Herbal] API '+text),
  });
  system.afterEvents.scriptEventReceive.subscribe(event=>{host.handle(event.id,event.message,event.sourceType);},{namespaces:[NS]});

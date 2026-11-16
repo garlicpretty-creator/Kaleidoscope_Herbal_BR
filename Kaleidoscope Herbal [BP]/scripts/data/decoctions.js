@@ -64,13 +64,22 @@ export const EXTERNAL_RECIPES=new Map(),EXTERNAL_ADJUVANTS=new Map();
 export const DEFAULT_TIME=600;
 const adjuvant=x=>ADJUVANTS[x]??EXTERNAL_ADJUVANTS.get(x);
 function take(rest,options){const i=rest.findIndex(x=>options.includes(x));if(i<0)return false;rest.splice(i,1);return true;}
+// v1.2.1: slots that accept only their own item are filled first. A slice slot also takes the dried root, and filled in
+// list order it could take the root another slot needed, so the same herbs brewed or failed by the order they went in.
+const slots=recipe=>[...recipe.ingredients].sort((a,b)=>(variants[a]?1:0)-(variants[b]?1:0));
 function fit(recipe,items){
  const rest=[...items];
- if(!recipe.ingredients.every(slot=>take(rest,variants[slot]??[slot])))return undefined;
+ if(!slots(recipe).every(slot=>take(rest,variants[slot]??[slot])))return undefined;
  if(rest.length>MAX_ADJUVANTS||!rest.every(adjuvant))return undefined;
  let servings=recipe.servings;
  for(const kind of new Set(rest))servings+=adjuvant(kind).servings??0;
  return {...recipe,servings:Math.min(MAX_SERVINGS,servings)};
+}
+// v1.2.1: true when one list of ingredients would be taken for the other in the pot (same herbs, sliced or not), with no
+// adjuvants counted. The host uses it to refuse a second formula for a mix that already brews something.
+export function sameMix(a,b){
+ const whole=(recipe,items)=>{const rest=[...items];return recipe.length===items.length&&slots({ingredients:recipe}).every(slot=>take(rest,variants[slot]??[slot]));};
+ return whole(a,b)||whole(b,a);
 }
 export function matchBuiltin(items){
  for(const recipe of DECOCTIONS){const match=fit(recipe,items);if(match)return match;}

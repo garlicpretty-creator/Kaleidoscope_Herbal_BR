@@ -14,7 +14,8 @@
 | 來源 | 只接受腳本送出的事件（`sourceType === 'Server'`）；玩家輸入的 `/scriptevent` 與指令方塊一律忽略 |
 | 請求必填 | `api: 1`、`source`：你的模組命名空間（`[a-z0-9_.-]`，1–64 字，不可為 `kaleidoscope_herbal`） |
 | 回覆定址 | 事件是廣播，回覆帶 `to: <你的 source>`，請只處理 `to` 等於自己的訊息 |
-| 對應請求 | 請求可帶 `req`（字串或數字，最長 32 字），回覆原樣帶回 |
+| 對應請求 | 請求可帶 `req`（字串或數字），回覆原樣帶回：數字仍是數字；字串超過 32 字時只帶回前 32 字 |
+| 回覆長度 | 登記類的回覆若超過一封的長度，`rejected` 會從尾端省略，並以 `more` 說明省略了幾筆（v1.2.1） |
 | 不合格的請求 | JSON 壞掉、`api` 不是 1、`source` 不合規 → 不回覆 |
 | 持久性 | 草本不保存任何外部註冊；每次收到 `api_ready` 都要重送一次（重送無副作用） |
 | 沒裝草本 | 不會有任何回覆；你的模組應照常運作 |
@@ -35,6 +36,7 @@
 | `externalHeat` | 256 | 全部模組合計可登記的寒熱物品數 |
 | `itemsPerMessage` | 32 | `heat_register`、`adjuvant_register` 一封的筆數上限 |
 | `heatAddMax` | 50 | `heat_add` 單次 `delta` 的絕對值上限 |
+| `heatAddsPerPlayer` | 2 | 同一玩家每 20 tick 最多接受幾次 `heat_add`，所有模組合計（v1.2.1 新增） |
 | `externalRecipes` | 64 | 全部模組合計可註冊的湯劑方數（v1.2.0 新增） |
 | `recipesPerMessage` | 8 | `recipe_register` 一封的筆數上限（v1.2.0 新增） |
 | `recipeIngredients` | 6 | 一個湯劑方的藥材總份數上限，等於砂鍋容量（v1.2.0 新增） |
@@ -92,7 +94,8 @@
 回覆 `kaleidoscope_herbal:heat`：`{"ok":true,"heat":15,"applied":-20}`；跨過上下限時多一個 `"effect":"overheat"` 或 `"chill"`。
 
 - `delta` 會四捨五入並限制在 ±50（`limits.heatAddMax`）。
-- 同一模組對同一玩家每 20 tick 只收一次，超過回 `THROTTLED`（附目前 `heat`）。
+- 同一模組對同一玩家每 20 tick 只收一次；同一玩家每 20 tick 合計最多收 2 次（不論來自哪個模組）。超過回 `THROTTLED`（附目前 `heat`）。
+- `delta` 四捨五入後為 0（例如 0.4）回 `BAD_DELTA`，不佔用這一秒的額度。
 
 | `code` | 原因 |
 |---|---|
@@ -140,7 +143,7 @@
 | 欄位 | 規定 |
 |---|---|
 | `id` | 成品物品 ID，必須是你自己的物品（不可為 `kaleidoscope_herbal:` 或 `minecraft:`），而且已存在於世界中 |
-| `ingredients` | `[{id, count}]`，`count` 省略視為 1；任何物品都可以（包含草本的藥材），總份數 1–6 |
+| `ingredients` | `[{id, count}]`，`count` 省略視為 1；任何物品都可以（包含草本的藥材），總份數 1–6。砂鍋只記物品種類，所以玩家手上那一個若有命名、附魔、說明文字或自訂資料，砂鍋不收 |
 | `servings` | 1–4 的整數；`0` 表示撤回自己先前註冊的這個成品（此時不需要其他欄位） |
 | `time` | 選填，文火下的煎煮 tick，200–2400 的整數，預設 600；猛火快一倍 |
 
@@ -253,7 +256,7 @@ const herbal = connectHerbal(system, {
 });
 
 // 之後任何時候：
-const herbs = await herbal.requestCatalog('herbs');   // 沒裝草本時為 undefined
+const herbs = await herbal.requestCatalog('herbs');   // 沒裝草本時為 undefined（等 timeoutTicks 之後）；草本還沒就緒時會等它
 const state = await herbal.requestHeat(player.id);    // {heat} 或 {error}
 await herbal.addHeat(player.id, -20);
 const formulas = await herbal.requestCatalog('decoctions'); // 內建與外部註冊的湯劑方（v1.2.0）

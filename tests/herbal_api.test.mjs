@@ -30,7 +30,7 @@ function world(){
  const f=fakeSystem(),heat=new Map([['p1',0]]),sent=[];
  const host=createHerbalHost({
   send:(id,message)=>{sent.push({id,m:JSON.parse(message)});f.system.sendScriptEvent(id,message);},now:()=>f.system.currentTick,version:'1.1.0',
-  externalRecipes:D.EXTERNAL_RECIPES,externalAdjuvants:D.EXTERNAL_ADJUVANTS,matchBuiltin:D.matchBuiltin,itemExists:id=>!id.includes('missing'),
+  externalRecipes:D.EXTERNAL_RECIPES,externalAdjuvants:D.EXTERNAL_ADJUVANTS,matchBuiltin:D.matchBuiltin,sameMix:D.sameMix,itemExists:id=>!id.includes('missing'),
   catalogs:{decoctions:D.decoctionCatalog,adjuvants:D.adjuvantCatalog,herbs:()=>Array.from({length:40},(_,i)=>({key:'herb'+i,fresh:'kaleidoscope_herbal:fresh_herb_number_'+i,dry:'kaleidoscope_herbal:dried_herb_number_'+i}))},
   externalHeat:EXTERNAL_HEAT,ownsItem:id=>id.startsWith('kaleidoscope_herbal:'),
   getPlayer:id=>heat.has(id)?id:undefined,getHeat:p=>heat.get(p),
@@ -60,7 +60,7 @@ test('malformed or wrong-api requests get no answer',()=>{
 });
 test('catalog is chunked under the packet limit and unknown kinds are named',()=>{
  const w=world();const parts=w.call(EVENTS.catalogRequest,{kind:'herbs',req:7});
- assert.ok(parts.length>1);assert.ok(parts.every(p=>p.to==='other_pack'&&p.req==='7'&&p.parts===parts.length&&JSON.stringify(p).length<=LIMITS.packetBytes));
+ assert.ok(parts.length>1);assert.ok(parts.every(p=>p.to==='other_pack'&&p.req===7&&p.parts===parts.length&&JSON.stringify(p).length<=LIMITS.packetBytes));
  assert.equal(parts.flatMap(p=>p.items).length,40);
  const [bad]=w.call(EVENTS.catalogRequest,{kind:'nope'});assert.equal(bad.ok,false);assert.equal(bad.code,'UNKNOWN_KIND');assert.deepEqual(bad.kinds,['decoctions','adjuvants','herbs']);
  assert.deepEqual(packItems([],160),[[]]);
@@ -111,9 +111,9 @@ test('SDK: handshake, heat registration, queries, events, and silence without He
  w.system.sendScriptEvent(HERBAL_EVENTS.evt,JSON.stringify({v:1,t:'decoction_served',p:'p1',id:'kaleidoscope_herbal:ginseng_decoction'}));
  assert.equal(events[0].t,'decoction_served');
  client.dispose();assert.equal(w.subs.length,1);
- // No host: nothing answers, requests resolve to undefined at once.
- const lone=fakeSystem(),alone=connectHerbal(lone.system,{source:'my_pack',log:()=>{}});lone.step(5);
- assert.equal(alone.ready,false);assert.equal(await alone.requestHeat('p1'),undefined);
+ // No host: nothing answers; a request waits for a ready that never comes and resolves to undefined after timeoutTicks.
+ const lone=fakeSystem(),alone=connectHerbal(lone.system,{source:'my_pack',log:()=>{},timeoutTicks:10});lone.step(5);
+ assert.equal(alone.ready,false);const unanswered=alone.requestHeat('p1');lone.step(12);assert.equal(await unanswered,undefined);
  assert.throws(()=>connectHerbal(lone.system,{source:'Bad Name'}));
 });
 test('SDK: a request the host never answers times out to undefined',async()=>{
@@ -231,7 +231,7 @@ test('recipe_register stops at the table limit',()=>{
 test('adjuvant_register validates, caps, keeps the first owner and withdraws',()=>{
  const w=world();
  const [ack]=w.call(EVENTS.adjuvantRegister,{req:5,items:[{id:'other_pack:honey'},{id:'other_pack:dates',servings:1},{id:kh('dried_jujube')},{id:'minecraft:sugar'},{id:'nocolon'},{id:'other_pack:x',servings:2},{id:'other_pack:y',servings:-1},{id:'other_pack:w',servings:.5}]});
- assert.equal(ack.req,'5');assert.equal(ack.accepted,2);assert.deepEqual(ack.rejected.map(r=>r.code),['RESERVED','RESERVED','BAD_ID','BAD_SERVINGS','BAD_SERVINGS','BAD_SERVINGS']);
+ assert.equal(ack.req,5);assert.equal(ack.accepted,2);assert.deepEqual(ack.rejected.map(r=>r.code),['RESERVED','RESERVED','BAD_ID','BAD_SERVINGS','BAD_SERVINGS','BAD_SERVINGS']);
  assert.deepEqual(D.EXTERNAL_ADJUVANTS.get('other_pack:honey'),{servings:1,source:'other_pack'});
  assert.equal(w.call(EVENTS.adjuvantRegister,{items:[{id:'other_pack:honey'}]})[0].ok,true);assert.equal(D.EXTERNAL_ADJUVANTS.size,2); // idempotent
  assert.equal(w.call(EVENTS.adjuvantRegister,JSON.stringify({api:1,source:'third_pack',items:[{id:'other_pack:honey',servings:0}]}))[0].rejected[0].code,'TAKEN');
@@ -323,7 +323,7 @@ test('SDK: recipes and adjuvants register on ready, replay harmlessly, and can b
  // Without Herbal the same options and calls stay silent.
  const lone=fakeSystem(),alone=connectHerbal(lone.system,{source:'my_pack',recipes:many,adjuvants:[{id:'my_pack:honey'}],log:t=>logs.push(t)});lone.step(5);
  alone.registerRecipes([many[0]]);alone.registerAdjuvants([{id:'my_pack:x'}]);
- assert.equal(alone.ready,false);assert.equal(await alone.requestCatalog('decoctions'),undefined);
+ assert.equal(alone.ready,false);const unanswered=alone.requestCatalog('decoctions');lone.step(101);assert.equal(await unanswered,undefined);
 });
 
 // ---- v1.1.0 powders: grind, mix in the mortar, strange results, learning
@@ -353,3 +353,51 @@ test('a sealed prescription holds one powder formula; the guidebook gives no pow
  for(const f of P.POWDER_FORMULAS){const page=GUIDEBOOK.entries.find(e=>e.id===f.result);assert.ok(page,f.result);assert.deepEqual(page.recipes,[]);
   const words=JSON.stringify(page);for(const i of f.ingredients)assert.ok(!words.includes(i),f.result+' page names '+i);}
 });
+
+// ---- v1.2.1 fixes
+test('a reply too long for one script event is cut and says how many refusals were left out',()=>{
+ const w=world(),long=i=>'another_quite_long_pack_namespace:some_fairly_long_item_identifier_'+i;
+ w.call(EVENTS.heatRegister,{source:'first_pack',items:Array.from({length:32},(_,i)=>({id:long(i),heat:5}))});
+ const [ack]=w.call(EVENTS.heatRegister,{items:Array.from({length:32},(_,i)=>({id:long(i),heat:5}))});
+ assert.ok(ack,'the reply was sent');assert.equal(ack.ok,false);assert.equal(ack.accepted,0);
+ assert.ok(ack.more>0);assert.equal(ack.rejected.length+ack.more,32);assert.ok(JSON.stringify(ack).length<=2048);
+ const [short]=w.call(EVENTS.heatRegister,{items:[{id:long(0),heat:5}]});assert.equal(short.more,undefined);
+});
+test('catalog_request: an inherited name is an unknown kind; req comes back as it was sent',()=>{
+ const w=world();
+ const [bad]=w.call(EVENTS.catalogRequest,{kind:'constructor',req:7});
+ assert.equal(bad.ok,false);assert.equal(bad.code,'UNKNOWN_KIND');assert.strictEqual(bad.req,7);
+ assert.strictEqual(w.call(EVENTS.heatRequest,{p:'p1',req:'abc'})[0].req,'abc');
+ assert.equal(w.call(EVENTS.heatRequest,{p:'p1',req:'x'.repeat(40)})[0].req.length,32);
+});
+test('heat_add: a delta that rounds to nothing is refused and does not use up the second',()=>{
+ const w=world();
+ assert.equal(w.call(EVENTS.heatAdd,{p:'p1',delta:0.4})[0].code,'BAD_DELTA');
+ const [ok]=w.call(EVENTS.heatAdd,{p:'p1',delta:10});assert.equal(ok.ok,true);assert.equal(ok.applied,10);
+});
+test('heat_add: changing the source name does not get past the per-player limit',()=>{
+ const w=world();let accepted=0;
+ for(let i=0;i<10;i++)if(w.call(EVENTS.heatAdd,{source:'pack_'+i,p:'p1',delta:50})[0].ok)accepted++;
+ assert.equal(accepted,LIMITS.heatAddsPerPlayer);assert.ok(w.heat.get('p1')<100);
+ w.step(LIMITS.heatAddCooldown);assert.equal(w.call(EVENTS.heatAdd,{source:'pack_x',p:'p1',delta:-5})[0].ok,true);
+});
+test('sliced and unsliced herbs: the order they go in does not matter, and two formulas for one mix are refused',()=>{
+ const w=world(),slices=kh('angelica_slices'),dried=kh('dried_angelica');
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:[{id:'other_pack:both',servings:1,ingredients:[{id:slices},{id:dried},{id:'other_pack:root'}]}]})[0].accepted,1);
+ assert.equal(matchDecoction([slices,dried,'other_pack:root'])?.result,'other_pack:both');
+ assert.equal(matchDecoction([dried,slices,'other_pack:root'])?.result,'other_pack:both');
+ assert.equal(matchDecoction(['other_pack:root',dried,slices])?.result,'other_pack:both');
+ w.call(EVENTS.recipeRegister,{recipes:[{id:'other_pack:a',servings:1,ingredients:[{id:kh('licorice_slices')},{id:'other_pack:root'}]}]});
+ const [ack]=w.call(EVENTS.recipeRegister,{source:'third_pack',recipes:[{id:'third_pack:b',servings:1,ingredients:[{id:kh('dried_licorice')},{id:'other_pack:root'}]}]});
+ assert.deepEqual(ack.rejected,[{id:'third_pack:b',code:'TAKEN'}]);
+ assert.equal(D.sameMix([kh('licorice_slices')],[kh('dried_licorice')]),true);assert.equal(D.sameMix([kh('licorice_slices')],[kh('dried_poria')]),false);
+});
+test('SDK: a request made before api_ready waits for it; a repeated refusal is listed once',async()=>{
+ const w=world();
+ const client=connectHerbal(w.system,{source:'my_pack',heat:[{id:'minecraft:apple',heat:1}],log:()=>{}});
+ const early=client.requestHeat('p1');   // asked in the same tick as connectHerbal, before the ping has gone out
+ w.step();assert.deepEqual(await early,{heat:0,applied:undefined,effect:undefined});
+ w.host.announce();w.host.announce();assert.deepEqual(client.rejected,[{id:'minecraft:apple',code:'RESERVED'}]);
+ const late=connectHerbal(w.system,{source:'late_pack',log:()=>{}});const asked=late.requestHeat('p1');late.dispose();assert.equal(await asked,undefined);
+});
+
