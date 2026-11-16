@@ -1,5 +1,6 @@
 import {system} from '@minecraft/server';
 import {GUIDEBOOK} from '../data/guidebook.js';
+import {VERSION} from '../data/version.js';
 import {TAVERN_LINKED,isTavernPresent,onTavernPresent} from '../utils/tavernPresence.js';
 const SOURCE='kaleidoscope_herbal',ID='kaleidoscope_herbal:guidebook';
 let publication=0,requested=false;
@@ -18,7 +19,7 @@ export function guidebookFor(tavern){
 }
 export function publishGuidebook(){
  requested=true;
- const number=++publication,revision=`1.2.13-${number}`,chunks=utf8Chunks(JSON.stringify(guidebookFor(isTavernPresent())));
+ const number=++publication,revision=`${VERSION}-${number}`,chunks=utf8Chunks(JSON.stringify(guidebookFor(isTavernPresent())));
  const header={api:1,source:SOURCE,id:ID,revision};
  system.sendScriptEvent('kaleidoscope_cookery:guidebook_begin',JSON.stringify({...header,chunks:chunks.length}));
  chunks.forEach((chunk,index)=>system.runTimeout(()=>{

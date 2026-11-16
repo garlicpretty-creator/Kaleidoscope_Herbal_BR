@@ -1,4 +1,5 @@
 import {id} from './herbs.js';
+import {VERSION} from './version.js';
 export const HERBAL_WINES=[
  {key:'ginseng_wine',ingredients:['minecraft:wheat',id('ginseng_slices'),id('licorice_slices')],title:{zh_TW:'人參調和酒',zh_CN:'人参调和酒',en_US:'Ginseng Herbal Wine'}},
  {key:'angelica_wine',ingredients:['minecraft:wheat',id('angelica_slices'),'minecraft:honeycomb'],title:{zh_TW:'當歸蜜釀',zh_CN:'当归蜜酿',en_US:'Angelica Honey Wine'}},
@@ -27,7 +28,7 @@ const winePages=HERBAL_WINES.map(w=>({id:id('guide/'+w.key),item:id(w.key),categ
 // Public product pages give the host localized names for external ingredients.
 const ingredientPages=Object.entries(WINE_MATERIAL_NAMES).filter(([item])=>item.startsWith('kaleidoscope_herbal:')).map(([item,title])=>({id:id('guide/ingredient_'+item.split(':')[1]),item,category:'ingredients',title,icon:'textures/kaleidoscope_herbal/items/'+item.split(':')[1],body:{zh_TW:'藥酒用炮製藥材；採集與炮製方法請見廚房圖鑑的《本草》。',zh_CN:'药酒用炮制药材；采集与炮制方法请见厨房图鉴的《本草》。',en_US:'Prepared medicinal wine ingredient. See Materia Medica in the Cookery guide for gathering and processing.'}}));
 export const TAVERN_PAYLOAD={
- api:1,source:'kaleidoscope_herbal',version:'1.2.13',
+ api:1,source:'kaleidoscope_herbal',version:VERSION,
  title:{zh_TW:'森羅物語：草本',zh_CN:'森罗物语：草本',en_US:'Kaleidoscope Herbal'},
  requires:['barrel_recipes','guide_product_pages','chunk_transport','acknowledgements'],
  recipes:HERBAL_WINES.map(w=>({id:id('barrel/'+w.key),kind:'barrel',title:w.title,fluid:'minecraft:water',ingredients:w.ingredients.map(item=>[item]),carrier:WINE_BATCH.carrier,unitTime:4800,output:{item:id(w.key)}})),

@@ -2,6 +2,7 @@ import {spillExplodedSoup} from '../custom_components/herbalSoup.js';
 import {system,world,WeatherType} from '@minecraft/server';
 import {id} from '../data/herbs.js';
 import {FOOD_EFFECTS} from '../data/decoctions.js';
+import {hasExternalHeat} from '../data/constitution.js';
 import {onSky,onReaction} from '../utils/awwWorld.js';
 import {onSenluoEvent} from '../utils/senluoWeek.js';
 import {readStore} from '../utils/blockStore.js';
@@ -26,7 +27,11 @@ export {isDawn} from '../custom_components/wildHoneysuckle.js';
 // Shared by real eating (itemCompleteUse) and A Witch Way's backpack auto-feed. Bowls and cups are returned
 // only by food.using_converts_to, never here; hunger is the game's (or AWW's) job.
 export function applyFood(source,typeId){
- const data=FOOD_EFFECTS[typeId];if(!data||!source)return false;
+ const data=FOOD_EFFECTS[typeId];if(!source)return false;
+ if(!data){ // v1.1.0: another pack's food carries only the 寒熱 value it registered through the Herbal API
+  if(source.typeId!=='minecraft:player'||!hasExternalHeat(typeId))return false;
+  applyHeat(source,typeId);return true;
+ }
  for(const effect of data.clear??[])source.removeEffect(effect);
  for(const e of data.effects)source.addEffect(e.name,e.ticks,{amplifier:e.amplifier,showParticles:true});
  if(source.typeId==='minecraft:player')applyHeat(source,typeId);
@@ -39,7 +44,7 @@ export function onAwwEvent(event){
   // v1.2.12 (phase 3a): sky events speed our crops up, a catalyze reaction grows those nearby.
   if(m.t==='sky'){onSky(m);return;}
   if(m.t==='reaction'){onReaction(m);return;}
-  if(m.t!=='autofed'||typeof m.id!=='string'||!m.id.startsWith('kaleidoscope_herbal:'))return;
+  if(m.t!=='autofed'||typeof m.id!=='string'||!(m.id.startsWith('kaleidoscope_herbal:')||hasExternalHeat(m.id)))return;
   const player=world.getEntity(m.p);
   if(player?.isValid&&player.typeId==='minecraft:player')applyFood(player,m.id);
  }catch{} // malformed message or player gone: ignore quietly

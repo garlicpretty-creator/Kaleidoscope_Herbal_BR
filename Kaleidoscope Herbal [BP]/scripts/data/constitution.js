@@ -15,8 +15,12 @@ for(const [key,value] of Object.entries(table)){
  if(key.endsWith('_decoction'))for(const tier of ['_low','_high'])HEAT_VALUES.set(id(key+tier),value);
 }
 // The Nether doubles warming tonics; cooling drinks keep their strength.
+// v1.1.0: 寒熱 values other packs registered through the Herbal API (api/herbalHost.js): typeId -> {heat, source}.
+// Our own table always wins; nothing here is saved, clients register again after every api_ready.
+export const EXTERNAL_HEAT=new Map();
+export const hasExternalHeat=typeId=>EXTERNAL_HEAT.has(typeId);
 export function heatDelta(typeId,inNether=false){
- const value=HEAT_VALUES.get(typeId)??0;
+ const value=HEAT_VALUES.get(typeId)??EXTERNAL_HEAT.get(typeId)?.heat??0;
  return inNether&&value>0?value*2:value;
 }
 export function stepHeat(current,delta){

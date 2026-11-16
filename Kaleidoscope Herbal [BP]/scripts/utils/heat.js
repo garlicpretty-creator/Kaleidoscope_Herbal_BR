@@ -2,7 +2,8 @@
 const unconditional=new Set(['minecraft:fire','minecraft:soul_fire','minecraft:lava','minecraft:flowing_lava','minecraft:magma','minecraft:magma_block']);
 const legacy=new Set(['minecraft:lit_furnace','minecraft:lit_smoker','minecraft:lit_blast_furnace']);
 const furnace=new Set(['minecraft:furnace','minecraft:smoker','minecraft:blast_furnace',...legacy]);
-const tags=['kaleidoscope_cookery:heat_sources','farmersdelight:heat_sources','c:heat_sources','c:heat_source'];
+// v1.1.0: kaleidoscope_herbal:heat_sources is our own public tag; any pack's block carrying it heats a clay pot (mild).
+const tags=['kaleidoscope_herbal:heat_sources','kaleidoscope_cookery:heat_sources','farmersdelight:heat_sources','c:heat_sources','c:heat_source'];
 function litState(block){
  try{for(const [name,value] of Object.entries(block?.permutation?.getAllStates?.()??{})){
   const key=name.split(':').pop(); if(key==='lit'||key==='lit_bit')return value===true||value===1;
