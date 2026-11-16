@@ -40,7 +40,7 @@ python3 tools/pbr_audit.py
 141 組 texture set 全數通過：顏色、法線、MER 三張齊全，尺寸一致。
 尺寸分布：16×16 共 130 組，64×64 共 8 組，128×128 共 2 組，128×64 共 1 組。
 
-66 個物品圖示由 `tools/icons.py` 繪製：每個像素的材質決定 MER（例如液面粗糙度 40、銅件金屬度 255、燈籠紙自發光），法線由材質高度與亮度推出輕微的斜面。
+79 個物品圖示由 `tools/icons.py` 繪製：每個像素的材質決定 MER（例如液面粗糙度 40、銅件金屬度 255、燈籠紙自發光），法線由材質高度與亮度推出輕微的斜面。
 
 待美術確認的項目（1.1.0 沒有修改既有貼圖）：
 
@@ -48,7 +48,7 @@ python3 tools/pbr_audit.py
 |---|---|---|---|
 | 1 | `models/clay_pot_water` | 平均粗糙度 235，與空鍋 `clay_pot` 完全相同 | 水面區域降到 15–60 |
 | 2 | `models/teas` | 平均粗糙度 224 | 茶湯面降到 15–60，杯身維持 |
-| 3 | 新湯劑的擺放模型；9 種單味藥粉圖示 | 擺放模型沿用既有湯碗；藥粉圖示由靈芝粉調色 | 繪製專屬模型與圖示 |
+| 3 | 新湯劑的擺放模型；10 種單味藥粉圖示 | 1.2.0 已完成：四種湯劑各有模型（`tools/decoction_models.py`，湯面粗糙度 32）；藥粉圖示由 `tools/icons.py` 繪製 | 實機確認外觀 |
 | 4 | `models/incense_burner`、`_lit` | 金屬度全為 0；點燃版只有 2 個自發光像素 | 若設定為銅爐則給金屬度；香頭自發光可略增 |
 | 5 | `models/plants`、`blocks/leaf`、作物與野生藥草 | 無次表面散射 | texture set 升到 `1.21.30` 改用 `metalness_emissive_roughness_subsurface`，葉片透光 |
 | 6 | 全部方塊（355 個 material instance） | 一律 `alpha_test` | 貼圖無透明像素的面改 `opaque`；液面評估 `blend` |

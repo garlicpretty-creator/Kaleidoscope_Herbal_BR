@@ -440,6 +440,74 @@ SINGLE['fresh_cordyceps']=(["........oo......",
 "..nNNNnNNNNnNN..",
 "................"],{'o':OUTLINE,'T':(170,104,54,'herb'),'S':(124,72,36,'herb'),'s':(84,46,22,'herb'),'Y':(218,174,94,'herb'),
  'y':(170,126,60,'herb'),'H':(244,214,146,'herb'),'N':(110,84,60,'soil'),'n':(80,60,42,'soil')})
+SINGLE['burnt_dregs']=(["................",
+".......s........",
+"......s..s......",
+".......s.s......",
+"........s.......",
+"................",
+"......kKk.......",
+"....kKeKKkk.....",
+"..kkKKKKeKKKk...",
+".okKKKkKKKKkKko.",
+"oDDDDDDDDDDDDDDo",
+"odDDDDDDDDDDDDdo",
+".oddddddddddddo.",
+"..oooooooooooo..",
+"................","................"],{'o':OUTLINE,'D':(176,172,162,'cer'),'d':(130,126,118,'cer'),'K':(46,40,38,'herb'),
+ 'k':(24,20,20,'herb'),'e':(240,112,42,'glow'),'s':(150,144,140,'steam')})
+SINGLE['icon_clay_pot']=(["................","................",
+".......oo.......",
+"......oLLo......",
+"....oooLLooo....",
+"...oLLLLLLLLo...",
+"..oLlllllllllo..",
+".oooooooooooooo.",
+"ooPPPPPPPPPPPPoo",
+"oHoPPpPPPPPPpoHo",
+"oooPPPPPPPPPpooo",
+"..oPPPPPPPPPpo..",
+"..oPpPPPPPPppo..",
+"...oppppppppo...",
+"....oooooooo....",
+"................"],{'o':OUTLINE,'L':(186,116,74,'cer'),'l':(144,84,52,'cer'),'P':(160,94,58,'cer'),'p':(112,62,36,'cer'),'H':(186,116,74,'cer')})
+SINGLE['icon_incense_burner']=([".......s........",
+"......s.........",
+".......s........",
+"......oKo.......",
+".....oGGGo......",
+"....oGgGgGo.....",
+"..oooooooooooo..",
+".oKKKKKKKKKKKKo.",
+".oGGoGGoGGoGGgo.",
+".oGGGGGGGGGGGgo.",
+"..oGGGGGGGGGgo..",
+"...oKKKKKKKKo...",
+"...oogggggoo....",
+"..oKo.oooo.oKo..",
+"..oKo......oKo..",
+"..ooo......ooo.."],{'o':OUTLINE,'G':(112,164,124,'cer'),'g':(74,118,88,'cer'),'K':(216,172,72,'brass'),'s':(170,164,160,'steam')})
+# Single-herb powders: one pile on a paper square, told apart by the herb's own colour (highlight, body, shade).
+PILE=["................","................","................","................",
+".......oo.......",
+"......ohho......",
+".....ohbbbo.....",
+"....ohbbbbso....",
+"...ohbbbhbbso...",
+"..oohbbbbbbsoo..",
+".oPobbsbbbbsoPo.",
+".oPPossssssoPPo.",
+".oPPPooooooPPpo.",
+"..opPPPPPPPPpo..",
+"...oooooooooo...",
+"................"]
+PILES={'angelica':((220,180,124),(185,138,82),(138,96,52)),'chrysanthemum':((255,240,138),(240,204,48),(189,148,22)),
+ 'cordyceps':((207,143,64),(160,98,31),(110,64,18)),'ginseng':((248,236,198),(226,204,148),(181,156,100)),
+ 'goji':((244,118,94),(210,62,46),(149,35,24)),'honeysuckle':((242,246,184),(211,220,126),(160,169,78)),
+ 'jujube':((184,74,60),(138,42,34),(90,24,20)),'licorice':((242,210,114),(214,168,60),(162,118,34)),
+ 'poria':((255,255,255),(235,232,222),(185,180,164)),'reishi':((208,108,64),(156,62,34),(104,36,20))}
+def pile(hi,body,shade):
+    return layer(PILE,{'o':OUTLINE,'h':hi+('herb',),'b':body+('herb',),'s':shade+('herb',),'P':(238,226,198,'paper'),'p':(200,186,154,'paper')})
 def dried_cordyceps():
     pal={'o':OUTLINE,'S':(96,54,28,'herb'),'s':(64,36,18,'herb'),'Y':(184,138,70,'herb'),'y':(140,100,48,'herb'),'t':(196,44,38,'cloth')}
     rows=[list('.'*16) for _ in range(16)]
@@ -549,6 +617,8 @@ def build():
     for name,args in POWDERS.items():out[name]=packet(*args)
     out['strange_powder']=packet((32,24,40),(110,40,130),'ask',(236,90,236),paper=(206,196,216))
     for name,(rows,pal) in SINGLE.items():check(name,rows);out[name]=layer(rows,pal)
+    check('pile',PILE)
+    for herb,shades in PILES.items():out[herb+'_powder']=pile(*shades)
     for name,fn in {**SINGLE_FN,**SINGLE_FN_EXTRA}.items():out[name]=fn()
     for name,fn in PLANTS.items():out[name]=fn()
     return out

@@ -1,4 +1,4 @@
-# 森羅物語：草本 | Kaleidoscope Herbal（重製版 v1.1）
+# 森羅物語：草本 | Kaleidoscope Herbal（重製版 v1.2）
 
 讓草木的芬芳融入 Minecraft，展開一段充滿自然氣息的草藥生活。
 

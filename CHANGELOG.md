@@ -1,5 +1,22 @@
 # 更新紀錄
 
+## 1.2.0
+
+### 對外 API（`api` 仍為 1，只增加功能）
+
+- 其他模組可註冊由砂鍋煎煮的湯劑方（`recipe_register`，capability `external_recipes`）與佐使（`adjuvant_register`，capability `external_adjuvants`）。內建藥方優先，外部模組不能覆寫草本或原版的物品。
+- `catalog` 新增 `decoctions`、`adjuvants` 兩種清單。
+- 新事件：`herb_harvested`（採收藥材）、`decoction_burnt`（煎焦）、`decoction_bitter`（配錯）。
+- SDK 新增 `recipes`、`adjuvants` 選項與 `registerRecipes`、`registerAdjuvants`、`registerHeat`。
+- 砂鍋裡若是已移除模組的湯劑，盛出或打破時改掉苦澀藥渣，不會卡住。
+
+### 美術
+
+- 蟲草湯、四君子湯、艾歸湯、甘棗湯擺在地上時各有自己的模型，不再借用參湯、四物湯、靈芝湯的湯碗。產生腳本為 `tools/decoction_models.py`。
+- 補畫 13 個圖示：10 種單味藥粉（紙上一堆，加上描邊，與其他圖示一致）、焦糊藥渣、圖鑑裡的砂鍋與藥香薰爐。
+
+以上皆未在遊戲內實機測試。
+
 ## 1.1.0（重製版）
 
 以舊線 1.2.13 為基準重新起算版本。只支援新世界：下列被移除的物品與方塊在舊世界裡會消失。
