@@ -608,6 +608,16 @@ for herb in ('chrysanthemum','mugwort'):
 PLANTS['carried_wild_ginseng']=lambda:layer(GRASS,GRASS_PAL,from_src('carried_wild_ginseng'),top=12)
 PLANTS['carried_ginseng_crop']=lambda:layer(PODZOL,PODZOL_PAL,layer(BERRIES,BERRY_PAL,from_src('carried_wild_ginseng'),top=0),top=13)
 
+# Icons taken from Retro Diffusion output (tools/icon_src/rd/<name>.png, 16x16, hard-edged alpha). They replace the
+# drawings above for the same names; the material given here sets their MER value and normal relief.
+RD={**{n:'cer' for n in ('ginseng_decoction','four_herb_decoction','reishi_decoction','cordyceps_decoction','four_gentlemen_decoction',
+ 'mugwort_angelica_decoction','licorice_jujube_decoction','ginseng_chicken_soup','goji_chicken_soup','goji_jujube_soup','jujube_sweet_soup',
+ 'angelica_mutton_soup','four_herb_chicken','chrysanthemum_tea','goji_tea','honeysuckle_tea','honeysuckle_tea_dew','jujube_tea')},
+ **{n:'glass' for n in ('ginseng_wine','goji_wine','angelica_wine','jujube_wine','reishi_wine')},'bitter_dregs':'herb'}
+def from_rd(name,mat):
+    img=Image.open(os.path.join(SRC,'rd',name+'.png')).convert('RGBA');assert img.size==(16,16),(name,img.size)
+    return {(x,y):(img.getpixel((x,y))[:3]+(255,),mat) for y in range(16) for x in range(16) if img.getpixel((x,y))[3]>=128}
+
 def build():
     out={}
     for name,(liq,g,gp) in DECOCTIONS.items():out[name]=bowl(liq,g,gp)
@@ -621,6 +631,7 @@ def build():
     for herb,shades in PILES.items():out[herb+'_powder']=pile(*shades)
     for name,fn in {**SINGLE_FN,**SINGLE_FN_EXTRA}.items():out[name]=fn()
     for name,fn in PLANTS.items():out[name]=fn()
+    for name,mat in RD.items():out[name]=from_rd(name,mat)
     return out
 
 def sheet(names,path,before=None):
