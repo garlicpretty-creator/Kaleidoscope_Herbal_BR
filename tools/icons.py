@@ -624,6 +624,13 @@ RD.update({n+'_powder':'paper' for n in ('an_shen','hui_chun','ming_mu','qing_re
 RD.update({'sealed_prescription':'paper','icon_herb_packets':'paper','icon_paper_lantern':'paper','carried_reishi_spawn':'wood','herbal_trowel':'wood',
  'icon_abacus':'wood','icon_hanging_gourd':'wood','icon_herb_cabinet':'wood','icon_herb_counter':'wood','icon_steelyard':'wood',
  'icon_clay_pot':'cer','icon_incense_burner':'cer','icon_medicine_jar':'cer','icon_mortar':'stone'})
+# The 38 icons that were hand-drawn originals (tools/icon_src/original/), redrawn the same way.
+RD.update({n:'herb' for n in ['angelica_seeds','chrysanthemum_seeds','ginseng_seeds','goji_seeds','honeysuckle_seeds','licorice_seeds','mugwort_seeds',
+ 'angelica_slices','ginseng_slices','licorice_slices','poria_slices','broken_ginseng_root','dried_broken_ginseng','fresh_ginseng','dried_ginseng',
+ 'fresh_angelica','dried_angelica','fresh_licorice','dried_licorice','fresh_goji','dried_goji','fresh_jujube','fresh_mugwort','dried_mugwort',
+ 'fresh_poria','dried_poria','reishi','dried_reishi','chrysanthemum','dried_chrysanthemum','honeysuckle','dewy_honeysuckle','dried_honeysuckle',
+ 'carried_wild_cordyceps','carried_wild_poria']})
+RD.update({'formula_notebook':'paper','prescription_slip':'paper','icon_herbal_curtain':'cloth'})
 def from_rd(name,mat):
     img=Image.open(os.path.join(SRC,'rd',name+'.png')).convert('RGBA');assert img.size==(16,16),(name,img.size)
     return {(x,y):(img.getpixel((x,y))[:3]+(255,),mat) for y in range(16) for x in range(16) if img.getpixel((x,y))[3]>=128}

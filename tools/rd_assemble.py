@@ -47,5 +47,20 @@ if __name__=='__main__':
                 t=(lum(p)-lo)/(hi-lo);a,b,k=(dark,mid,t*2) if t<.5 else (mid,light,t*2-1)
                 im.putpixel((x,y),tuple(round(a[i]+(b[i]-a[i])*k) for i in range(3))+(255,))
         out[herb+'_powder']=im
+    # The 38 icons that were hand-drawn originals (kept in tools/icon_src/original/), redrawn the same way into orig/.
+    ORIG=os.path.join(ROOT,'art','retro_diffusion','orig');KEPT=os.path.join(ROOT,'tools','icon_src','original')
+    for n in sorted({f.rsplit('_s',1)[0] for f in os.listdir(ORIG) if f.endswith('.png')}):
+        s30=os.path.join(ORIG,n+'_s30.png');out[n]=clean(Image.open(s30 if os.path.exists(s30) else os.path.join(ORIG,n+'_s50.png')).convert('RGBA'))
+    seeds=out['angelica_seeds'].copy()                 # chrysanthemum seeds came out as noise both times: the angelica seeds in grey
+    for y in range(16):
+        for x in range(16):
+            p=seeds.getpixel((x,y))
+            if p[3]: g=round(70+lum(p)*.62);seeds.putpixel((x,y),(g,g,g-6,255))
+    out['chrysanthemum_seeds']=seeds
+    dew=Image.open(os.path.join(KEPT,'dewy_honeysuckle.png')).convert('RGBA')   # the dew drops were painted over: put them back
+    for y in range(16):
+        for x in range(16):
+            p=dew.getpixel((x,y))
+            if p[3] and p[2]>p[0]+30: out['dewy_honeysuckle'].putpixel((x,y),p[:3]+(255,))
     for n,im in out.items(): im.save(os.path.join(OUT,n+'.png'))
     print(len(out),'sprites')

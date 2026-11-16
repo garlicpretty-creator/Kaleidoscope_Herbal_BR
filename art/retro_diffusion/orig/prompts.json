@@ -1,0 +1,262 @@
+{
+ "angelica_seeds_s50": {
+  "prompt": "a few small brown angelica seeds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "angelica_slices_s50": {
+  "prompt": "three cream colored slices of angelica root",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "broken_ginseng_root_s50": {
+  "prompt": "a broken piece of pale cream ginseng root with thin rootlets",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_cordyceps_s50": {
+  "prompt": "two brown cordyceps stalks growing out of white snow",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_poria_s50": {
+  "prompt": "a round dark brown poria fungus lump with a small green sprout on top",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "chrysanthemum_s50": {
+  "prompt": "a single yellow chrysanthemum flower on a green stem with leaves",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "chrysanthemum_seeds_s50": {
+  "prompt": "a few small grey chrysanthemum seeds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dewy_honeysuckle_s50": {
+  "prompt": "a sprig of white honeysuckle flowers with green leaves and blue dew drops",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_angelica_s50": {
+  "prompt": "a dried brown angelica root, diagonal",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_broken_ginseng_s50": {
+  "prompt": "small broken pieces of dried tan ginseng root",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_chrysanthemum_s50": {
+  "prompt": "a dried pale brown chrysanthemum flower on a dry stem",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_ginseng_s50": {
+  "prompt": "a dried tan ginseng root with thin rootlets",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_goji_s50": {
+  "prompt": "a handful of dried dark red goji berries",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_honeysuckle_s50": {
+  "prompt": "a dried tan honeysuckle twig with small dried buds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_licorice_s50": {
+  "prompt": "two dried brown licorice root sticks with yellow cut ends, diagonal",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_mugwort_s50": {
+  "prompt": "a dried grey brown mugwort sprig, diagonal",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_poria_s50": {
+  "prompt": "three white dried poria cubes",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_reishi_s50": {
+  "prompt": "a dried dark red brown reishi mushroom with a stalk",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "formula_notebook_s50": {
+  "prompt": "a brown leather notebook with a green label and cream pages",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "fresh_angelica_s50": {
+  "prompt": "a fresh pale tan angelica root with green leaves on top, diagonal",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "fresh_ginseng_s50": {
+  "prompt": "a fresh pale cream ginseng root with thin rootlets and green leaves on top",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "fresh_goji_s50": {
+  "prompt": "a goji branch with green leaves and bright red goji berries",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "fresh_jujube_s50": {
+  "prompt": "fresh red jujube dates on a twig with green leaves",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "fresh_licorice_s50": {
+  "prompt": "two fresh brown licorice root sticks with yellow cut ends and small green leaves, diagonal",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "fresh_mugwort_s50": {
+  "prompt": "a fresh green mugwort sprig with feathery leaves, diagonal",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "fresh_poria_s50": {
+  "prompt": "a round brown poria fungus lump with a white cut face",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "ginseng_seeds_s50": {
+  "prompt": "a few small pale beige ginseng seeds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "ginseng_slices_s50": {
+  "prompt": "three pale yellow slices of ginseng root",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "goji_seeds_s50": {
+  "prompt": "a few small golden yellow goji seeds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "honeysuckle_s50": {
+  "prompt": "a sprig of white and pale yellow honeysuckle flowers with green leaves",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "honeysuckle_seeds_s50": {
+  "prompt": "a few small brown and cream honeysuckle seeds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_herbal_curtain_s50": {
+  "prompt": "two green cloth shop curtains hanging from a wooden pole",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "licorice_seeds_s50": {
+  "prompt": "a few small dark red brown licorice seeds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "licorice_slices_s50": {
+  "prompt": "a pile of golden yellow licorice root slices",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "mugwort_seeds_s50": {
+  "prompt": "a few small dark olive green mugwort seeds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "poria_slices_s50": {
+  "prompt": "three white slices of poria mushroom",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "prescription_slip_s50": {
+  "prompt": "a tall cream paper slip with black brush writing and a red seal stamp, brown border",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "reishi_s50": {
+  "prompt": "a red reishi mushroom with a glossy red cap, cream edge and brown stalk",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "angelica_seeds_s30": {
+  "prompt": "a few small brown angelica seeds",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "chrysanthemum_seeds_s30": {
+  "prompt": "a few small grey chrysanthemum seeds",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "ginseng_seeds_s30": {
+  "prompt": "a few small pale beige ginseng seeds",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "goji_seeds_s30": {
+  "prompt": "a few small golden yellow goji seeds",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "honeysuckle_seeds_s30": {
+  "prompt": "a few small brown and cream honeysuckle seeds",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "licorice_seeds_s30": {
+  "prompt": "a few small dark red brown licorice seeds",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "mugwort_seeds_s30": {
+  "prompt": "a few small dark olive green mugwort seeds",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "dried_broken_ginseng_s30": {
+  "prompt": "small broken pieces of dried tan ginseng root",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "fresh_goji_s30": {
+  "prompt": "a goji branch with green leaves and bright red goji berries",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "fresh_jujube_s30": {
+  "prompt": "fresh red jujube dates on a twig with green leaves",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "dried_reishi_s30": {
+  "prompt": "a dried dark red brown reishi mushroom with a stalk",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "dewy_honeysuckle_s30": {
+  "prompt": "a sprig of white honeysuckle flowers with green leaves and blue dew drops",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "dried_ginseng_s30": {
+  "prompt": "a dried tan ginseng root with thin rootlets",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ },
+ "dried_goji_s30": {
+  "prompt": "a handful of dried dark red goji berries",
+  "strength": 0.3,
+  "cost_usd": 0.0
+ }
+}
