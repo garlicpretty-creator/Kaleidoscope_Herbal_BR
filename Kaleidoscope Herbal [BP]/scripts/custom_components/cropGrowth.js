@@ -1,6 +1,7 @@
 import {HERBS,id} from '../data/herbs.js';
 import {hand,heldId,takeOne,drop,feedback} from '../utils/items.js';
 import {growthBoost} from '../utils/awwWorld.js';
+import {emitEvt} from '../utils/bus.js';
 export const cropGrowth={
  onRandomTick({block}){
   const age=Number(block.permutation.getState(id('growth'))??0);
@@ -17,5 +18,6 @@ export const cropGrowth={
   const herb=HERBS.find(h=>block.typeId===id(h.key+'_crop'));if(!herb)return;
   drop(block,id(herb.fresh),1);if(Math.random()<.35)drop(block,id(herb.key+'_seeds'));
   block.setPermutation(block.permutation.withState(id('growth'),0));feedback(block);
+  emitEvt('herb_harvested',player,{herb:herb.key,wild:false});
  },
 };

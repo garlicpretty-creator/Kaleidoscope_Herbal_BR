@@ -1,6 +1,6 @@
 import {system} from '@minecraft/server';
-import {HERB_ITEMS,id} from '../data/herbs.js';
-import {matchDecoction,advancePot,contentsOnBreak,burnLimit} from '../data/decoctions.js';
+import {HERB_ITEMS,NS,id} from '../data/herbs.js';
+import {matchDecoction,advancePot,contentsOnBreak,burnLimit,potEvent,isExternalIngredient,MAX_INGREDIENTS} from '../data/decoctions.js';
 import {getRecord,newRecord,saveRecord,removeRecord,loadedBlock,blockKey,setStates,isRedraw} from '../utils/blockStore.js';
 import {hand,heldId,takeOne,exchangeOne,drop,feedback,countItems,removeItems,refuse} from '../utils/items.js';
 import {heatBelow} from '../utils/heat.js';
@@ -9,10 +9,14 @@ import {shownStates} from '../data/displayItems.js';
 import {emitEvt} from '../utils/bus.js';
 import {SLIP,FORMULA,formulaFrom,parseFormula,planFill,slipLore,tally} from '../data/prescription.js';
 export const activePots=new StationSet();
-const MAX_INGREDIENTS=6;
 const deny=block=>feedback(block,'minecraft:basic_smoke_particle','random.fizz');
 // v1.2.7: no servings block state (nothing drew it; the count lives in the record) - 19,200 -> 3,840 permutations.
 const STAGE=id('stage');
+// v1.2.0: a brew registered by another pack (docs/API.md) may outlive that pack; its output then no longer
+// exists and cannot be spawned, so the pot gives bitter dregs instead of jamming.
+function dropOutput(block,item,count=1){
+ try{drop(block,item,count);}catch(error){if(item.startsWith(NS+':'))throw error;drop(block,id('bitter_dregs'),count);}
+}
 // The last herb put in floats on the water until the brew is done; burnt or empty pots show nothing.
 export const shownFor=r=>r&&r.stage>=1&&r.stage<=3&&r.ingredients?.length?shownStates(r.ingredients.at(-1)):{shown:0,page:0};
 // The pot is redrawn from the loop every second, so only changed states are written (setStates).
@@ -41,7 +45,7 @@ export function spillPot(block){
  const items=contentsOnBreak(r);
  // Retain an explicit remaining-drop journal if a spawn throws; never erase failed drops.
  r.pendingDrops??=items;
- while(r.pendingDrops.length){const item=r.pendingDrops[0];drop(block,item.id,item.count);r.pendingDrops.shift();saveRecord(r);}
+ while(r.pendingDrops.length){const item=r.pendingDrops[0];dropOutput(block,item.id,item.count);r.pendingDrops.shift();saveRecord(r);}
  activePots.delete(r.key);removeRecord(r.key);
 }
 export const clayPot={
@@ -59,7 +63,7 @@ export const clayPot={
    if(!exchangeOne(player,slot,held,'minecraft:bucket'))return;
    r.stage=1;r.ingredients=[];saveRecord(r);sync(block,r);feedback(block,'minecraft:water_splash_particle','bucket.empty_water');return;
   }
-  if(r.stage===1&&HERB_ITEMS.has(held)){
+  if(r.stage===1&&(HERB_ITEMS.has(held)||isExternalIngredient(held))){
    if(r.ingredients.length>=MAX_INGREDIENTS){refuse(block,'full');return;}
    r.ingredients.push(held);saveRecord(r);sync(block,r);takeOne(player,slot);feedback(block);return;
   }
@@ -67,12 +71,12 @@ export const clayPot={
    // Empty water or a cold hearth fizzles instead of silently wasting the pot.
    if(!r.ingredients.length||!heatBelow(block)){deny(block);return;}
    const recipe=matchDecoction(r.ingredients);
-   Object.assign(r,{stage:2,progress:0,warm:0,time:recipe?.time??400,result:recipe?.result??id('bitter_dregs'),recipeServings:recipe?.servings??1});
+   Object.assign(r,{stage:2,progress:0,warm:0,time:recipe?.time??400,result:recipe?.result??id('bitter_dregs'),recipeServings:recipe?.servings??1,by:player.id}); // by: who the burnt/bitter broadcast names
    saveRecord(r);sync(block,r);activePots.add(r.key);feedback(block,'minecraft:basic_smoke_particle','fire.ignite');return;
   }
   if((r.stage===3||r.stage===4)&&held==='minecraft:bowl'){
    // Output must spawn successfully before consuming the bowl or reducing the serving.
-   drop(block,r.output);takeOne(player,slot);r.servings--;emitEvt('decoction_served',player,{id:r.output});
+   dropOutput(block,r.output);takeOne(player,slot);r.servings--;emitEvt('decoction_served',player,{id:r.output});
    if(r.servings<=0){removeRecord(r.key);activePots.delete(r.key);sync(block,{stage:0,servings:0});}
    else{saveRecord(r);sync(block,r,true);system.runTimeout(()=>{const current=getRecord(r.key),loaded=current&&loadedBlock(current);if(loaded?.typeId===id('clay_pot'))sync(loaded,current);},12);}return;
   }
@@ -88,6 +92,7 @@ export function tickPot(key){
  const heat=heatBelow(block);
  // Progress is checkpointed every 30 s (v1.2.6, was 5 s); stage transitions are saved at once.
  if(advancePot(r,heat)&&(before!==r.stage||system.currentTick-(lastSave.get(key)??0)>=CHECKPOINT_TICKS)){saveRecord(r);lastSave.set(key,system.currentTick);}
+ const event=potEvent(before,r);if(event&&r.by)emitEvt(event.t,{id:r.by},event.fields);
  if(before!==r.stage){sync(block,r);if(r.stage===3)feedback(block,'kaleidoscope_herbal:pot_ready','random.orb');else if(r.stage===4)feedback(block,'minecraft:basic_smoke_particle','random.fizz');}
  // Ambient cues run on a slower, staggered beat; warnings stay every second.
  if(r.stage===2&&heat&&onBeat(key,3))feedback(block,'kaleidoscope_herbal:pot_simmer','bubble.pop');

@@ -1,14 +1,13 @@
 import {world,system,ItemStack,EquipmentSlot} from '@minecraft/server';
 import {ActionFormData} from '@minecraft/server-ui';
-import {id,NS} from '../data/herbs.js';
-import {SLIP,FORMULA,parseFormula,slipLore,tally} from '../data/prescription.js';
+import {id} from '../data/herbs.js';
+import {SLIP,FORMULA,parseFormula,slipLore,tally,nameKey} from '../data/prescription.js';
 import {SEALED,sealedFormula} from '../data/powders.js';
 import {emitEvt} from './bus.js';
 // v1.1.0 藥方手札: what each player has learned. Cookery's guidebook is one book for everybody and cannot
 // show pages per player, so learned formulas live on the player and are read through this notebook.
 export const NOTEBOOK=id('formula_notebook');
 const LEARNED=id('learned'),MAX_LEARNED=64;
-const short=item=>item.startsWith(NS+':')?item.slice(NS.length+1):item;
 export function learnedOf(player){
  try{const list=JSON.parse(String(player.getDynamicProperty(LEARNED)??'[]'));return Array.isArray(list)?list.filter(f=>parseFormula(JSON.stringify(f))):[];}catch{return [];}
 }
@@ -26,7 +25,7 @@ export function learn(player,formula){
  emitEvt('formula_learned',player,{id:formula.result});
  return true;
 }
-const name=item=>({translate:`kh.name.${short(item)}`});
+const name=item=>({translate:nameKey(item)});
 // The page of one formula: where it is made, then each herb with its count.
 export function formulaPage(formula){
  return {rawtext:[{translate:formula.via==='mortar'?'kh.notebook.mortar':'kh.notebook.pot'},{text:'\n\n'},

@@ -9,6 +9,7 @@ const load=path=>import(pathToFileURL(resolve(root,path)).href);
 const {createHerbalHost,EVENTS,CAPABILITIES,LIMITS,packItems}=await load('Kaleidoscope Herbal [BP]/scripts/api/herbalHostCore.js');
 const {EXTERNAL_HEAT,heatDelta,stepHeat,HEAT_VALUES}=await load('Kaleidoscope Herbal [BP]/scripts/data/constitution.js');
 const {connectHerbal,HERBAL_EVENTS}=await load('sdk/herbal-client.js');
+const D=await load('Kaleidoscope Herbal [BP]/scripts/data/decoctions.js');
 
 // A stand-in for @minecraft/server's `system`: script events reach every subscriber, timers run on step().
 function fakeSystem(){
@@ -25,11 +26,12 @@ function fakeSystem(){
  return {system,step,subs};
 }
 function world(){
- EXTERNAL_HEAT.clear();
+ EXTERNAL_HEAT.clear();D.EXTERNAL_RECIPES.clear();D.EXTERNAL_ADJUVANTS.clear();
  const f=fakeSystem(),heat=new Map([['p1',0]]),sent=[];
  const host=createHerbalHost({
   send:(id,message)=>{sent.push({id,m:JSON.parse(message)});f.system.sendScriptEvent(id,message);},now:()=>f.system.currentTick,version:'1.1.0',
-  catalogs:{herbs:()=>Array.from({length:40},(_,i)=>({key:'herb'+i,fresh:'kaleidoscope_herbal:fresh_herb_number_'+i,dry:'kaleidoscope_herbal:dried_herb_number_'+i}))},
+  externalRecipes:D.EXTERNAL_RECIPES,externalAdjuvants:D.EXTERNAL_ADJUVANTS,matchBuiltin:D.matchBuiltin,itemExists:id=>!id.includes('missing'),
+  catalogs:{decoctions:D.decoctionCatalog,adjuvants:D.adjuvantCatalog,herbs:()=>Array.from({length:40},(_,i)=>({key:'herb'+i,fresh:'kaleidoscope_herbal:fresh_herb_number_'+i,dry:'kaleidoscope_herbal:dried_herb_number_'+i}))},
   externalHeat:EXTERNAL_HEAT,ownsItem:id=>id.startsWith('kaleidoscope_herbal:'),
   getPlayer:id=>heat.has(id)?id:undefined,getHeat:p=>heat.get(p),
   shiftHeat:(p,delta)=>{const r=stepHeat(heat.get(p),delta);heat.set(p,r.heat);return r;},
@@ -60,7 +62,7 @@ test('catalog is chunked under the packet limit and unknown kinds are named',()=
  const w=world();const parts=w.call(EVENTS.catalogRequest,{kind:'herbs',req:7});
  assert.ok(parts.length>1);assert.ok(parts.every(p=>p.to==='other_pack'&&p.req==='7'&&p.parts===parts.length&&JSON.stringify(p).length<=LIMITS.packetBytes));
  assert.equal(parts.flatMap(p=>p.items).length,40);
- const [bad]=w.call(EVENTS.catalogRequest,{kind:'nope'});assert.equal(bad.ok,false);assert.equal(bad.code,'UNKNOWN_KIND');assert.deepEqual(bad.kinds,['herbs']);
+ const [bad]=w.call(EVENTS.catalogRequest,{kind:'nope'});assert.equal(bad.ok,false);assert.equal(bad.code,'UNKNOWN_KIND');assert.deepEqual(bad.kinds,['decoctions','adjuvants','herbs']);
  assert.deepEqual(packItems([],160),[[]]);
 });
 test('heat_register validates, keeps the first owner, and feeds heatDelta',()=>{
@@ -121,7 +123,7 @@ test('SDK: a request the host never answers times out to undefined',async()=>{
 });
 
 // ---- v1.1.0 formulas: done or burnt only, every herb has a use
-const {DECOCTIONS,FOOD_EFFECTS,ADJUVANTS,matchDecoction,advancePot,burnLimit}=await load('Kaleidoscope Herbal [BP]/scripts/data/decoctions.js');
+const {DECOCTIONS,FOOD_EFFECTS,ADJUVANTS,matchDecoction,advancePot,burnLimit}=D;
 const {HERBS}=await load('Kaleidoscope Herbal [BP]/scripts/data/herbs.js');
 const {COOKERY_RECIPES}=await load('Kaleidoscope Herbal [BP]/scripts/data/cookeryRecipes.js');
 const {HERBAL_WINES}=await load('Kaleidoscope Herbal [BP]/scripts/data/tavernRecipes.js');
@@ -155,6 +157,173 @@ test('every herb goes into at least one formula, dish, tea, wine or the incense 
  used.add(kh('mugwort_floss')); // incense
  for(const h of HERBS)assert.ok([h.fresh,h.dry,h.processed].filter(Boolean).some(x=>used.has(kh(x))),h.key+' has no use');
  for(const h of ['licorice','poria','cordyceps','mugwort'])assert.ok(DECOCTIONS.some(r=>r.ingredients.some(i=>i.includes(h))&&r.result.includes(h==='poria'?'four_gentlemen':h)),h+' has its own formula');
+});
+
+// ---- v1.2.0 (A9/A11): other packs' formulas and adjuvants, the decoctions catalog, pot broadcasts
+const tonic=(over={})=>({id:'other_pack:tonic',ingredients:[{id:'other_pack:root',count:2},{id:kh('licorice_slices'),count:1}],servings:2,...over});
+const brew=items=>{ // light the pot the way clayPot.js does, then simmer until done
+ const recipe=matchDecoction(items);
+ const pot={stage:2,progress:0,warm:0,time:recipe?.time??400,result:recipe?.result??kh('bitter_dregs'),recipeServings:recipe?.servings??1,ingredients:items};
+ while(pot.stage===2)advancePot(pot,'mild');
+ return pot;
+};
+test('api_ready lists the v1.2.0 capabilities and limits, which mirror the clay pot',()=>{
+ const w=world();const [ready]=w.call(EVENTS.ping,'x');
+ assert.ok(ready.capabilities.includes('external_recipes')&&ready.capabilities.includes('external_adjuvants'));
+ for(const key of ['externalHeat','itemsPerMessage','heatAddMax','externalRecipes','recipesPerMessage','recipeIngredients','recipeServingsMax','recipeTimeMin','recipeTimeMax','externalAdjuvants','adjuvantServingsMax'])assert.equal(ready.limits[key],LIMITS[key],key);
+ assert.equal(LIMITS.recipeIngredients,D.MAX_INGREDIENTS);assert.equal(LIMITS.recipeServingsMax,D.MAX_SERVINGS);assert.equal(LIMITS.recipeTimeDefault,D.DEFAULT_TIME);
+ assert.ok(JSON.stringify(ready).length<=2048);
+});
+test('recipe_register validates every field and never lets a built-in formula be shadowed',()=>{
+ const w=world();
+ const [ack]=w.call(EVENTS.recipeRegister,{req:'r1',recipes:[
+  tonic(),
+  tonic({id:'nocolon'}),
+  tonic({id:kh('ginseng_decoction')}),
+  tonic({id:'minecraft:potion'}),
+  tonic({id:'other_pack:a',servings:5}),
+  tonic({id:'other_pack:b',servings:1.5}),
+  tonic({id:'other_pack:c',time:10}),
+  tonic({id:'other_pack:d',ingredients:[]}),
+ ]});
+ assert.equal(ack.to,'other_pack');assert.equal(ack.req,'r1');assert.equal(ack.ok,false);assert.equal(ack.accepted,1);
+ assert.deepEqual(ack.rejected.map(r=>r.code),['BAD_ID','RESERVED','RESERVED','BAD_SERVINGS','BAD_SERVINGS','BAD_TIME','BAD_INGREDIENTS']);
+ const [more]=w.call(EVENTS.recipeRegister,{recipes:[
+  tonic({id:'other_pack:e',ingredients:[{id:'other_pack:root',count:7}]}),
+  tonic({id:'other_pack:f',ingredients:[{id:'other_pack:root',count:4},{id:'other_pack:leaf',count:3}]}),
+  tonic({id:'other_pack:g',ingredients:[{id:'Bad Item',count:1}]}),
+  tonic({id:'other_pack:h',ingredients:[{id:'other_pack:root',count:0}]}),
+  tonic({id:'other_pack:i',ingredients:'other_pack:root'}),
+  tonic({id:'other_pack:missing_item'}),
+  tonic({id:'other_pack:j',ingredients:DECOCTIONS[0].ingredients.map(id=>({id,count:1}))}),                       // a built-in mix
+  tonic({id:'other_pack:k',ingredients:[{id:kh('dried_ginseng'),count:2},{id:kh('dried_licorice'),count:1},{id:kh('dried_goji'),count:1}]}), // the same through variants and an adjuvant
+ ]});
+ assert.deepEqual(more.rejected.map(r=>r.code),['BAD_INGREDIENTS','BAD_INGREDIENTS','BAD_INGREDIENTS','BAD_INGREDIENTS','BAD_INGREDIENTS','UNKNOWN_ITEM','BUILTIN','BUILTIN']);
+ assert.deepEqual([...D.EXTERNAL_RECIPES.keys()],['other_pack:tonic']);
+ assert.deepEqual(D.EXTERNAL_RECIPES.get('other_pack:tonic'),{result:'other_pack:tonic',ingredients:[kh('licorice_slices'),'other_pack:root','other_pack:root'],servings:2,time:600,source:'other_pack'});
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:'x'})[0].code,'BAD_RECIPES');
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:Array.from({length:LIMITS.recipesPerMessage+1},(_,i)=>tonic({id:'other_pack:z'+i}))})[0].code,'BAD_RECIPES');
+ assert.deepEqual(w.call(EVENTS.recipeRegister,{recipes:[tonic({id:'other_pack:typed'})]},'Entity'),[]);assert.equal(D.EXTERNAL_RECIPES.size,1);
+});
+test('recipe_register: first owner keeps output and mix, re-sending is idempotent, the owner updates and withdraws',()=>{
+ const w=world();const third=body=>JSON.stringify({api:1,source:'third_pack',...body});
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:[tonic()]})[0].ok,true);
+ const before=JSON.stringify([...D.EXTERNAL_RECIPES]);
+ const [again]=w.call(EVENTS.recipeRegister,{recipes:[tonic()]});assert.equal(again.ok,true);assert.equal(again.accepted,1);
+ assert.equal(JSON.stringify([...D.EXTERNAL_RECIPES]),before);
+ assert.equal(w.call(EVENTS.recipeRegister,third({recipes:[tonic({servings:4})]}))[0].rejected[0].code,'TAKEN');   // someone else's output
+ assert.equal(w.call(EVENTS.recipeRegister,third({recipes:[tonic({id:'third_pack:copy'})]}))[0].rejected[0].code,'TAKEN'); // someone else's mix
+ assert.equal(w.call(EVENTS.recipeRegister,third({recipes:[tonic({servings:0})]}))[0].rejected[0].code,'TAKEN');   // cannot withdraw it either
+ assert.equal(D.EXTERNAL_RECIPES.get('other_pack:tonic').servings,2);
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:[tonic({servings:3,time:400})]})[0].ok,true);
+ assert.equal(D.EXTERNAL_RECIPES.get('other_pack:tonic').servings,3);assert.equal(D.EXTERNAL_RECIPES.get('other_pack:tonic').time,400);
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:[{id:'other_pack:tonic',servings:0}]})[0].ok,true);assert.equal(D.EXTERNAL_RECIPES.size,0);
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:[{id:'other_pack:tonic',servings:0}]})[0].ok,true); // withdrawing twice is harmless
+ assert.equal(w.call(EVENTS.recipeRegister,third({recipes:[tonic({id:'third_pack:copy'})]}))[0].ok,true); // the mix is free again
+});
+test('recipe_register stops at the table limit',()=>{
+ const w=world();const row=n=>tonic({id:'other_pack:brew_'+n,ingredients:[{id:'other_pack:herb_'+n,count:1}]});
+ for(let n=0;n<LIMITS.externalRecipes;n+=LIMITS.recipesPerMessage)assert.equal(w.call(EVENTS.recipeRegister,{recipes:Array.from({length:LIMITS.recipesPerMessage},(_,i)=>row(n+i))})[0].ok,true);
+ assert.equal(D.EXTERNAL_RECIPES.size,LIMITS.externalRecipes);
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:[row('more')]})[0].rejected[0].code,'FULL');
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:[{...row(0),servings:1}]})[0].ok,true); // an update still fits
+});
+test('adjuvant_register validates, caps, keeps the first owner and withdraws',()=>{
+ const w=world();
+ const [ack]=w.call(EVENTS.adjuvantRegister,{req:5,items:[{id:'other_pack:honey'},{id:'other_pack:dates',servings:1},{id:kh('dried_jujube')},{id:'minecraft:sugar'},{id:'nocolon'},{id:'other_pack:x',servings:2},{id:'other_pack:y',servings:-1},{id:'other_pack:w',servings:.5}]});
+ assert.equal(ack.req,'5');assert.equal(ack.accepted,2);assert.deepEqual(ack.rejected.map(r=>r.code),['RESERVED','RESERVED','BAD_ID','BAD_SERVINGS','BAD_SERVINGS','BAD_SERVINGS']);
+ assert.deepEqual(D.EXTERNAL_ADJUVANTS.get('other_pack:honey'),{servings:1,source:'other_pack'});
+ assert.equal(w.call(EVENTS.adjuvantRegister,{items:[{id:'other_pack:honey'}]})[0].ok,true);assert.equal(D.EXTERNAL_ADJUVANTS.size,2); // idempotent
+ assert.equal(w.call(EVENTS.adjuvantRegister,JSON.stringify({api:1,source:'third_pack',items:[{id:'other_pack:honey',servings:0}]}))[0].rejected[0].code,'TAKEN');
+ assert.equal(w.call(EVENTS.adjuvantRegister,{items:[{id:'other_pack:dates',servings:0}]})[0].ok,true);assert.deepEqual([...D.EXTERNAL_ADJUVANTS.keys()],['other_pack:honey']);
+ assert.equal(w.call(EVENTS.adjuvantRegister,{items:{}})[0].code,'BAD_ITEMS');
+ assert.equal(w.call(EVENTS.adjuvantRegister,{items:Array.from({length:LIMITS.itemsPerMessage+1},(_,i)=>({id:'other_pack:q'+i}))})[0].code,'BAD_ITEMS');
+ w.call(EVENTS.adjuvantRegister,{items:Array.from({length:LIMITS.itemsPerMessage},(_,i)=>({id:'other_pack:q'+i}))});
+ assert.equal(D.EXTERNAL_ADJUVANTS.size,LIMITS.externalAdjuvants);
+ assert.equal(w.call(EVENTS.adjuvantRegister,{items:[{id:'other_pack:one_more'}]})[0].rejected[0].code,'FULL');
+});
+test('the pot brews and serves an external recipe, built-ins still win, adjuvants add a serving',()=>{
+ const w=world();
+ const mix=['other_pack:root',kh('licorice_slices'),'other_pack:root'];
+ assert.equal(matchDecoction(mix),undefined);assert.equal(D.isExternalIngredient('other_pack:root'),false);
+ assert.equal(brew(mix).output,kh('bitter_dregs'));
+ w.call(EVENTS.recipeRegister,{recipes:[tonic({time:300})]});
+ assert.ok(D.isExternalIngredient('other_pack:root'));assert.ok(!D.isExternalIngredient('other_pack:pebble'));
+ const pot=brew(mix);
+ assert.equal(pot.stage,3);assert.equal(pot.output,'other_pack:tonic');assert.equal(pot.servings,2);assert.equal(pot.progress,300);
+ assert.deepEqual(D.contentsOnBreak(pot),[{id:'other_pack:tonic',count:2}]);
+ assert.equal(matchDecoction(['other_pack:root','other_pack:root',kh('dried_licorice')]).result,'other_pack:tonic'); // Herbal's unsliced forms count here too
+ assert.equal(matchDecoction([...mix,kh('dried_goji')]).servings,3);          // a built-in adjuvant joins an external formula
+ assert.equal(matchDecoction([...mix,'other_pack:honey']),undefined);         // not an adjuvant yet
+ w.call(EVENTS.adjuvantRegister,{items:[{id:'other_pack:honey'}]});
+ assert.ok(D.isExternalIngredient('other_pack:honey'));
+ assert.equal(matchDecoction([...mix,'other_pack:honey']).servings,3);
+ assert.equal(matchDecoction([...mix,'other_pack:honey','other_pack:honey']).servings,3); // each kind counts once
+ assert.equal(matchDecoction([...mix,'other_pack:honey',kh('dried_goji')]).servings,4);
+ assert.equal(matchDecoction([...mix,'other_pack:honey',kh('dried_goji'),kh('dried_cordyceps')]),undefined); // MAX_ADJUVANTS
+ const reishi=[kh('reishi_powder'),kh('reishi_powder'),kh('licorice_slices')];
+ assert.equal(matchDecoction([...reishi,'other_pack:honey']).result,kh('reishi_decoction'));  // an external adjuvant joins a built-in formula
+ assert.equal(matchDecoction([...reishi,'other_pack:honey']).servings,4);assert.equal(matchDecoction([...reishi,'other_pack:honey',kh('dried_goji')]).servings,4); // MAX_SERVINGS
+ // A formula that is a built-in one plus an item which later becomes an adjuvant: the built-in still wins.
+ const ginseng=DECOCTIONS[0].ingredients;
+ assert.equal(w.call(EVENTS.recipeRegister,{recipes:[{id:'other_pack:super',ingredients:[...ginseng,'other_pack:spice'].map(id=>({id,count:1})),servings:4}]})[0].ok,true);
+ assert.equal(matchDecoction([...ginseng,'other_pack:spice']).result,'other_pack:super');
+ w.call(EVENTS.adjuvantRegister,{items:[{id:'other_pack:spice'}]});
+ assert.equal(matchDecoction([...ginseng,'other_pack:spice']).result,kh('ginseng_decoction'));
+ for(const recipe of DECOCTIONS)assert.equal(matchDecoction(recipe.ingredients).result,recipe.result,recipe.id);
+ // Of two external formulas the one naming more ingredients is tried first.
+ w.call(EVENTS.recipeRegister,{recipes:[{id:'other_pack:plain',ingredients:[{id:'other_pack:bark',count:1}],servings:1},{id:'other_pack:rich',ingredients:[{id:'other_pack:bark',count:1},{id:'other_pack:honey',count:1}],servings:1}]});
+ assert.equal(matchDecoction(['other_pack:bark','other_pack:honey']).result,'other_pack:rich');assert.equal(matchDecoction(['other_pack:bark']).result,'other_pack:plain');
+ w.call(EVENTS.recipeRegister,{recipes:[{id:'other_pack:tonic',servings:0}]});assert.equal(matchDecoction(mix),undefined);
+});
+test('an external brew burns like a built-in one; burnt and bitter pots earn a broadcast',()=>{
+ const w=world();w.call(EVENTS.recipeRegister,{recipes:[tonic({time:200})]});
+ const items=['other_pack:root','other_pack:root',kh('licorice_slices')],recipe=matchDecoction(items);
+ const pot={stage:2,progress:0,warm:0,time:recipe.time,result:recipe.result,recipeServings:recipe.servings,ingredients:items},events=[];
+ const tick=heat=>{const before=pot.stage;advancePot(pot,heat);const e=D.potEvent(before,pot);if(e)events.push(e);};
+ while(pot.stage===2)tick('strong');
+ assert.equal(pot.output,'other_pack:tonic');assert.deepEqual(events,[]);
+ for(let t=0;t<burnLimit('strong');t+=20)tick('strong');
+ assert.equal(pot.stage,4);assert.equal(pot.output,kh('burnt_dregs'));assert.equal(pot.servings,1);
+ assert.deepEqual(events,[{t:'decoction_burnt',fields:{id:'other_pack:tonic'}}]);
+ tick('strong');assert.equal(events.length,1); // once only
+ const wrong={stage:2,progress:0,warm:0,time:400,result:kh('bitter_dregs'),recipeServings:1,ingredients:[kh('dried_jujube')]},seen=[];
+ for(let i=0;i<200&&wrong.stage!==4;i++){const before=wrong.stage;advancePot(wrong,'mild');const e=D.potEvent(before,wrong);if(e)seen.push(e.t);}
+ assert.deepEqual(seen,['decoction_bitter','decoction_burnt']);
+});
+test('catalog lists built-in and registered decoctions and adjuvants',()=>{
+ const w=world();
+ const own=w.call(EVENTS.catalogRequest,{kind:'decoctions'}).flatMap(p=>p.items);
+ assert.equal(own.length,DECOCTIONS.length);assert.ok(own.every(r=>!('source' in r)));
+ assert.deepEqual(own[0],{id:kh('ginseng_decoction'),ingredients:[[kh('ginseng_slices'),2],[kh('licorice_slices'),1]],servings:2,time:600});
+ w.call(EVENTS.recipeRegister,{recipes:[tonic()]});w.call(EVENTS.adjuvantRegister,{items:[{id:'other_pack:honey'}]});
+ const parts=w.call(EVENTS.catalogRequest,{kind:'decoctions',req:'c'});assert.ok(parts.every(p=>p.ok&&JSON.stringify(p).length<=LIMITS.packetBytes));
+ assert.deepEqual(parts.flatMap(p=>p.items).at(-1),{id:'other_pack:tonic',ingredients:[[kh('licorice_slices'),1],['other_pack:root',2]],servings:2,time:600,source:'other_pack'});
+ assert.deepEqual(w.call(EVENTS.catalogRequest,{kind:'adjuvants'}).flatMap(p=>p.items),[{id:kh('dried_goji'),servings:1},{id:kh('dried_cordyceps'),servings:1},{id:'other_pack:honey',servings:1,source:'other_pack'}]);
+});
+test('SDK: recipes and adjuvants register on ready, replay harmlessly, and can be added or withdrawn later',async()=>{
+ const w=world();const logs=[];
+ const many=Array.from({length:20},(_,i)=>({id:'my_pack:brew_number_'+i,ingredients:[{id:'my_pack:a_rather_long_ingredient_name_'+i,count:2},{id:kh('licorice_slices'),count:1},{id:'my_pack:another_long_ingredient_'+i,count:1}],servings:2,time:400}));
+ const client=connectHerbal(w.system,{source:'my_pack',recipes:[...many,{id:'minecraft:potion',ingredients:[{id:'my_pack:a',count:1}],servings:1}],adjuvants:[{id:'my_pack:honey'}],log:t=>logs.push(t)});
+ w.step();
+ assert.ok(client.has('external_recipes')&&client.has('external_adjuvants'));
+ assert.equal(D.EXTERNAL_RECIPES.size,20);assert.equal(D.EXTERNAL_ADJUVANTS.size,1);
+ assert.deepEqual(client.rejected,[{id:'minecraft:potion',code:'RESERVED'}]);assert.equal(logs.length,1);
+ w.host.announce();assert.equal(D.EXTERNAL_RECIPES.size,20);assert.equal(D.EXTERNAL_ADJUVANTS.size,1);assert.equal(client.rejected.length,1);
+ assert.equal(matchDecoction(['my_pack:a_rather_long_ingredient_name_3','my_pack:a_rather_long_ingredient_name_3',kh('licorice_slices'),'my_pack:another_long_ingredient_3','my_pack:honey']).servings,3);
+ const listed=await client.requestCatalog('decoctions');
+ assert.equal(listed.length,DECOCTIONS.length+20);assert.equal(listed.filter(r=>r.source==='my_pack').length,20);
+ assert.equal((await client.requestCatalog('adjuvants')).length,3);
+ client.registerRecipes([{id:'my_pack:late',ingredients:[{id:'my_pack:moss',count:1}],servings:1}]);client.registerAdjuvants([{id:'my_pack:syrup'}]);client.registerHeat([{id:'my_pack:late',heat:10}]);
+ assert.equal(matchDecoction(['my_pack:moss','my_pack:syrup']).result,'my_pack:late');assert.equal(heatDelta('my_pack:late'),10);
+ client.registerRecipes([{id:'my_pack:brew_number_0',servings:0}]);assert.equal(D.EXTERNAL_RECIPES.size,20);
+ D.EXTERNAL_RECIPES.clear();D.EXTERNAL_ADJUVANTS.clear();EXTERNAL_HEAT.clear();w.host.announce(); // Herbal reloaded: everything comes back, the withdrawn one stays out
+ assert.equal(D.EXTERNAL_RECIPES.size,20);assert.ok(!D.EXTERNAL_RECIPES.has('my_pack:brew_number_0'));assert.equal(D.EXTERNAL_ADJUVANTS.size,2);assert.equal(heatDelta('my_pack:late'),10);
+ client.dispose();
+ // Without Herbal the same options and calls stay silent.
+ const lone=fakeSystem(),alone=connectHerbal(lone.system,{source:'my_pack',recipes:many,adjuvants:[{id:'my_pack:honey'}],log:t=>logs.push(t)});lone.step(5);
+ alone.registerRecipes([many[0]]);alone.registerAdjuvants([{id:'my_pack:x'}]);
+ assert.equal(alone.ready,false);assert.equal(await alone.requestCatalog('decoctions'),undefined);
 });
 
 // ---- v1.1.0 powders: grind, mix in the mortar, strange results, learning

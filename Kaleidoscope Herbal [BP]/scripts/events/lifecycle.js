@@ -11,7 +11,7 @@ import {trackBurner,startIncenseLoop,spillBurner} from '../custom_components/inc
 import {startReishiInoculation} from '../custom_components/reishiSpawn.js';
 import {applyHeat,startConstitution} from '../utils/constitution.js';
 import {startStoreSweep} from '../utils/storeSweep.js';
-import {handleGinsengBreak} from '../utils/ginsengHarvest.js';
+import {handleGinsengBreak,handleWildHarvest} from '../utils/ginsengHarvest.js';
 import {spillCabinet} from '../custom_components/herbCabinet.js';
 import {spillMortar} from '../custom_components/mortar.js';
 import {STRANGE,STRANGE_EFFECTS,parseMark} from '../data/powders.js';
@@ -70,6 +70,7 @@ export function startEvents(){
  world.afterEvents.playerBreakBlock.subscribe(event=>{
   handleHoneysuckleHarvest(event);
   handleGinsengBreak(event);
+  handleWildHarvest(event);
  });
  world.afterEvents.blockExplode.subscribe(({block,explodedBlockPermutation})=>{
   const type=explodedBlockPermutation.type.id;

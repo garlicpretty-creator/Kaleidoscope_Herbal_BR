@@ -8,13 +8,18 @@
  *   import {connectHerbal} from './herbal-client.js';
  *   const herbal=connectHerbal(system,{source:'my_pack',heat:[{id:'my_pack:iced_tea',heat:-30}],
  *     onEvent:e=>{if(e.t==='decoction_served')...}});
+ *
+ * v1.2.0: `recipes` ([{id, ingredients:[{id,count}], servings, time?}]) are brewed by Herbal's clay pot and
+ * `adjuvants` ([{id, servings?}]) add a serving to any brew; both are sent again on every api_ready, like `heat`.
  */
 export const HERBAL_EVENTS=Object.freeze({ping:'kaleidoscope_herbal:api_ping',ready:'kaleidoscope_herbal:api_ready',
  catalogRequest:'kaleidoscope_herbal:catalog_request',catalog:'kaleidoscope_herbal:catalog',
  heatRegister:'kaleidoscope_herbal:heat_register',heatAck:'kaleidoscope_herbal:heat_ack',
  heatRequest:'kaleidoscope_herbal:heat_request',heatAdd:'kaleidoscope_herbal:heat_add',heat:'kaleidoscope_herbal:heat',
+ recipeRegister:'kaleidoscope_herbal:recipe_register',recipeAck:'kaleidoscope_herbal:recipe_ack',
+ adjuvantRegister:'kaleidoscope_herbal:adjuvant_register',adjuvantAck:'kaleidoscope_herbal:adjuvant_ack',
  evt:'kaleidoscope_herbal:evt'});
-export function connectHerbal(system,{source,heat=[],requires=[],onReady,onEvent,log=console.warn,timeoutTicks=100}={}){
+export function connectHerbal(system,{source,heat=[],recipes=[],adjuvants=[],requires=[],onReady,onEvent,log=console.warn,timeoutTicks=100}={}){
  if(typeof source!=='string'||!/^[a-z0-9_.-]{1,64}$/.test(source))throw new Error('source must be your pack namespace');
  let info,disposed=false,sequence=0,warned=false;
  const waiting=new Map(),rejected=[];
@@ -26,10 +31,23 @@ export function connectHerbal(system,{source,heat=[],requires=[],onReady,onEvent
   waiting.set(req,{collect,parts:[],done:value=>{system.clearRun(timer);waiting.delete(req);resolve(value);}});
   send(id,{...body,req});
  });
- const registerHeat=()=>{
-  const size=info.limits?.itemsPerMessage??32;
-  for(let i=0;i<heat.length;i+=size)send(HERBAL_EVENTS.heatRegister,{items:heat.slice(i,i+size)});
+ // Batches stay under the host's per-message count and well inside the 2048-character script event limit.
+ const sendAll=(id,field,rows,size)=>{
+  let batch=[],length=0;
+  const flush=()=>{if(batch.length)send(id,{[field]:batch});batch=[];length=0;};
+  for(const row of rows){
+   const cost=JSON.stringify(row).length+1;
+   if(batch.length>=size||length+cost>1700)flush();
+   batch.push(row);length+=cost;
+  }
+  flush();
  };
+ const registerHeat=(rows=heat)=>sendAll(HERBAL_EVENTS.heatRegister,'items',rows,info.limits?.itemsPerMessage??32);
+ const registerRecipes=(rows=recipes)=>sendAll(HERBAL_EVENTS.recipeRegister,'recipes',rows,info.limits?.recipesPerMessage??8);
+ const registerAdjuvants=(rows=adjuvants)=>sendAll(HERBAL_EVENTS.adjuvantRegister,'items',rows,info.limits?.itemsPerMessage??32);
+ // Later additions replace an earlier row with the same id, so the next api_ready replays the latest value.
+ const keep=(list,rows)=>{for(const row of rows){const i=list.findIndex(x=>x.id===row.id);if(i<0)list.push(row);else list[i]=row;}};
+ heat=[...heat];recipes=[...recipes];adjuvants=[...adjuvants];
  const callback=ev=>{
   if(disposed||ev.sourceType!=='Server')return;
   let m;try{m=JSON.parse(ev.message);}catch{return;}
@@ -42,11 +60,17 @@ export function connectHerbal(system,{source,heat=[],requires=[],onReady,onEvent
    // Herbal keeps registrations in memory only; every ready replays them, which is harmless when repeated.
    info=m;rejected.length=0;
    if(heat.length&&m.capabilities?.includes('external_heat'))registerHeat();
+   if(adjuvants.length&&m.capabilities?.includes('external_adjuvants'))registerAdjuvants();
+   if(recipes.length&&m.capabilities?.includes('external_recipes'))registerRecipes();
    if(onReady){try{onReady(m);}catch(error){log('[Herbal SDK] onReady: '+error);}}
    return;
   }
   if(m.to!==source)return;
-  if(ev.id===HERBAL_EVENTS.heatAck){for(const row of m.rejected??[]){rejected.push(row);log('[Herbal SDK] Rejected '+row.id+': '+row.code);}return;}
+  if(ev.id===HERBAL_EVENTS.heatAck||ev.id===HERBAL_EVENTS.recipeAck||ev.id===HERBAL_EVENTS.adjuvantAck){
+   if(m.code)log('[Herbal SDK] Refused '+ev.id+': '+m.code);
+   for(const row of m.rejected??[]){rejected.push(row);log('[Herbal SDK] Rejected '+row.id+': '+row.code);}
+   return;
+  }
   const wait=waiting.get(m.req);if(!wait)return;
   if(ev.id===HERBAL_EVENTS.heat){wait.done(m.ok?{heat:m.heat,applied:m.applied,effect:m.effect}:{error:m.code,heat:m.heat});return;}
   if(ev.id===HERBAL_EVENTS.catalog){
@@ -62,15 +86,21 @@ export function connectHerbal(system,{source,heat=[],requires=[],onReady,onEvent
   get ready(){return !!info;},
   /** The host's api_ready payload: {api, source, version, capabilities, limits}. */
   get host(){return info;},
-  /** Heat registrations the host refused since the last ready: [{id, code}]. */
+  /** Heat, recipe and adjuvant registrations the host refused since the last ready: [{id, code}]. */
   get rejected(){return [...rejected];},
   has:capability=>!!info?.capabilities?.includes(capability),
-  /** kind: 'herbs' | 'foods'. Resolves to the item list, or undefined (no Herbal, unknown kind, timeout). */
+  /** kind: 'herbs' | 'foods' | 'decoctions' | 'adjuvants'. Resolves to the item list, or undefined (no Herbal, unknown kind, timeout). */
   requestCatalog:kind=>ask(HERBAL_EVENTS.catalogRequest,{kind}),
   /** Resolves to {heat} for a player id, {error} when refused, undefined without Herbal. Range -100..100. */
   requestHeat:playerId=>ask(HERBAL_EVENTS.heatRequest,{p:playerId}),
   /** Warms (+) or cools (-) a player; the host clamps to its heatAddMax and allows one push a second. */
   addHeat:(playerId,delta)=>ask(HERBAL_EVENTS.heatAdd,{p:playerId,delta}),
+  /** Adds or updates clay-pot recipes ([{id, ingredients:[{id,count}], servings, time?}]); servings 0 withdraws one. Replayed on every ready. */
+  registerRecipes(rows){keep(recipes,rows);if(!disposed&&info?.capabilities?.includes('external_recipes'))registerRecipes(rows);},
+  /** Adds or updates adjuvants ([{id, servings?}]); servings 0 withdraws one. Replayed on every ready. */
+  registerAdjuvants(rows){keep(adjuvants,rows);if(!disposed&&info?.capabilities?.includes('external_adjuvants'))registerAdjuvants(rows);},
+  /** Adds or updates heat values ([{id, heat}]); heat 0 withdraws one. Replayed on every ready. */
+  registerHeat(rows){keep(heat,rows);if(!disposed&&info?.capabilities?.includes('external_heat'))registerHeat(rows);},
   dispose(){disposed=true;system.afterEvents.scriptEventReceive.unsubscribe(callback);for(const wait of [...waiting.values()])wait.done(undefined);},
  };
 }

@@ -56,19 +56,42 @@ export const ADJUVANTS = {
  [id('dried_goji')]:{servings:1},
  [id('dried_cordyceps')]:{servings:1},
 };
-export const MAX_ADJUVANTS=2,MAX_SERVINGS=4;
+export const MAX_ADJUVANTS=2,MAX_SERVINGS=4,MAX_INGREDIENTS=6;
+// v1.2.0: formulas and adjuvants other packs registered through the Herbal API (api/herbalHostCore.js, docs/API.md).
+// EXTERNAL_RECIPES: result item -> {result, ingredients, servings, time, source}; EXTERNAL_ADJUVANTS: item -> {servings, source}.
+// Our own formulas always win; nothing here is saved, clients register again after every api_ready.
+export const EXTERNAL_RECIPES=new Map(),EXTERNAL_ADJUVANTS=new Map();
+export const DEFAULT_TIME=600;
+const adjuvant=x=>ADJUVANTS[x]??EXTERNAL_ADJUVANTS.get(x);
 function take(rest,options){const i=rest.findIndex(x=>options.includes(x));if(i<0)return false;rest.splice(i,1);return true;}
-export function matchDecoction(items){
- for(const recipe of DECOCTIONS){
-  const rest=[...items];
-  if(!recipe.ingredients.every(slot=>take(rest,variants[slot]??[slot])))continue;
-  if(rest.length>MAX_ADJUVANTS||!rest.every(x=>ADJUVANTS[x]))continue;
-  let servings=recipe.servings;
-  for(const kind of new Set(rest))servings+=ADJUVANTS[kind].servings??0;
-  return {...recipe,servings:Math.min(MAX_SERVINGS,servings)};
- }
+function fit(recipe,items){
+ const rest=[...items];
+ if(!recipe.ingredients.every(slot=>take(rest,variants[slot]??[slot])))return undefined;
+ if(rest.length>MAX_ADJUVANTS||!rest.every(adjuvant))return undefined;
+ let servings=recipe.servings;
+ for(const kind of new Set(rest))servings+=adjuvant(kind).servings??0;
+ return {...recipe,servings:Math.min(MAX_SERVINGS,servings)};
+}
+export function matchBuiltin(items){
+ for(const recipe of DECOCTIONS){const match=fit(recipe,items);if(match)return match;}
  return undefined;
 }
+// Built-in formulas first; then other packs' formulas, the one naming the most ingredients first.
+export function matchDecoction(items){
+ const own=matchBuiltin(items);if(own||!EXTERNAL_RECIPES.size)return own;
+ for(const recipe of [...EXTERNAL_RECIPES.values()].sort((a,b)=>b.ingredients.length-a.ingredients.length)){const match=fit(recipe,items);if(match)return match;}
+ return undefined;
+}
+// What the clay pot takes besides our own herbs: anything a registered formula or adjuvant names.
+export function isExternalIngredient(item){
+ if(EXTERNAL_ADJUVANTS.has(item))return true;
+ for(const recipe of EXTERNAL_RECIPES.values())if(recipe.ingredients.includes(item))return true;
+ return false;
+}
+const counted=list=>[...list.reduce((m,x)=>m.set(x,(m.get(x)??0)+1),new Map())];
+// Catalog rows for the Herbal API: built-in entries carry no `source`.
+export const decoctionCatalog=()=>[...DECOCTIONS,...EXTERNAL_RECIPES.values()].map(r=>({id:r.result,ingredients:counted(r.ingredients),servings:r.servings,time:r.time,...(r.source?{source:r.source}:{})}));
+export const adjuvantCatalog=()=>[...Object.entries(ADJUVANTS),...EXTERNAL_ADJUVANTS].map(([item,a])=>({id:item,servings:a.servings,...(a.source?{source:a.source}:{})}));
 export const burnLimit=heat=>heat==='strong'?400:1200;
 export function advancePot(record,heat,elapsed=20){
  if(!heat||![2,3].includes(record.stage))return false;
@@ -84,6 +107,13 @@ export function advancePot(record,heat,elapsed=20){
   if(record.warm>=burnLimit(heat)){record.stage=4;record.output=id('burnt_dregs');record.servings=1;}
  }
  return true;
+}
+// v1.2.0: the broadcast a stage change earns (utils/bus.js): the brew burnt, or a wrong mix came out as bitter dregs.
+export function potEvent(before,record){
+ if(before===record.stage)return undefined;
+ if(record.stage===4)return {t:'decoction_burnt',fields:{id:record.result}};
+ if(record.stage===3&&record.result===id('bitter_dregs'))return {t:'decoction_bitter',fields:{}};
+ return undefined;
 }
 export function contentsOnBreak(record){
  if(!record)return [];
