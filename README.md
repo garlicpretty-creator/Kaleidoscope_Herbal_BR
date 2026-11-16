@@ -15,7 +15,7 @@
 | `docs/改善企劃書.md` | 重製版改善企劃書 |
 | `docs/API.md` | 對外 API 契約 |
 | `docs/PBR.md` | PBR 貼圖規範與檢查結果 |
-| `tools/` | PBR 檢查與打包 |
+| `tools/` | 物品圖示繪製、引用與 PBR 檢查、打包 |
 | `tests/` | 測試 |
 
 需求：Minecraft 基岩版 1.26.1 以上，以及森羅物語：廚房（Cookery）——晾曬、切片、研磨、藥膳與茶都在 Cookery 的器具上完成。
