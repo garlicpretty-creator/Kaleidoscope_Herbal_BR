@@ -1,0 +1,1 @@
+{"format_version":"1.20.10","minecraft:recipe_shaped":{"description":{"identifier":"kaleidoscope_herbal:incense_burner"},"tags":["crafting_table"],"unlock":{"context":"AlwaysUnlocked"},"pattern":[" B ","B B"," S "],"key":{"B":{"item":"minecraft:brick"},"S":{"item":"minecraft:stick"}},"result":{"item":"kaleidoscope_herbal:incense_burner","count":1}}}
