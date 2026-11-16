@@ -2,7 +2,7 @@ import {system} from '@minecraft/server';
 // v1.2.10: family event broadcast (森羅 PHASE2 event contract §0/§4). One-line JSON on
 // `kaleidoscope_herbal:evt`: {"v":1,"t":<event>,"p":<player.id>,...}. Only id strings, numbers and booleans.
 // Events: decoction_served {id}, ate_placed {id, kind: 'soup'|'wine'}, ginseng_dug {whole}, incense_lit {fuel},
-// constitution {state: 'overheat'|'chill'} (v1.1.0). The full contract is docs/API.md.
+// constitution {state: 'overheat'|'chill'}, powder_mixed {id}, formula_learned {id} (v1.1.0). The full contract is docs/API.md.
 // The same event for the same player is sent at most once per 20 ticks. Sending never breaks the caller.
 export const EVT='kaleidoscope_herbal:evt';
 export const EVT_THROTTLE=20;

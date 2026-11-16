@@ -20,6 +20,7 @@ export const world=new Proxy({getAllPlayers:()=>[],getDynamicPropertyIds:()=>[],
 export const WeatherType={Rain:'Rain',Thunder:'Thunder'},EquipmentSlot={Mainhand:'Mainhand'},GameMode={Creative:'Creative'};
 export class ItemStack{constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;}}
 export class MolangVariableMap{setVector3(){}}
+export class ActionFormData{title(){return this;}body(){return this;}button(){return this;}async show(){return {canceled:true};}}
 export class BlockVolume{constructor(from,to){this.from=from;this.to=to;}}
 export const BlockPermutation=any(),EntityInitializationCause={Spawned:'Spawned',Loaded:'Loaded'};
 `;
@@ -38,7 +39,7 @@ test('the pack entry loads, registers its components and announces the API',asyn
  await import(pathToFileURL(resolve(bp,'scripts/main.js')).href);
  const {system}=await import('@minecraft/server');
  const names=[];globalThis.__startup({blockComponentRegistry:{registerCustomComponent:name=>names.push(name)}});
- assert.ok(names.includes('kaleidoscope_herbal:clay_pot'));assert.equal(new Set(names).size,names.length);
+ assert.ok(names.includes('kaleidoscope_herbal:clay_pot')&&names.includes('kaleidoscope_herbal:mortar'));assert.equal(new Set(names).size,names.length);
  const ready=system.sent.find(e=>e.id==='kaleidoscope_herbal:api_ready');
  assert.ok(ready,'api_ready is broadcast at start');
  const {VERSION}=await import(pathToFileURL(resolve(bp,'scripts/data/version.js')).href);

@@ -156,3 +156,24 @@ test('every herb goes into at least one formula, dish, tea, wine or the incense 
  for(const h of HERBS)assert.ok([h.fresh,h.dry,h.processed].filter(Boolean).some(x=>used.has(kh(x))),h.key+' has no use');
  for(const h of ['licorice','poria','cordyceps','mugwort'])assert.ok(DECOCTIONS.some(r=>r.ingredients.some(i=>i.includes(h))&&r.result.includes(h==='poria'?'four_gentlemen':h)),h+' has its own formula');
 });
+
+// ---- v1.1.0 powders: grind, mix in the mortar, strange results, learning
+const P=await load('Kaleidoscope Herbal [BP]/scripts/data/powders.js');
+const {MILLING}=await load('Kaleidoscope Herbal [BP]/scripts/data/herbs.js');
+test('every herb grinds to a powder and every powder goes into a formula',()=>{
+ const milled=new Set(MILLING.flatMap(m=>m.outputs.map(o=>o.id)));
+ for(const h of HERBS){const powder=kh(P.HERB_POWDERS[h.key]);assert.ok(milled.has(powder),h.key+' has no millstone recipe');
+  assert.ok(P.POWDER_FORMULAS.some(f=>f.ingredients.includes(powder)),h.key+' powder is in no formula');}
+ assert.equal(new Set(P.POWDER_FORMULAS.map(f=>P.mixKey(f.ingredients))).size,P.POWDER_FORMULAS.length); // no two formulas share a mix
+ for(const f of P.POWDER_FORMULAS){assert.ok(f.ingredients.length>=P.MIN_POWDERS&&f.ingredients.length<=P.MAX_POWDERS);assert.ok(FOOD_EFFECTS[f.result].effects.length);}
+});
+test('a right mix gives its powder in any order; a wrong mix gives a strange powder fixed per world',()=>{
+ const good=P.mixResult([kh('chrysanthemum_powder'),kh('goji_powder')],1);
+ assert.equal(good.item,kh('ming_mu_powder'));assert.equal(good.formula.via,'mortar');assert.equal(good.mark,undefined);
+ const wrong=[kh('goji_powder'),kh('ginseng_powder')];
+ const a=P.mixResult(wrong,1),b=P.mixResult([...wrong].reverse(),1);
+ assert.equal(a.item,P.STRANGE);assert.equal(a.formula,undefined);assert.equal(a.mark,b.mark);
+ const marks=new Set(Array.from({length:40},(_,salt)=>P.mixResult(wrong,salt).mark));assert.ok(marks.size>3); // other worlds differ
+ assert.equal(P.parseMark([P.strangeMark(a.mark)]),a.mark);assert.equal(P.parseMark([]),undefined);assert.equal(P.parseMark(['§8✦ 999']),undefined);
+ assert.equal(P.mixResult([kh('goji_powder'),kh('goji_powder')],1).item,P.STRANGE); // doubling one powder is not a formula
+});

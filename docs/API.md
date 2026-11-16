@@ -126,6 +126,8 @@
 | `ginseng_dug` | `whole`（是否用藥鋤完整挖起） | 挖起人參 |
 | `incense_lit` | `fuel` | 點燃香爐 |
 | `constitution` | `state`: `overheat` \| `chill` | 玩家上火或受寒（v1.1.0 新增） |
+| `powder_mixed` | `id`（成品，配錯時為 `kaleidoscope_herbal:strange_powder`） | 在藥缽配出散劑（v1.1.0 新增） |
+| `formula_learned` | `id`（藥方成品） | 玩家用藥方籤學會一個藥方（v1.1.0 新增） |
 
 ## 草本會聽的外部事件（供參考）
 

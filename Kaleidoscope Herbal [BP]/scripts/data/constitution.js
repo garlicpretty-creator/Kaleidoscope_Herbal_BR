@@ -1,4 +1,5 @@
 import {id} from './herbs.js';
+import {POWDER_FORMULAS} from './powders.js';
 // 寒熱: positive warms (溫補), negative cools (清涼); 0 is 平和 and leaves the body alone.
 export const HEAT_LIMIT=100,HEAT_RESET=60,HEAT_DECAY=5,HEAT_DECAY_TICKS=100;
 const table={
@@ -9,7 +10,7 @@ const table={
  honeysuckle_tea:-35,honeysuckle_tea_dew:-50,chrysanthemum_tea:-40,goji_tea:5,jujube_tea:0,
  bitter_dregs:-15,
 };
-export const HEAT_VALUES=new Map();
+export const HEAT_VALUES=new Map(POWDER_FORMULAS.filter(f=>f.heat).map(f=>[f.result,f.heat]));
 for(const [key,value] of Object.entries(table)){
  HEAT_VALUES.set(id(key),value);
 }

@@ -1,4 +1,5 @@
 import {id} from './herbs.js';
+import {POWDER_FORMULAS} from './powders.js';
 export const NEGATIVE_EFFECTS = ['poison','wither','nausea','blindness','darkness','weakness','slowness','mining_fatigue'];
 const effect=(name,seconds,amplifier=0)=>({name,ticks:seconds*20,amplifier});
 // v1.1.0: a brew is either done (熟) or burnt (焦); the 下/中/上 grades are gone. Every herb leads or joins
@@ -42,7 +43,7 @@ export const FOOD_EFFECTS = {
   [id('goji_wine')]: {effects:[effect('night_vision',60)]},
   [id('jujube_wine')]: {effects:[effect('absorption',60)]},
 };
-for(const recipe of DECOCTIONS)FOOD_EFFECTS[recipe.result]={effects:recipe.effects,clear:recipe.clear};
+for(const recipe of [...DECOCTIONS,...POWDER_FORMULAS])FOOD_EFFECTS[recipe.result]={effects:recipe.effects,clear:recipe.clear};
 // Unsliced forms count as their base herb (a slice is one third of a dried root, so slicing still pays).
 const variants = {
  [id('ginseng_slices')]:['ginseng_slices','dried_ginseng','dried_broken_ginseng','broken_ginseng_root'].map(id),

@@ -17,6 +17,8 @@ export const HERB_ITEMS = new Set(HERBS.flatMap(h=>[h.fresh,h.dry,h.processed]).
 export const MILLING = [
   {input:id('dried_reishi'), outputs:[{id:id('reishi_powder'),count:2,chance:1}]},
   {input:id('dried_mugwort'), outputs:[{id:id('mugwort_floss'),count:2,chance:1}]},
+  // v1.1.0: every other herb grinds to its own powder for the mortar.
+  ...['ginseng','angelica','licorice','honeysuckle','goji','jujube','chrysanthemum','poria','cordyceps'].map(k=>({input:id('dried_'+k), outputs:[{id:id(k+'_powder'),count:2,chance:1}]})),
 ];
 export const LOGS =['oak','spruce','birch','jungle','acacia','dark_oak','mangrove','cherry','pale_oak'].flatMap(x=>[`minecraft:${x}_log`,`minecraft:stripped_${x}_log`]).concat(['minecraft:log','minecraft:log2']);
 export const isLog = block => !!block && (LOGS.includes(block.typeId) || block.hasTag?.('log') || block.hasTag?.('minecraft:logs'));

@@ -11,7 +11,7 @@ export function parseFormula(raw){
  if(typeof raw!=='string')return undefined;
  try{
   const f=JSON.parse(raw);
-  return typeof f?.result==='string'&&Array.isArray(f.ingredients)&&f.ingredients.length&&f.ingredients.length<=6&&f.ingredients.every(x=>typeof x==='string')?f:undefined;
+  return typeof f?.result==='string'&&Array.isArray(f.ingredients)&&f.ingredients.length&&f.ingredients.length<=6&&f.ingredients.every(x=>typeof x==='string')?f:undefined; // f.via==='mortar' marks a powder formula
  }catch{return undefined;}
 }
 export const tally=list=>list.reduce((m,x)=>m.set(x,(m.get(x)??0)+1),new Map());

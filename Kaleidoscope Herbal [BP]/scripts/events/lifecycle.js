@@ -13,6 +13,9 @@ import {applyHeat,startConstitution} from '../utils/constitution.js';
 import {startStoreSweep} from '../utils/storeSweep.js';
 import {handleGinsengBreak} from '../utils/ginsengHarvest.js';
 import {spillCabinet} from '../custom_components/herbCabinet.js';
+import {spillMortar} from '../custom_components/mortar.js';
+import {STRANGE,STRANGE_EFFECTS,parseMark} from '../data/powders.js';
+import {startFormulaBook} from '../utils/formulaBook.js';
 import {handleHoneysuckleHarvest,handleHoneysuckleExplosion} from '../custom_components/wildHoneysuckle.js';
 import {spillExplodedWine} from '../custom_components/herbalWine.js';
 import {spillExplodedTea} from '../utils/teaDrops.js';
@@ -31,6 +34,13 @@ export function applyFood(source,typeId){
  if(source.typeId==='minecraft:player')applyHeat(source,typeId);
  return true;
 }
+// 奇怪藥散: the packet's mark names its effect; a packet without one (given by command, auto-fed) picks at random.
+export function applyStrange(source,lore){
+ if(!source)return false;
+ const e=STRANGE_EFFECTS[parseMark(lore)??Math.floor(Math.random()*STRANGE_EFFECTS.length)];
+ source.addEffect(e.name,e.ticks,{amplifier:e.amplifier,showParticles:true});
+ return true;
+}
 export function onAwwEvent(event){
  if(event.id!=='aww:evt')return;
  try{
@@ -40,12 +50,15 @@ export function onAwwEvent(event){
   if(m.t==='reaction'){onReaction(m);return;}
   if(m.t!=='autofed'||typeof m.id!=='string'||!(m.id.startsWith('kaleidoscope_herbal:')||hasExternalHeat(m.id)))return;
   const player=world.getEntity(m.p);
-  if(player?.isValid&&player.typeId==='minecraft:player')applyFood(player,m.id);
+  if(player?.isValid&&player.typeId==='minecraft:player'){if(m.id===STRANGE)applyStrange(player);else applyFood(player,m.id);}
  }catch{} // malformed message or player gone: ignore quietly
 }
 export function startEvents(){
  startReishiInoculation();
- world.afterEvents.itemCompleteUse.subscribe(({source,itemStack})=>applyFood(source,itemStack.typeId));
+ world.afterEvents.itemCompleteUse.subscribe(({source,itemStack})=>{
+  if(itemStack.typeId===STRANGE)applyStrange(source,itemStack.getLore());else applyFood(source,itemStack.typeId);
+ });
+ startFormulaBook();
  // v1.2.11 (B047): A Witch Way's backpack auto-feed does not really eat (it gives Saturation directly), so
  // itemCompleteUse never fires; AWW broadcasts each bite on aww:evt instead. Hunger and the bowl are AWW's.
  system.afterEvents.scriptEventReceive.subscribe(onAwwEvent,{namespaces:['aww']});
@@ -62,6 +75,7 @@ export function startEvents(){
   const type=explodedBlockPermutation.type.id;
   if(type===id('clay_pot'))spillPot(block);
   if(type===id('herb_cabinet'))spillCabinet(block);
+  if(type===id('mortar'))spillMortar(block);
   if(type===id('incense_burner'))spillBurner(block);
   handleHoneysuckleExplosion({block,explodedBlockPermutation});
   spillExplodedTea({block,explodedBlockPermutation});

@@ -31,7 +31,7 @@ function useSlip(block,player,slot,r){
  }
  const formula=parseFormula(stack.getDynamicProperty(FORMULA));
  // Nothing goes in unless every herb is in the inventory; the slip's tooltip lists what is needed.
- if(r.stage!==1||r.ingredients.length||!formula||!planFill(formula.ingredients,countItems(player)).ok){deny(block);return;}
+ if(r.stage!==1||r.ingredients.length||!formula||formula.via==='mortar'||!planFill(formula.ingredients,countItems(player)).ok){deny(block);return;}
  removeItems(player,tally(formula.ingredients));
  r.ingredients=[...formula.ingredients];saveRecord(r);sync(block,r);feedback(block);
 }
