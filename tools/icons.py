@@ -614,9 +614,36 @@ RD={**{n:'cer' for n in ('ginseng_decoction','four_herb_decoction','reishi_decoc
  'mugwort_angelica_decoction','licorice_jujube_decoction','ginseng_chicken_soup','goji_chicken_soup','goji_jujube_soup','jujube_sweet_soup',
  'angelica_mutton_soup','four_herb_chicken','chrysanthemum_tea','goji_tea','honeysuckle_tea','honeysuckle_tea_dew','jujube_tea')},
  **{n:'glass' for n in ('ginseng_wine','goji_wine','angelica_wine','jujube_wine','reishi_wine')},'bitter_dregs':'herb'}
+# The other 55 icons: each drawing above redrawn by Retro Diffusion and put together by tools/rd_assemble.py, which needs
+# the drawings (soil strips, packet labels, powder shades), so they stay in this file.
+RD.update({n:'herb' for n in ['burnt_dregs','dried_cordyceps','fresh_cordyceps','dried_jujube','jujube_seeds','mugwort_floss']+[h+'_powder' for h in
+ ('angelica','chrysanthemum','cordyceps','ginseng','goji','honeysuckle','jujube','licorice','poria','reishi')]+['carried_%s_crop'%h for h in
+ ('angelica','chrysanthemum','ginseng','goji','honeysuckle','jujube','licorice','mugwort')]+['carried_wild_'+h for h in
+ ('angelica','chrysanthemum','ginseng','goji','honeysuckle','jujube','licorice','mugwort')]})
+RD.update({n+'_powder':'paper' for n in ('an_shen','hui_chun','ming_mu','qing_re','qing_shen','shen_chong','xing_qi','yin_xi','strange')})
+RD.update({'sealed_prescription':'paper','icon_herb_packets':'paper','icon_paper_lantern':'paper','carried_reishi_spawn':'wood','herbal_trowel':'wood',
+ 'icon_abacus':'wood','icon_hanging_gourd':'wood','icon_herb_cabinet':'wood','icon_herb_counter':'wood','icon_steelyard':'wood',
+ 'icon_clay_pot':'cer','icon_incense_burner':'cer','icon_medicine_jar':'cer','icon_mortar':'stone'})
+# The 38 icons that were hand-drawn originals (tools/icon_src/original/), redrawn the same way.
+RD.update({n:'herb' for n in ['angelica_seeds','chrysanthemum_seeds','ginseng_seeds','goji_seeds','honeysuckle_seeds','licorice_seeds','mugwort_seeds',
+ 'angelica_slices','ginseng_slices','licorice_slices','poria_slices','broken_ginseng_root','dried_broken_ginseng','fresh_ginseng','dried_ginseng',
+ 'fresh_angelica','dried_angelica','fresh_licorice','dried_licorice','fresh_goji','dried_goji','fresh_jujube','fresh_mugwort','dried_mugwort',
+ 'fresh_poria','dried_poria','reishi','dried_reishi','chrysanthemum','dried_chrysanthemum','honeysuckle','dewy_honeysuckle','dried_honeysuckle',
+ 'carried_wild_cordyceps','carried_wild_poria']})
+RD.update({'formula_notebook':'paper','prescription_slip':'paper','icon_herbal_curtain':'cloth'})
+# Parts of a redrawn icon that are a different material from the rest, picked out by colour: (test on r,g,b) -> material.
+gold=lambda r,g,b:r>165 and g>120 and b<120 and r-b>70
+RD_PARTS={'icon_paper_lantern':[(lambda r,g,b:r>170 and g<130,'glow')],          # the lit paper
+ 'burnt_dregs':[(lambda r,g,b:r>190 and 60<g<180 and b<100,'glow')],             # embers
+ 'icon_incense_burner':[(gold,'brass')],'icon_steelyard':[(gold,'brass')],
+ 'herbal_trowel':[(lambda r,g,b:abs(r-g)<22 and abs(g-b)<30 and r>110,'iron')]}  # the blade
 def from_rd(name,mat):
     img=Image.open(os.path.join(SRC,'rd',name+'.png')).convert('RGBA');assert img.size==(16,16),(name,img.size)
-    return {(x,y):(img.getpixel((x,y))[:3]+(255,),mat) for y in range(16) for x in range(16) if img.getpixel((x,y))[3]>=128}
+    def material(rgb):
+        for test,part in RD_PARTS.get(name,()):
+            if test(*rgb): return part
+        return mat
+    return {(x,y):(img.getpixel((x,y))[:3]+(255,),material(img.getpixel((x,y))[:3])) for y in range(16) for x in range(16) if img.getpixel((x,y))[3]>=128}
 
 def build():
     out={}
