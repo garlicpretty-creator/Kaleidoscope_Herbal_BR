@@ -1,0 +1,1 @@
+{"format_version":"1.10.0","render_controllers":{"controller.render.kaleidoscope_herbal.herb_grinder_decor_visual_stone":{"geometry":"Geometry.default","materials":[{"*":"Material.default"}],"textures":["Texture.stone"],"part_visibility":[{"*":true}]}}}

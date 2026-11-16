@@ -1,0 +1,88 @@
+import {spillExplodedSoup} from '../custom_components/herbalSoup.js';
+import {system,world,WeatherType} from '@minecraft/server';
+import {id} from '../data/herbs.js';
+import {FOOD_EFFECTS} from '../data/decoctions.js';
+import {onSky,onReaction} from '../utils/awwWorld.js';
+import {onSenluoEvent} from '../utils/senluoWeek.js';
+import {readStore} from '../utils/blockStore.js';
+import {activePots,startPotLoop,spillPot,restorePotVisual} from '../custom_components/clayPot.js';
+import {trackBurner,startIncenseLoop,spillBurner} from '../custom_components/incenseBurner.js';
+import {startReishiInoculation} from '../custom_components/reishiSpawn.js';
+import {applyHeat,startConstitution} from '../utils/constitution.js';
+import {spillMortar} from '../custom_components/mortar.js';
+import {spillGrinder} from '../custom_components/herbGrinder.js';
+import {spillCutter} from '../custom_components/herbCutter.js';
+import {startStoreSweep} from '../utils/storeSweep.js';
+import {startDisplayMigration} from '../utils/displayMigration.js';
+import {activeBaskets,spillBasket,startBasketLoop} from '../custom_components/dryingBasket.js';
+import {handleGinsengBreak} from '../utils/ginsengHarvest.js';
+import {startStationAnimations} from '../utils/stationAnimation.js';
+import {startCabinetStorage,spillCabinet} from '../custom_components/herbCabinet.js';
+import {handleHoneysuckleHarvest,handleHoneysuckleExplosion} from '../custom_components/wildHoneysuckle.js';
+import {spillExplodedWine} from '../custom_components/herbalWine.js';
+import {spillExplodedTea} from '../utils/teaDrops.js';
+export {isDawn} from '../custom_components/wildHoneysuckle.js';
+// The effects of eating or drinking one of our foods: clears, potion effects and constitution heat.
+// Shared by real eating (itemCompleteUse) and A Witch Way's backpack auto-feed. Bowls and cups are returned
+// only by food.using_converts_to, never here; hunger is the game's (or AWW's) job.
+export function applyFood(source,typeId){
+ const data=FOOD_EFFECTS[typeId];if(!data||!source)return false;
+ for(const effect of data.clear??[])source.removeEffect(effect);
+ for(const e of data.effects)source.addEffect(e.name,e.ticks,{amplifier:e.amplifier,showParticles:true});
+ if(source.typeId==='minecraft:player')applyHeat(source,typeId);
+ return true;
+}
+export function onAwwEvent(event){
+ if(event.id!=='aww:evt')return;
+ try{
+  const m=JSON.parse(event.message);if(m?.v!==1)return;
+  // v1.2.12 (phase 3a): sky events speed our crops up, a catalyze reaction grows those nearby.
+  if(m.t==='sky'){onSky(m);return;}
+  if(m.t==='reaction'){onReaction(m);return;}
+  if(m.t!=='autofed'||typeof m.id!=='string'||!m.id.startsWith('kaleidoscope_herbal:'))return;
+  const player=world.getEntity(m.p);
+  if(player?.isValid&&player.typeId==='minecraft:player')applyFood(player,m.id);
+ }catch{} // malformed message or player gone: ignore quietly
+}
+export function startEvents(){
+ startStationAnimations();
+ startReishiInoculation();
+ world.afterEvents.itemCompleteUse.subscribe(({source,itemStack})=>applyFood(source,itemStack.typeId));
+ // v1.2.11 (B047): A Witch Way's backpack auto-feed does not really eat (it gives Saturation directly), so
+ // itemCompleteUse never fires; AWW broadcasts each bite on aww:evt instead. Hunger and the bowl are AWW's.
+ system.afterEvents.scriptEventReceive.subscribe(onAwwEvent,{namespaces:['aww']});
+ // v1.2.13: 森羅週曆 weekly themes from 魔女手札.
+ system.afterEvents.scriptEventReceive.subscribe(onSenluoEvent,{namespaces:['senluo_link']});
+ world.afterEvents.weatherChange.subscribe(({dimension,newWeather})=>{
+  world.setDynamicProperty(id('rain/'+dimension),newWeather===WeatherType.Rain||newWeather===WeatherType.Thunder);
+ });
+ world.afterEvents.playerBreakBlock.subscribe(event=>{
+  handleHoneysuckleHarvest(event);
+  handleGinsengBreak(event);
+ });
+ world.afterEvents.blockExplode.subscribe(({block,explodedBlockPermutation})=>{
+  const type=explodedBlockPermutation.type.id;
+  if(type===id('clay_pot'))spillPot(block);
+  if(type===id('herb_cabinet'))spillCabinet(block);
+  if(type===id('mortar'))spillMortar(block);
+  if(type===id('incense_burner'))spillBurner(block);
+  if(type===id('herb_grinder_decor'))spillGrinder(block);
+  if(type===id('drying_basket'))spillBasket(block);
+  if(type===id('herb_cutter'))spillCutter(block);
+  handleHoneysuckleExplosion({block,explodedBlockPermutation});
+  spillExplodedTea({block,explodedBlockPermutation});
+  spillExplodedWine({block,explodedBlockPermutation});spillExplodedSoup({block,explodedBlockPermutation});
+ });
+ system.run(()=>{
+  const store=readStore();
+  startDisplayMigration(store);   // v1.2.8, once: redraw grinders, mortars and cutters placed before the upgrade
+  for(const record of store.values()){
+   if(record.type==='clay_pot')restorePotVisual(record);
+   if(record.type==='clay_pot'&&[2,3].includes(record.stage))activePots.add(record.key);
+   if(record.type==='incense_burner'&&record.lit)trackBurner(record);
+   if(record.type==='drying_basket'&&!record.done)activeBaskets.add(record.key);
+  }
+  startCabinetStorage();startPotLoop();startIncenseLoop();startConstitution();startBasketLoop();startStoreSweep();
+ });
+}
+

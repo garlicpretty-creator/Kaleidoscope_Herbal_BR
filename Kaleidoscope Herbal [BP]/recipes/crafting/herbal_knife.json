@@ -1,0 +1,1 @@
+{"format_version":"1.20.10","minecraft:recipe_shaped":{"description":{"identifier":"kaleidoscope_herbal:herbal_knife"},"tags":["crafting_table"],"unlock":{"context":"AlwaysUnlocked"},"pattern":[" S ","III"],"key":{"S":{"item":"minecraft:stick"},"I":{"item":"minecraft:iron_ingot"}},"result":{"item":"kaleidoscope_herbal:herbal_knife","count":1}}}
