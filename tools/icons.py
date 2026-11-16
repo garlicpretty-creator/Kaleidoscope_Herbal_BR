@@ -614,6 +614,16 @@ RD={**{n:'cer' for n in ('ginseng_decoction','four_herb_decoction','reishi_decoc
  'mugwort_angelica_decoction','licorice_jujube_decoction','ginseng_chicken_soup','goji_chicken_soup','goji_jujube_soup','jujube_sweet_soup',
  'angelica_mutton_soup','four_herb_chicken','chrysanthemum_tea','goji_tea','honeysuckle_tea','honeysuckle_tea_dew','jujube_tea')},
  **{n:'glass' for n in ('ginseng_wine','goji_wine','angelica_wine','jujube_wine','reishi_wine')},'bitter_dregs':'herb'}
+# The other 55 icons: each drawing above redrawn by Retro Diffusion and put together by tools/rd_assemble.py, which needs
+# the drawings (soil strips, packet labels, powder shades), so they stay in this file.
+RD.update({n:'herb' for n in ['burnt_dregs','dried_cordyceps','fresh_cordyceps','dried_jujube','jujube_seeds','mugwort_floss']+[h+'_powder' for h in
+ ('angelica','chrysanthemum','cordyceps','ginseng','goji','honeysuckle','jujube','licorice','poria','reishi')]+['carried_%s_crop'%h for h in
+ ('angelica','chrysanthemum','ginseng','goji','honeysuckle','jujube','licorice','mugwort')]+['carried_wild_'+h for h in
+ ('angelica','chrysanthemum','ginseng','goji','honeysuckle','jujube','licorice','mugwort')]})
+RD.update({n+'_powder':'paper' for n in ('an_shen','hui_chun','ming_mu','qing_re','qing_shen','shen_chong','xing_qi','yin_xi','strange')})
+RD.update({'sealed_prescription':'paper','icon_herb_packets':'paper','icon_paper_lantern':'paper','carried_reishi_spawn':'wood','herbal_trowel':'wood',
+ 'icon_abacus':'wood','icon_hanging_gourd':'wood','icon_herb_cabinet':'wood','icon_herb_counter':'wood','icon_steelyard':'wood',
+ 'icon_clay_pot':'cer','icon_incense_burner':'cer','icon_medicine_jar':'cer','icon_mortar':'stone'})
 def from_rd(name,mat):
     img=Image.open(os.path.join(SRC,'rd',name+'.png')).convert('RGBA');assert img.size==(16,16),(name,img.size)
     return {(x,y):(img.getpixel((x,y))[:3]+(255,),mat) for y in range(16) for x in range(16) if img.getpixel((x,y))[3]>=128}

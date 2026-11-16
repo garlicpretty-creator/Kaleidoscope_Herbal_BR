@@ -1,0 +1,327 @@
+{
+ "an_shen_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a purple label with a crescent moon in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_herb_cabinet_s50": {
+  "prompt": "a tall wooden apothecary cabinet with nine small drawers with brass knobs, front view",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_goji_s50": {
+  "prompt": "a wild goji shrub with red berries growing in a tuft of green grass",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "angelica_powder_s50": {
+  "prompt": "a small cone shaped heap of light brown herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "burnt_dregs_s50": {
+  "prompt": "a shallow grey ceramic dish holding a heap of black burnt herb dregs with orange embers and a wisp of smoke",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_angelica_crop_s50": {
+  "prompt": "a angelica herb with white umbel flowers and green leaves growing from a strip of brown tilled soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_chrysanthemum_crop_s50": {
+  "prompt": "a chrysanthemum plant with two yellow flowers growing from a strip of brown tilled soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_ginseng_crop_s50": {
+  "prompt": "a ginseng plant with green leaves and a red berry cluster growing from a strip of brown tilled soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_goji_crop_s50": {
+  "prompt": "a goji shrub with red berries growing from a strip of brown tilled soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_honeysuckle_crop_s50": {
+  "prompt": "a honeysuckle vine with white and yellow flowers growing from a strip of brown tilled soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_jujube_crop_s50": {
+  "prompt": "a jujube sapling with red date fruits growing from a strip of brown tilled soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_licorice_crop_s50": {
+  "prompt": "a licorice plant with purple flower spikes growing from a strip of brown tilled soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_mugwort_crop_s50": {
+  "prompt": "a grey green mugwort plant with feathery leaves growing from a strip of brown tilled soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_reishi_spawn_s50": {
+  "prompt": "a short cut wooden log seen from the front with white mycelium patches and a small red mushroom, a cloth cover on top",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_angelica_s50": {
+  "prompt": "a wild angelica herb with white umbel flowers and green leaves growing in a tuft of green grass",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_chrysanthemum_s50": {
+  "prompt": "a wild chrysanthemum plant with two yellow flowers growing in a tuft of green grass",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_ginseng_s50": {
+  "prompt": "a wild ginseng plant with green leaves and a red berry cluster growing in a tuft of green grass",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_honeysuckle_s50": {
+  "prompt": "a wild honeysuckle vine with white and yellow flowers growing in a tuft of green grass",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_jujube_s50": {
+  "prompt": "a wild jujube sapling with red date fruits growing in a tuft of green grass",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_licorice_s50": {
+  "prompt": "a wild licorice plant with purple flower spikes growing in a tuft of green grass",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_wild_mugwort_s50": {
+  "prompt": "a wild grey green mugwort plant with feathery leaves growing in a tuft of green grass",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "chrysanthemum_powder_s50": {
+  "prompt": "a small cone shaped heap of bright yellow herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "cordyceps_powder_s50": {
+  "prompt": "a small cone shaped heap of dark orange brown herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_cordyceps_s50": {
+  "prompt": "a bundle of dried brown cordyceps sticks tied with a red string",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "dried_jujube_s50": {
+  "prompt": "three wrinkled dark red dried jujube dates",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "fresh_cordyceps_s50": {
+  "prompt": "a fresh cordyceps: a yellow caterpillar body with a brown stalk growing up, on soil",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "ginseng_powder_s50": {
+  "prompt": "a small cone shaped heap of pale cream herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "goji_powder_s50": {
+  "prompt": "a small cone shaped heap of bright red herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "herbal_trowel_s50": {
+  "prompt": "a small garden trowel with a grey iron blade and a wooden handle, diagonal",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "honeysuckle_powder_s50": {
+  "prompt": "a small cone shaped heap of pale yellow green herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "hui_chun_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a pink label with a heart in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_abacus_s50": {
+  "prompt": "a wooden abacus with rows of red beads, front view",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_clay_pot_s50": {
+  "prompt": "a brown clay cooking pot with a lid and two handles",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_hanging_gourd_s50": {
+  "prompt": "a golden yellow calabash gourd bottle with a red tassel on top",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_herb_counter_s50": {
+  "prompt": "a wooden shop counter with two drawers, a blue jar and a small box on top, front view",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_herb_packets_s50": {
+  "prompt": "three cream paper parcels tied with red string, stacked",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_incense_burner_s50": {
+  "prompt": "a jade green incense burner on three golden legs with a golden lid and smoke",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_medicine_jar_s50": {
+  "prompt": "a white porcelain jar with blue patterns and a blue lid",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_mortar_s50": {
+  "prompt": "a grey stone mortar with a pestle inside",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_paper_lantern_s50": {
+  "prompt": "a red paper lantern with dark wooden caps and a red tassel",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "icon_steelyard_s50": {
+  "prompt": "a small balance scale with a hanging brass pan and a weight on a dark wooden beam",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "jujube_powder_s50": {
+  "prompt": "a small cone shaped heap of dark red herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "jujube_seeds_s50": {
+  "prompt": "five small brown pointed jujube seeds",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "licorice_powder_s50": {
+  "prompt": "a small cone shaped heap of golden yellow herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "ming_mu_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a blue label with an eye in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "mugwort_floss_s50": {
+  "prompt": "a fluffy ball of pale grey green mugwort wool",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "poria_powder_s50": {
+  "prompt": "a small cone shaped heap of white herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "qing_re_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a teal label with a snowflake in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "qing_shen_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a yellow label with an up arrow in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "reishi_powder_s50": {
+  "prompt": "a small cone shaped heap of red brown herbal powder on a square of cream paper",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "sealed_prescription_s50": {
+  "prompt": "a folded cream paper letter tied with a red ribbon and a red wax seal",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "shen_chong_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a red label with a flame in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "strange_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a purple label with a question mark in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "xing_qi_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a green label with a right arrow in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "yin_xi_powder_s50": {
+  "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a dark grey label with a dotted ring in the middle",
+  "strength": 0.5,
+  "cost_usd": 0.0
+ },
+ "carried_honeysuckle_crop_s35": {
+  "prompt": "a honeysuckle vine with white and yellow flowers growing from a strip of brown tilled soil",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "carried_jujube_crop_s35": {
+  "prompt": "a jujube sapling with red date fruits growing from a strip of brown tilled soil",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "carried_chrysanthemum_crop_s35": {
+  "prompt": "a chrysanthemum plant with two yellow flowers growing from a strip of brown tilled soil",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "carried_mugwort_crop_s35": {
+  "prompt": "a grey green mugwort plant with feathery leaves growing from a strip of brown tilled soil",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "carried_wild_ginseng_s35": {
+  "prompt": "a wild ginseng plant with green leaves and a red berry cluster growing in a tuft of green grass",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "icon_incense_burner_s35": {
+  "prompt": "a jade green incense burner on three golden legs with a golden lid and smoke",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "burnt_dregs_s35": {
+  "prompt": "a shallow grey ceramic dish holding a heap of black burnt herb dregs with orange embers and a wisp of smoke",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "dried_cordyceps_s35": {
+  "prompt": "a bundle of dried brown cordyceps sticks tied with a red string",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "carried_reishi_spawn_s35": {
+  "prompt": "a short cut wooden log seen from the front with white mycelium patches and a small red mushroom, a cloth cover on top",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "icon_hanging_gourd_s35": {
+  "prompt": "a golden yellow calabash gourd bottle with a red tassel on top",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ }
+}
