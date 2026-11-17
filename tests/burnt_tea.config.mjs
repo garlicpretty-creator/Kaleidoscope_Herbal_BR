@@ -1,0 +1,1 @@
+export default { root: "..", ns: "kaleidoscope_herbal", bp: "Kaleidoscope Herbal [BP]", rp: "Kaleidoscope Herbal [RP]", module: "Kaleidoscope Herbal [BP]/scripts/api/burntTea.js", catalog: "Kaleidoscope Herbal [BP]/scripts/data/burntTeaCatalog.js" };

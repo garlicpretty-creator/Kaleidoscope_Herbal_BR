@@ -278,3 +278,14 @@ herbal.registerRecipes([{id: 'my_pack:mint_decoction', servings: 0}]);
 herbal.registerAdjuvants([{id: 'my_pack:syrup'}]);
 console.info(herbal.rejected); // 被拒絕的註冊 [{id, code}]
 ```
+## 和 burnt-tea-dev 的包握手（下單了、煙火）
+
+這兩個包沒有自己的 `api_ping`，但收註冊。我們載入 20 tick 後主動送，沒裝就沒人聽、什麼都不發生。程式在 `api/burntTea.js`，要送的清單 `data/burntTeaCatalog.js` 由 `tools/gen_burnt_tea.mjs` 從本包的物品、燻爐配方與 zh_TW 語言檔產生（不要手改；測試會檢查它是否過期）。
+
+| 對方 | 送出 | 效果 |
+| --- | --- | --- |
+| 下單了 Order To Cook | `ordertocook:food_catalog_v1`（收到 `food_catalog_request_v1` 時重送） | 料理用中文名上餐廳菜單；杯裝、瓶裝的算飲品。生食材、漁獲、食材分類、飢餓值不到 3 的不上菜單 |
+| 同上 | `ordertocook:smoking_recipes_v1`（回應 `request_smoking_recipes_v1`） | 本包的燻爐配方可以在下單了的爐子上做；目錄名用 `main`，會取代下單了發行時替我們內建的那份 |
+| 煙火 Grilling | `kaleidoscope_grilling:register_smoking`，一組一則 | 神秘烤串上的生肉、生魚烤好後變成熟的那一樣，和 Java 版煙火查燻製配方一樣 |
+
+當兩個倉庫放在本倉庫旁邊時，測試會直接用下單了與煙火自己的程式碼驗證我們的訊息都被接受。
