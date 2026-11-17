@@ -234,6 +234,17 @@
 | `aww:evt` `autofed` / `sky` / `reaction` | A Witch Way | 自動餵食套用藥效；天象期間作物加速；催化使附近作物成長 |
 | `senluo_link:evt` `week` | 魔女手札 | 豐收週作物與曬籃 1.5 倍；薰香週香爐每份燃燒 9000 tick |
 
+## 草本會主動找的附加包
+
+草本載入一秒後會送出下面兩個 `api_ping`（`scripts/api/familyBridge.js`）。有回覆才會動作；沒裝的話什麼都不會發生，也不會在日誌留訊息。
+
+| 附加包 | 草本送出 | 效果 |
+|---|---|---|
+| 森羅物語：樂牧 `kaleidoscope_ranching` | `register_remedy`（需要 `remedy`） | 金銀花粉（清熱解毒）可以治好生病的動物，用掉一個 |
+| 森羅物語：漁歌 `kaleidoscope_fishing` | `register_pond_feed`（需要 `pond_feed`，漁歌 1.5.0） | 苦藥渣、焦糊藥渣放進魚池的餵食台，各算 1 餐 |
+
+反過來會送寒熱值給草本的姊妹包：漁歌（39 道料理）、豐收（20 樣食物，另有陳皮、肉桂皮兩樣佐使）、樂牧（16 樣食物）。
+
 ## SDK 範例
 
 ```js

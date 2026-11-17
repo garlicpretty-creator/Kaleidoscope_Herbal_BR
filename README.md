@@ -25,7 +25,7 @@
 | `tests/` | 測試 |
 
 需求：Minecraft 基岩版 1.26.1 以上，以及森羅物語：廚房（Cookery）——晾曬、切片、研磨、藥膳與茶都在 Cookery 的器具上完成。
-Tavern、A Witch Way、魔女手札為選用聯動。
+Tavern、A Witch Way、魔女手札，以及姊妹包樂牧、漁歌、豐收為選用聯動（見 `docs/API.md`）。
 
 ## 開發
 
