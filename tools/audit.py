@@ -135,7 +135,17 @@ for p in files(BP,'recipes/**/*.json'):
             r=body.get('result');r=r if isinstance(r,list) else [r]
             for x in r:
                 recipe_out.add(x.get('item') if isinstance(x,dict) else x)
-cat=json.dumps(load(files(BP,'item_catalog/*.json')[0]))
+catalog=load(files(BP,'item_catalog/*.json')[0]);cat=json.dumps(catalog)
+# an item's own menu_category must be the tab and group the catalog lists it under, and a group's icon one of its items
+for c in catalog['minecraft:crafting_items_catalog']['categories']:
+    for g in c['groups']:
+        gi=g.get('group_identifier',{})
+        if gi.get('icon') and gi['icon'] not in g['items']: bad('catalog','group %s shows %s, which is not in the group'%(gi.get('name'),gi['icon']))
+        for x in g['items']:
+            if x not in known: bad('catalog','%s is listed but does not exist'%x);continue
+            m=(items.get(x) or blocks.get(x))[1]['description'].get('menu_category',{})
+            if m.get('category')!=c['category_name'] or m.get('group')!=gi.get('name'): bad('catalog','%s says %s / %s but is listed under %s / %s'%(x,m.get('category'),m.get('group'),c['category_name'],gi.get('name')))
+            if x in items and x in blocks and blocks[x][1]['description'].get('menu_category')!=items[x][1]['description'].get('menu_category'): bad('catalog','%s: its item and its block name different groups'%x)
 for iid in items:
     if iid not in cat: notes.append('item %s is not in the creative item catalog'%iid)
 # ---------------------------------------------------------------- scripts: every id they name exists
