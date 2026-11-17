@@ -1,6 +1,6 @@
 {
  "angelica_mutton_soup": "round1",
- "angelica_wine": "round1",
+ "angelica_wine": "round3 (a ceramic jar with a paper label and a cloth-tied mouth, as the placed block is)",
  "bitter_dregs": "round1",
  "chrysanthemum_tea": "tea/ (shared cup, tools/tea_cups.py)",
  "cordyceps_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
@@ -9,18 +9,18 @@
  "four_herb_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
  "ginseng_chicken_soup": "round1",
  "ginseng_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
- "ginseng_wine": "round1",
+ "ginseng_wine": "round3 (a ceramic jar with a paper label and a cloth-tied mouth, as the placed block is)",
  "goji_chicken_soup": "round1",
  "goji_jujube_soup": "round1",
  "goji_tea": "tea/ (shared cup, tools/tea_cups.py)",
- "goji_wine": "round1",
+ "goji_wine": "round3 (a ceramic jar with a paper label and a cloth-tied mouth, as the placed block is)",
  "honeysuckle_tea": "tea/ (shared cup, tools/tea_cups.py)",
  "honeysuckle_tea_dew": "tea/ (shared cup, tools/tea_cups.py)",
  "jujube_sweet_soup": "round2",
  "jujube_tea": "tea/ (shared cup, tools/tea_cups.py)",
- "jujube_wine": "round1",
+ "jujube_wine": "round3 (a ceramic jar with a paper label and a cloth-tied mouth, as the placed block is)",
  "licorice_jujube_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
  "mugwort_angelica_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
  "reishi_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
- "reishi_wine": "round1"
+ "reishi_wine": "round3 (a ceramic jar with a paper label and a cloth-tied mouth, as the placed block is)"
 }
