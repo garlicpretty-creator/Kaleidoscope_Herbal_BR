@@ -12,7 +12,16 @@ import {isPlain} from '../data/cabinet.js';
 export const activePots=new StationSet();
 const deny=block=>feedback(block,'minecraft:basic_smoke_particle','random.fizz');
 // v1.2.7: no servings block state (nothing drew it; the count lives in the record) - 19,200 -> 3,840 permutations.
-const STAGE=id('stage');
+const STAGE=id('stage'),BOB=id('bob');
+// v1.1.0: while the pot boils its lid lifts and drops every second, twice as often on strong heat.
+function rattle(block,heat){
+ if(!heat||block.permutation.getState(STAGE)!==2){if(block.permutation.getState(BOB))setStates(block,{[BOB]:false});return;}
+ setStates(block,{[BOB]:!block.permutation.getState(BOB)});
+ if(heat==='strong')system.runTimeout(()=>{
+  let b;try{b=block.dimension.getBlock(block.location);}catch{}
+  if(b?.typeId===id('clay_pot')&&b.permutation.getState(STAGE)===2)setStates(b,{[BOB]:!b.permutation.getState(BOB)});
+ },10);
+}
 // v1.1.0: a brew registered by another pack (docs/API.md) may outlive that pack; its output then no longer
 // exists and cannot be spawned, so the pot gives bitter dregs instead of jamming.
 // Returns the item that was dropped (v1.1.0), so the served broadcast names what the player really got.
@@ -108,6 +117,7 @@ export function tickPot(key){
   // Past half of the scorch window the pot smokes and hisses before it burns.
   if(heat&&r.warm>=burnLimit(heat)/2)feedback(block,'minecraft:basic_smoke_particle','random.fizz');
  }
+ rattle(block,heat);
  if(r.stage===4){activePots.delete(key);lastSave.delete(key);}
 }
 export function startPotLoop(){startSetLoop(activePots,tickPot,20);}

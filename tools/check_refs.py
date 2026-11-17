@@ -47,6 +47,19 @@ for name,b in blocks.items():
         if d and d.startswith('%'):need_key(d[1:],name)
         loot=c.get('minecraft:loot')
         if loot and not os.path.exists(os.path.join(BP,loot)):err('block',name,'loot table',loot,'not found')
+# model poses: every bone a block shows or hides exists in its model, every state it reads is declared
+geo_bones={}
+for p in files(RP,'models'):
+    for g in load(p).get('minecraft:geometry',[]):geo_bones[g['description']['identifier']]={b['name'] for b in g['bones']}
+for name,b in blocks.items():
+    declared=set(b['description'].get('states',{}))|set(b['description'].get('traits',{}).get('minecraft:placement_direction',{}).get('enabled_states',[]))
+    for c in [b.get('components',{})]+[p.get('components',{}) for p in b.get('permutations',[])]:
+        g=c.get('minecraft:geometry')
+        if not isinstance(g,dict):continue
+        for bone_name,rule in g.get('bone_visibility',{}).items():
+            if bone_name not in geo_bones.get(g['identifier'],set()):err('block',name,'shows bone',bone_name,'missing from',g['identifier'])
+            for state in re.findall(r"q\.block_state\('([^']+)'\)",str(rule)):
+                if state not in declared:err('block',name,'reads undeclared state',state)
 # items
 for name,i in items.items():
     c=i['components'];icon=c.get('minecraft:icon');icon=icon.get('textures',{}).get('default') if isinstance(icon,dict) else icon
@@ -93,7 +106,7 @@ component_names=set(re.findall(r'"kaleidoscope_herbal:([a-z_]+)"',''.join(json.d
 for s in set(re.findall(r"\bid\('([a-z_/]+)'\)",script)):
     if NS+s not in known and s not in state_names and s not in component_names and s not in particles and '/' not in s and s not in('heat','heat_hint','formula','salt','learned','sealed_prescription','herb','herbal_trowel','ginseng','four_herb','reishi','cordyceps','four_gentlemen','mugwort_angelica','licorice_jujube'):err('script id() names missing',s)
 for key in set(re.findall(r"'(kh\.[a-z_]+\.[a-z_.]*[a-z_])'",script)):need_key(key,'script')
-for m in re.finditer(r"translate:`(kh\.[a-z_.]+)\$\{",script):
+for m in re.finditer(r"`(kh\.[a-z_.]+)\$\{",script):
     for k in list(langs[next(iter(langs))]):
         if k.startswith(m.group(1)):used_keys.add(k)
 # every placed block and item needs its fallback game keys too
