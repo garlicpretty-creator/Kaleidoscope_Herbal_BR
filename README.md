@@ -19,6 +19,7 @@
 | `docs/改善企劃書.md` | 重製版改善企劃書 |
 | `docs/API.md` | 對外 API 契約 |
 | `docs/測試表.md` | 進遊戲測試表 |
+| `docs/待測清單.md` | 還沒在遊戲裡確認的項目 |
 | `docs/PBR.md` | PBR 貼圖規範與檢查結果 |
 | `tools/` | 物品圖示與 banner 繪製、引用與 PBR 檢查、打包 |
 | `tests/` | 測試 |
