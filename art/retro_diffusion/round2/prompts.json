@@ -1,61 +1,11 @@
 {
- "ginseng_decoction": {
-  "prompt": "a large deep white porcelain soup bowl with a blue stripe, side view, filling the whole frame, brim full of golden amber broth with pale ginseng root slices",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
- "four_herb_decoction": {
-  "prompt": "a large deep white porcelain soup bowl with a blue stripe, side view, filling the whole frame, brim full of rose red broth with brown root slices",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
- "reishi_decoction": {
-  "prompt": "a large deep white porcelain soup bowl with a blue stripe, side view, filling the whole frame, brim full of dark brown broth with one red mushroom cap",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
  "cordyceps_decoction": {
   "prompt": "a large deep white porcelain soup bowl with a blue stripe, side view, filling the whole frame, brim full of bright orange broth with thin brown sticks",
   "style": "rd_plus__mc_item",
   "cost_usd": 0.0
  },
- "four_gentlemen_decoction": {
-  "prompt": "a large deep white porcelain soup bowl with a blue stripe, side view, filling the whole frame, brim full of pale cream milky broth with white cubes",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
- "mugwort_angelica_decoction": {
-  "prompt": "a large deep white porcelain soup bowl with a blue stripe, side view, filling the whole frame, brim full of olive green broth with green leaves",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
- "licorice_jujube_decoction": {
-  "prompt": "a large deep white porcelain soup bowl with a blue stripe, side view, filling the whole frame, brim full of honey yellow broth with two red dates",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
- "chrysanthemum_tea": {
-  "prompt": "a tall white porcelain teacup with a blue stripe, side view, filling the frame, full of yellow tea with a white daisy flower on top, steam above",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
- "honeysuckle_tea_dew": {
-  "prompt": "a tall white porcelain teacup with a blue stripe, side view, filling the frame, full of aqua blue green tea with a white flower on top, sparkles above",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
- "jujube_tea": {
-  "prompt": "a tall white porcelain teacup with a blue stripe, side view, filling the frame, full of dark red tea with a red date on top, steam above",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
  "jujube_sweet_soup": {
   "prompt": "a large brown earthen clay bowl, side view, filling the whole frame, brim full of amber orange sweet soup with bright red dates and white seeds",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.0
- },
- "four_herb_chicken": {
-  "prompt": "a large brown earthen clay bowl, side view, filling the whole frame, brim full of golden amber soup with a dark grey chicken and red berries",
   "style": "rd_plus__mc_item",
   "cost_usd": 0.0
  }
