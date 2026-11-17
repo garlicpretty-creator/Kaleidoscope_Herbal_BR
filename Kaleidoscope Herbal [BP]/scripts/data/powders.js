@@ -7,6 +7,14 @@ export const HERB_POWDERS={ginseng:'ginseng_powder',angelica:'angelica_powder',l
  honeysuckle:'honeysuckle_powder',goji:'goji_powder',jujube:'jujube_powder',mugwort:'mugwort_floss',chrysanthemum:'chrysanthemum_powder',
  poria:'poria_powder',cordyceps:'cordyceps_powder'};
 export const POWDER_ITEMS=new Set(Object.values(HERB_POWDERS).map(id));
+// The colour of each powder (red, green, blue in 0..1), for the puff the pestle raises.
+export const POWDER_COLORS=new Map(Object.entries({ginseng_powder:[.78,.68,.47],angelica_powder:[.65,.5,.3],licorice_powder:[.73,.58,.25],
+ reishi_powder:[.56,.3,.19],honeysuckle_powder:[.73,.72,.41],goji_powder:[.68,.3,.22],jujube_powder:[.51,.25,.19],mugwort_floss:[.8,.84,.75],
+ chrysanthemum_powder:[.81,.67,.21],poria_powder:[.79,.75,.65],cordyceps_powder:[.55,.39,.2]}).map(([k,v])=>[id(k),v]));
+export function mixColor(items){
+ const known=items.map(i=>POWDER_COLORS.get(i)).filter(Boolean);if(!known.length)return [.8,.75,.6];
+ return [0,1,2].map(i=>known.reduce((s,c)=>s+c[i],0)/known.length);
+}
 const formula=(result,ingredients,heat,effects,clear)=>({result:id(result),ingredients:ingredients.map(id).sort(),heat,effects,clear});
 export const POWDER_FORMULAS=[
  formula('ming_mu_powder',['goji_powder','chrysanthemum_powder'],-10,[effect('night_vision',240)]),                              // 明目散
