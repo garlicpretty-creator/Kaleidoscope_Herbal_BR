@@ -7,7 +7,7 @@ different poses, and a block state chooses which copy is drawn. The scripts step
 few ticks (see scripts/utils/frames.js):
 
   mortar       pestle 0..2          pestle at rest, raised, striking
-  clay pot     bob                  lid lifted by the boil
+  clay pot     pot 3 / 4            lid down / lifted by the boil
   herb cabinet drawer 0..2          middle drawer closed, half out, out
   soup bowls   sips 0..3            broth full, two thirds, one third, empty
   teas         (no state)           a tick component puffs steam over filled cups
@@ -62,8 +62,8 @@ def clay_pot():
     bob=dict(copy.deepcopy(lid),name='lid_bob',cubes=[moved(c,dy=.7) for c in lid['cubes']],rotation=[0,0,4])
     set_bones(g,[bob]);dump(path,j)
     path,j=block('stations/clay_pot');b=j['minecraft:block']
-    states(b,**{NS+'bob':[False,True]})
-    visibility(b,{'lid_closed':q('stage')+' == 2 && !'+q('bob'),'lid_bob':q('stage')+' == 2 && '+q('bob')})
+    # The pot's one `pot` state already has the two boiling looks (3 lid down, 4 lid lifted; see clayPot.js LOOK).
+    visibility(b,{'lid_closed':q('pot')+' == 3','lid_bob':q('pot')+' == 4'})
     dump(path,j)
 
 # ---------------------------------------------------------------- herb cabinet: the middle drawer slides out

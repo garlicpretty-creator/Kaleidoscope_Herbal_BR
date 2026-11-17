@@ -136,3 +136,22 @@ test('scripts and both manifests carry the same version',async()=>{
  assert.equal(GUIDEBOOK.version,VERSION);
  assert.ok(r.capabilities.includes('pbr'));
 });
+test('clay pot: one pot state draws every phase, within the permutation budget',async()=>{
+ const w=await potWorld(),{clayPot,tickPot}=await w.script('custom_components/clayPot.js'),{getRecord}=await w.script('utils/blockStore.js');
+ const look=()=>w.block.permutation.getState(kh('pot'));
+ const use=item=>{w.hold(item);clayPot.onPlayerInteract({block:w.block,player:w.player});};
+ const simmer=until=>{for(let i=0;i<400&&getRecord(w.block)?.stage!==until;i++)tickPot(getRecord(w.block).key);};
+ const pot=w.newPot();pot.location.x=pot.x=9001;w.system.currentTick=5000; // a spot and a tick no other test used
+ clayPot.onPlace({block:pot});assert.equal(look(),0); // empty
+ use('minecraft:water_bucket');assert.equal(look(),1); // plain water
+ for(const item of ['ginseng_slices','ginseng_slices','licorice_slices'])use(kh(item));
+ assert.equal(look(),2);assert.ok(w.block.permutation.getState(kh('shown'))>0||w.block.permutation.getState(kh('shown_page'))>0); // herbs float
+ w.player.isSneaking=true;use(undefined);w.player.isSneaking=false;assert.equal(look(),3); // lit, lid down
+ const key=getRecord(w.block).key;tickPot(key);assert.equal(look(),4);tickPot(key);assert.equal(look(),3); // the lid rattles
+ simmer(3);assert.equal(look(),5); // ready, lid on
+ simmer(4);assert.equal(look(),7); // burnt
+ const block=JSON.parse(readFileSync(resolve(bp,'blocks/stations/clay_pot.json'),'utf8'))['minecraft:block'];
+ const states=block.description.states,size=v=>Array.isArray(v)?v.length:v.values.max-v.values.min+1;
+ assert.deepEqual(Object.keys(states),['pot','shown','shown_page'].map(kh));
+ assert.equal(Object.values(states).reduce((n,v)=>n*size(v),4),1536); // x4 facings; was 7,680
+});

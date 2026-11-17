@@ -12,14 +12,30 @@ import {isPlain} from '../data/cabinet.js';
 export const activePots=new StationSet();
 const deny=block=>feedback(block,'minecraft:basic_smoke_particle','random.fizz');
 // v1.2.7: no servings block state (nothing drew it; the count lives in the record) - 19,200 -> 3,840 permutations.
-const STAGE=id('stage'),BOB=id('bob');
+// One `pot` state holds everything the model draws, in place of stage x herbed x lid_open x bob (20 combinations,
+// most of them never used): 7,680 -> 1,536 permutations. The record keeps the real stage; this is only the look.
+const POT=id('pot');
+const LOOK={EMPTY:0,WATER:1,HERBED:2,BOIL:3,BOIL_BOB:4,READY:5,READY_OPEN:6,BURNT:7};
+const boiling=look=>look===LOOK.BOIL||look===LOOK.BOIL_BOB;
+function lookOf(r,lidOpen,bob){
+ switch(r.stage){
+  case 1:return (r.ingredients?.length??0)>0?LOOK.HERBED:LOOK.WATER;
+  case 2:return bob?LOOK.BOIL_BOB:LOOK.BOIL;
+  case 3:return lidOpen?LOOK.READY_OPEN:LOOK.READY;
+  case 4:return LOOK.BURNT;
+  default:return LOOK.EMPTY;
+ }
+}
 // v1.1.0: while the pot boils its lid lifts and drops every second, twice as often on strong heat.
 function rattle(block,heat){
- if(!heat||block.permutation.getState(STAGE)!==2){if(block.permutation.getState(BOB))setStates(block,{[BOB]:false});return;}
- setStates(block,{[BOB]:!block.permutation.getState(BOB)});
+ const look=block.permutation.getState(POT);
+ if(!boiling(look))return;
+ if(!heat){if(look===LOOK.BOIL_BOB)setStates(block,{[POT]:LOOK.BOIL});return;}
+ setStates(block,{[POT]:look===LOOK.BOIL?LOOK.BOIL_BOB:LOOK.BOIL});
  if(heat==='strong')system.runTimeout(()=>{
   let b;try{b=block.dimension.getBlock(block.location);}catch{}
-  if(b?.typeId===id('clay_pot')&&b.permutation.getState(STAGE)===2)setStates(b,{[BOB]:!b.permutation.getState(BOB)});
+  const now=b?.typeId===id('clay_pot')?b.permutation.getState(POT):undefined;
+  if(boiling(now))setStates(b,{[POT]:now===LOOK.BOIL?LOOK.BOIL_BOB:LOOK.BOIL});
  },10);
 }
 // v1.1.0: a brew registered by another pack (docs/API.md) may outlive that pack; its output then no longer
@@ -33,8 +49,9 @@ export const shownFor=r=>r&&r.stage>=1&&r.stage<=3&&r.ingredients?.length?shownS
 // The pot is redrawn from the loop every second, so only changed states are written (setStates).
 function sync(block,r,lidOpen=false){
  const {shown,page}=shownFor(r);
- setStates(block,{[STAGE]:r.stage,[id('herbed')]:(r.ingredients?.length??0)>0,[id('lid_open')]:lidOpen,
-  [id('shown')]:shown,[id('shown_page')]:page});
+ // A redraw in the middle of a boil keeps the lid where the rattle left it.
+ const bob=block.permutation.getState(POT)===LOOK.BOIL_BOB;
+ setStates(block,{[POT]:lookOf(r,lidOpen,bob),[id('shown')]:shown,[id('shown_page')]:page});
 }
 // 藥方籤: sneak to copy a finished brew onto the slip; use a written slip on fresh water to put the herbs in.
 function useSlip(block,player,slot,r){
