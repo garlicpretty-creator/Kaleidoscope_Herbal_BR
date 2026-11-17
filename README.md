@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/banner.png" alt="Kaleidoscope Herbal" width="640">
+</p>
+
 # 森羅物語：草本 | Kaleidoscope Herbal（重製版 v1.1）
 
 讓草木的芬芳融入 Minecraft，展開一段充滿自然氣息的草藥生活。
@@ -16,7 +20,7 @@
 | `docs/API.md` | 對外 API 契約 |
 | `docs/測試表.md` | 進遊戲測試表 |
 | `docs/PBR.md` | PBR 貼圖規範與檢查結果 |
-| `tools/` | 物品圖示繪製、引用與 PBR 檢查、打包 |
+| `tools/` | 物品圖示與 banner 繪製、引用與 PBR 檢查、打包 |
 | `tests/` | 測試 |
 
 需求：Minecraft 基岩版 1.26.1 以上，以及森羅物語：廚房（Cookery）——晾曬、切片、研磨、藥膳與茶都在 Cookery 的器具上完成。
