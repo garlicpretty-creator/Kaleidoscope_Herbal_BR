@@ -233,6 +233,19 @@
 | `kaleidoscope_tavern:api_ready` | Tavern | 註冊藥酒配方，圖鑑補上藥酒頁 |
 | `aww:evt` `autofed` / `sky` / `reaction` | A Witch Way | 自動餵食套用藥效；天象期間作物加速；催化使附近作物成長 |
 | `senluo_link:evt` `week` | 魔女手札 | 豐收週作物與曬籃 1.5 倍；薰香週香爐每份燃燒 9000 tick |
+| `kaleidoscope_fishing:evt` `sky` | 漁歌（要有 `sky`） | 流星雨、極光之夜和 AWW 天象一樣：該維度的草本作物生長兩倍 |
+
+## 草本會主動找的附加包
+
+草本載入一秒後送出下面兩個 `api_ping`，有 `api_ready` 才動作；沒裝就什麼都不發生，也不留日誌。
+
+| 附加包 | 草本送出 | 效果 |
+|---|---|---|
+| 森羅物語：樂牧 `kaleidoscope_ranching` | `register_remedy`（要 `remedy`） | 清熱散可以醫好生病的動物，用掉一包 |
+| 同上 | `register_feed`（要 `register_feed`） | 苦藥渣、焦藥渣算蔬菜類飼料，各 1 份（藥渣餵豬） |
+| 森羅物語：漁歌 `kaleidoscope_fishing` | 不送註冊，只聽 `evt` 的 `sky` | 見上表 |
+
+樂牧的 `api_result` 只看 `id` 是 `kaleidoscope_herbal:` 開頭的；被拒絕時在內容日誌寫一行，同一句只寫一次。
 
 ## SDK 範例
 
