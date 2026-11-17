@@ -2,14 +2,14 @@
  * 森羅物語：草本 (Kaleidoscope Herbal) public client SDK, API 1. Contract: docs/API.md.
  * Copy this one file into YOUR add-on; never import Herbal's own pack paths.
  * It needs only the `system` object from @minecraft/server and works whether Herbal is installed or not:
- * without Herbal nothing is ever sent back, `ready` stays false and requests resolve to undefined.
+ * without Herbal nothing is ever sent back, `ready` stays false and requests resolve to undefined (after timeoutTicks).
  *
  *   import {system} from '@minecraft/server';
  *   import {connectHerbal} from './herbal-client.js';
  *   const herbal=connectHerbal(system,{source:'my_pack',heat:[{id:'my_pack:iced_tea',heat:-30}],
  *     onEvent:e=>{if(e.t==='decoction_served')...}});
  *
- * v1.2.0: `recipes` ([{id, ingredients:[{id,count}], servings, time?}]) are brewed by Herbal's clay pot and
+ * v1.1.0: `recipes` ([{id, ingredients:[{id,count}], servings, time?}]) are brewed by Herbal's clay pot and
  * `adjuvants` ([{id, servings?}]) add a serving to any brew; both are sent again on every api_ready, like `heat`.
  */
 export const HERBAL_EVENTS=Object.freeze({ping:'kaleidoscope_herbal:api_ping',ready:'kaleidoscope_herbal:api_ready',
@@ -22,14 +22,21 @@ export const HERBAL_EVENTS=Object.freeze({ping:'kaleidoscope_herbal:api_ping',re
 export function connectHerbal(system,{source,heat=[],recipes=[],adjuvants=[],requires=[],onReady,onEvent,log=console.warn,timeoutTicks=100}={}){
  if(typeof source!=='string'||!/^[a-z0-9_.-]{1,64}$/.test(source))throw new Error('source must be your pack namespace');
  let info,disposed=false,sequence=0,warned=false;
- const waiting=new Map(),rejected=[];
+ const waiting=new Map(),rejected=[],queued=[];
  const send=(id,body)=>system.sendScriptEvent(id,JSON.stringify({api:1,source,...body}));
  const ask=(id,body,collect)=>new Promise(resolve=>{
-  if(disposed||!info){resolve(undefined);return;}
-  const req=source.slice(0,20)+'#'+(++sequence);
-  const timer=system.runTimeout(()=>{waiting.delete(req);resolve(undefined);},timeoutTicks);
-  waiting.set(req,{collect,parts:[],done:value=>{system.clearRun(timer);waiting.delete(req);resolve(value);}});
-  send(id,{...body,req});
+  if(disposed){resolve(undefined);return;}
+  const start=()=>{
+   const req=source.slice(0,20)+'#'+(++sequence);
+   const timer=system.runTimeout(()=>{waiting.delete(req);resolve(undefined);},timeoutTicks);
+   waiting.set(req,{collect,parts:[],done:value=>{system.clearRun(timer);waiting.delete(req);resolve(value);}});
+   send(id,{...body,req});
+  };
+  if(info){start();return;}
+  // Asked before Herbal's api_ready arrived (it takes a tick or two after load): the request waits for it.
+  // Without Herbal it resolves to undefined after timeoutTicks.
+  const entry={start,resolve};queued.push(entry);
+  system.runTimeout(()=>{const i=queued.indexOf(entry);if(i>=0){queued.splice(i,1);resolve(undefined);}},timeoutTicks);
  });
  // Batches stay under the host's per-message count and well inside the 2048-character script event limit.
  const sendAll=(id,field,rows,size)=>{
@@ -62,13 +69,16 @@ export function connectHerbal(system,{source,heat=[],recipes=[],adjuvants=[],req
    if(heat.length&&m.capabilities?.includes('external_heat'))registerHeat();
    if(adjuvants.length&&m.capabilities?.includes('external_adjuvants'))registerAdjuvants();
    if(recipes.length&&m.capabilities?.includes('external_recipes'))registerRecipes();
+   for(const entry of queued.splice(0))entry.start();
    if(onReady){try{onReady(m);}catch(error){log('[Herbal SDK] onReady: '+error);}}
    return;
   }
   if(m.to!==source)return;
   if(ev.id===HERBAL_EVENTS.heatAck||ev.id===HERBAL_EVENTS.recipeAck||ev.id===HERBAL_EVENTS.adjuvantAck){
    if(m.code)log('[Herbal SDK] Refused '+ev.id+': '+m.code);
-   for(const row of m.rejected??[]){rejected.push(row);log('[Herbal SDK] Rejected '+row.id+': '+row.code);}
+   // Herbal announces itself and also answers our ping, so the same refusal can arrive twice: one row per id is kept.
+   for(const row of m.rejected??[]){const i=rejected.findIndex(x=>x.id===row.id);if(i<0)rejected.push(row);else rejected[i]=row;log('[Herbal SDK] Rejected '+row.id+': '+row.code);}
+   if(m.more)log('[Herbal SDK] '+m.more+' more refusals did not fit in the reply');
    return;
   }
   const wait=waiting.get(m.req);if(!wait)return;
@@ -101,6 +111,6 @@ export function connectHerbal(system,{source,heat=[],recipes=[],adjuvants=[],req
   registerAdjuvants(rows){keep(adjuvants,rows);if(!disposed&&info?.capabilities?.includes('external_adjuvants'))registerAdjuvants(rows);},
   /** Adds or updates heat values ([{id, heat}]); heat 0 withdraws one. Replayed on every ready. */
   registerHeat(rows){keep(heat,rows);if(!disposed&&info?.capabilities?.includes('external_heat'))registerHeat(rows);},
-  dispose(){disposed=true;system.afterEvents.scriptEventReceive.unsubscribe(callback);for(const wait of [...waiting.values()])wait.done(undefined);},
+  dispose(){disposed=true;system.afterEvents.scriptEventReceive.unsubscribe(callback);for(const wait of [...waiting.values()])wait.done(undefined);for(const entry of queued.splice(0))entry.resolve(undefined);},
  };
 }

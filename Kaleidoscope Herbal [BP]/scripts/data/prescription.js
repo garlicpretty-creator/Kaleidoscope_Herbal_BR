@@ -22,7 +22,7 @@ export function planFill(ingredients,have){
  return {ok:missing.length===0,missing};
 }
 // Tooltip lines, localized by the client: the brew's name, then each herb with its count.
-// v1.2.0: another pack's item (a formula registered through the API) is named by the game's own item key.
+// v1.1.0: another pack's item (a formula registered through the API) is named by the game's own item key.
 export const nameKey=item=>item.startsWith(NS+':')?`kh.name.${short(item)}`:item.startsWith('minecraft:')?`item.${item.slice(10)}.name`:`item.${item}`;
 export function slipLore(formula){
  return [{rawtext:[{text:'§6'},{translate:nameKey(formula.result)}]},

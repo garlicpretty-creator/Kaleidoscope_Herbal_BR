@@ -48,7 +48,7 @@ python3 tools/pbr_audit.py
 |---|---|---|---|
 | 1 | `models/clay_pot_water` | 平均粗糙度 235，與空鍋 `clay_pot` 完全相同 | 水面區域降到 15–60 |
 | 2 | `models/teas` | 平均粗糙度 224 | 茶湯面降到 15–60，杯身維持 |
-| 3 | 新湯劑的擺放模型；10 種單味藥粉圖示 | 1.2.0 已完成：四種湯劑各有模型（`tools/decoction_models.py`，湯面粗糙度 32）；藥粉圖示由 `tools/icons.py` 繪製 | 實機確認外觀 |
+| 3 | 新湯劑的擺放模型；10 種單味藥粉圖示 | 已完成：四種湯劑各有模型（`tools/decoction_models.py`，湯面粗糙度 32）；藥粉圖示由 `tools/icons.py` 繪製 | 實機確認外觀 |
 | 4 | `models/incense_burner`、`_lit` | 金屬度全為 0；點燃版只有 2 個自發光像素 | 若設定為銅爐則給金屬度；香頭自發光可略增 |
 | 5 | `models/plants`、`blocks/leaf`、作物與野生藥草 | 無次表面散射 | texture set 升到 `1.21.30` 改用 `metalness_emissive_roughness_subsurface`，葉片透光 |
 | 6 | 全部方塊（355 個 material instance） | 一律 `alpha_test` | 貼圖無透明像素的面改 `opaque`；液面評估 `blend` |

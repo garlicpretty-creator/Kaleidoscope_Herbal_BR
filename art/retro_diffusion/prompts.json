@@ -1,51 +1,11 @@
 {
- "ginseng_decoction": {
-  "prompt": "a white porcelain bowl with a blue rim, seen from the side, filled with golden amber herbal broth, slices of ginseng root floating on top",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
  "goji_wine": {
   "prompt": "a round glass bottle with a cork, filled with bright red liquor with red goji berries inside",
   "style": "rd_plus__mc_item",
   "cost_usd": 0.06
  },
- "chrysanthemum_tea": {
-  "prompt": "a small pale green celadon teacup without handle, filled with yellow tea with a white and yellow chrysanthemum flower floating, steam rising",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
  "ginseng_chicken_soup": {
   "prompt": "an earthen clay bowl, seen from the side, filled with pale yellow soup with a whole chicken drumstick and a ginseng root",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "four_herb_decoction": {
-  "prompt": "a white porcelain bowl with a blue rim, seen from the side, filled with dark rose red herbal broth, a few brown angelica root slices on top",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "reishi_decoction": {
-  "prompt": "a white porcelain bowl with a blue rim, seen from the side, filled with very dark brown herbal broth, one red reishi mushroom slice on top",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "cordyceps_decoction": {
-  "prompt": "a white porcelain bowl with a blue rim, seen from the side, filled with bright orange herbal broth, two thin brown cordyceps sticks on top",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "four_gentlemen_decoction": {
-  "prompt": "a white porcelain bowl with a blue rim, seen from the side, filled with pale beige milky herbal broth, white poria cubes on top",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "mugwort_angelica_decoction": {
-  "prompt": "a white porcelain bowl with a blue rim, seen from the side, filled with olive green herbal broth, green mugwort leaves on top",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "licorice_jujube_decoction": {
-  "prompt": "a white porcelain bowl with a blue rim, seen from the side, filled with honey yellow herbal broth, two red jujube dates on top",
   "style": "rd_plus__mc_item",
   "cost_usd": 0.06
  },
@@ -64,11 +24,6 @@
   "style": "rd_plus__mc_item",
   "cost_usd": 0.06
  },
- "jujube_sweet_soup": {
-  "prompt": "an earthen clay bowl, seen from the side, filled with dark amber sweet soup with red jujube dates and white lotus seeds",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
  "angelica_mutton_soup": {
   "prompt": "an earthen clay bowl, seen from the side, filled with brown broth with chunks of mutton and slices of angelica root",
   "style": "rd_plus__mc_item",
@@ -76,26 +31,6 @@
  },
  "four_herb_chicken": {
   "prompt": "an earthen clay bowl, seen from the side, filled with amber herbal broth with a black silkie chicken and red goji berries",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "goji_tea": {
-  "prompt": "a small pale green celadon teacup without handle, filled with orange red tea with red goji berries floating, steam rising",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "honeysuckle_tea": {
-  "prompt": "a small pale green celadon teacup without handle, filled with pale green tea with small white and yellow honeysuckle flowers floating, steam rising",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "honeysuckle_tea_dew": {
-  "prompt": "a small pale green celadon teacup without handle, filled with clear aqua green tea with white honeysuckle flowers and sparkling dew drops",
-  "style": "rd_plus__mc_item",
-  "cost_usd": 0.06
- },
- "jujube_tea": {
-  "prompt": "a small pale green celadon teacup without handle, filled with deep red brown tea with red jujube slices floating, steam rising",
   "style": "rd_plus__mc_item",
   "cost_usd": 0.06
  },

@@ -57,20 +57,29 @@ export const ADJUVANTS = {
  [id('dried_cordyceps')]:{servings:1},
 };
 export const MAX_ADJUVANTS=2,MAX_SERVINGS=4,MAX_INGREDIENTS=6;
-// v1.2.0: formulas and adjuvants other packs registered through the Herbal API (api/herbalHostCore.js, docs/API.md).
+// v1.1.0: formulas and adjuvants other packs registered through the Herbal API (api/herbalHostCore.js, docs/API.md).
 // EXTERNAL_RECIPES: result item -> {result, ingredients, servings, time, source}; EXTERNAL_ADJUVANTS: item -> {servings, source}.
 // Our own formulas always win; nothing here is saved, clients register again after every api_ready.
 export const EXTERNAL_RECIPES=new Map(),EXTERNAL_ADJUVANTS=new Map();
 export const DEFAULT_TIME=600;
 const adjuvant=x=>ADJUVANTS[x]??EXTERNAL_ADJUVANTS.get(x);
 function take(rest,options){const i=rest.findIndex(x=>options.includes(x));if(i<0)return false;rest.splice(i,1);return true;}
+// v1.1.0: slots that accept only their own item are filled first. A slice slot also takes the dried root, and filled in
+// list order it could take the root another slot needed, so the same herbs brewed or failed by the order they went in.
+const slots=recipe=>[...recipe.ingredients].sort((a,b)=>(variants[a]?1:0)-(variants[b]?1:0));
 function fit(recipe,items){
  const rest=[...items];
- if(!recipe.ingredients.every(slot=>take(rest,variants[slot]??[slot])))return undefined;
+ if(!slots(recipe).every(slot=>take(rest,variants[slot]??[slot])))return undefined;
  if(rest.length>MAX_ADJUVANTS||!rest.every(adjuvant))return undefined;
  let servings=recipe.servings;
  for(const kind of new Set(rest))servings+=adjuvant(kind).servings??0;
  return {...recipe,servings:Math.min(MAX_SERVINGS,servings)};
+}
+// v1.1.0: true when one list of ingredients would be taken for the other in the pot (same herbs, sliced or not), with no
+// adjuvants counted. The host uses it to refuse a second formula for a mix that already brews something.
+export function sameMix(a,b){
+ const whole=(recipe,items)=>{const rest=[...items];return recipe.length===items.length&&slots({ingredients:recipe}).every(slot=>take(rest,variants[slot]??[slot]));};
+ return whole(a,b)||whole(b,a);
 }
 export function matchBuiltin(items){
  for(const recipe of DECOCTIONS){const match=fit(recipe,items);if(match)return match;}
@@ -108,7 +117,7 @@ export function advancePot(record,heat,elapsed=20){
  }
  return true;
 }
-// v1.2.0: the broadcast a stage change earns (utils/bus.js): the brew burnt, or a wrong mix came out as bitter dregs.
+// v1.1.0: the broadcast a stage change earns (utils/bus.js): the brew burnt, or a wrong mix came out as bitter dregs.
 export function potEvent(before,record){
  if(before===record.stage)return undefined;
  if(record.stage===4)return {t:'decoction_burnt',fields:{id:record.result}};

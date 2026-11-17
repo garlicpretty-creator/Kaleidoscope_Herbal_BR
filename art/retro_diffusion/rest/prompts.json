@@ -4,24 +4,14 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "icon_herb_cabinet_s50": {
-  "prompt": "a tall wooden apothecary cabinet with nine small drawers with brass knobs, front view",
-  "strength": 0.5,
-  "cost_usd": 0.0
- },
- "carried_wild_goji_s50": {
-  "prompt": "a wild goji shrub with red berries growing in a tuft of green grass",
-  "strength": 0.5,
-  "cost_usd": 0.0
- },
  "angelica_powder_s50": {
   "prompt": "a small cone shaped heap of light brown herbal powder on a square of cream paper",
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "burnt_dregs_s50": {
+ "burnt_dregs_s35": {
   "prompt": "a shallow grey ceramic dish holding a heap of black burnt herb dregs with orange embers and a wisp of smoke",
-  "strength": 0.5,
+  "strength": 0.35,
   "cost_usd": 0.0
  },
  "carried_angelica_crop_s50": {
@@ -29,9 +19,9 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "carried_chrysanthemum_crop_s50": {
+ "carried_chrysanthemum_crop_s35": {
   "prompt": "a chrysanthemum plant with two yellow flowers growing from a strip of brown tilled soil",
-  "strength": 0.5,
+  "strength": 0.35,
   "cost_usd": 0.0
  },
  "carried_ginseng_crop_s50": {
@@ -44,14 +34,14 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "carried_honeysuckle_crop_s50": {
+ "carried_honeysuckle_crop_s35": {
   "prompt": "a honeysuckle vine with white and yellow flowers growing from a strip of brown tilled soil",
-  "strength": 0.5,
+  "strength": 0.35,
   "cost_usd": 0.0
  },
- "carried_jujube_crop_s50": {
+ "carried_jujube_crop_s35": {
   "prompt": "a jujube sapling with red date fruits growing from a strip of brown tilled soil",
-  "strength": 0.5,
+  "strength": 0.35,
   "cost_usd": 0.0
  },
  "carried_licorice_crop_s50": {
@@ -59,14 +49,14 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "carried_mugwort_crop_s50": {
+ "carried_mugwort_crop_s35": {
   "prompt": "a grey green mugwort plant with feathery leaves growing from a strip of brown tilled soil",
-  "strength": 0.5,
+  "strength": 0.35,
   "cost_usd": 0.0
  },
- "carried_reishi_spawn_s50": {
+ "carried_reishi_spawn_s35": {
   "prompt": "a short cut wooden log seen from the front with white mycelium patches and a small red mushroom, a cloth cover on top",
-  "strength": 0.5,
+  "strength": 0.35,
   "cost_usd": 0.0
  },
  "carried_wild_angelica_s50": {
@@ -79,8 +69,13 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "carried_wild_ginseng_s50": {
+ "carried_wild_ginseng_s35": {
   "prompt": "a wild ginseng plant with green leaves and a red berry cluster growing in a tuft of green grass",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "carried_wild_goji_s50": {
+  "prompt": "a wild goji shrub with red berries growing in a tuft of green grass",
   "strength": 0.5,
   "cost_usd": 0.0
  },
@@ -114,9 +109,9 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "dried_cordyceps_s50": {
+ "dried_cordyceps_s35": {
   "prompt": "a bundle of dried brown cordyceps sticks tied with a red string",
-  "strength": 0.5,
+  "strength": 0.35,
   "cost_usd": 0.0
  },
  "dried_jujube_s50": {
@@ -154,9 +149,9 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "icon_abacus_s50": {
+ "icon_abacus_s25": {
   "prompt": "a wooden abacus with rows of red beads, front view",
-  "strength": 0.5,
+  "strength": 0.25,
   "cost_usd": 0.0
  },
  "icon_clay_pot_s50": {
@@ -164,8 +159,13 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "icon_hanging_gourd_s50": {
+ "icon_hanging_gourd_s35": {
   "prompt": "a golden yellow calabash gourd bottle with a red tassel on top",
+  "strength": 0.35,
+  "cost_usd": 0.0
+ },
+ "icon_herb_cabinet_s50": {
+  "prompt": "a tall wooden apothecary cabinet with nine small drawers with brass knobs, front view",
   "strength": 0.5,
   "cost_usd": 0.0
  },
@@ -179,9 +179,9 @@
   "strength": 0.5,
   "cost_usd": 0.0
  },
- "icon_incense_burner_s50": {
+ "icon_incense_burner_s35": {
   "prompt": "a jade green incense burner on three golden legs with a golden lid and smoke",
-  "strength": 0.5,
+  "strength": 0.35,
   "cost_usd": 0.0
  },
  "icon_medicine_jar_s50": {
@@ -272,56 +272,6 @@
  "yin_xi_powder_s50": {
   "prompt": "a square folded cream paper medicine packet with a red stripe at the bottom and a dark grey label with a dotted ring in the middle",
   "strength": 0.5,
-  "cost_usd": 0.0
- },
- "carried_honeysuckle_crop_s35": {
-  "prompt": "a honeysuckle vine with white and yellow flowers growing from a strip of brown tilled soil",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "carried_jujube_crop_s35": {
-  "prompt": "a jujube sapling with red date fruits growing from a strip of brown tilled soil",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "carried_chrysanthemum_crop_s35": {
-  "prompt": "a chrysanthemum plant with two yellow flowers growing from a strip of brown tilled soil",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "carried_mugwort_crop_s35": {
-  "prompt": "a grey green mugwort plant with feathery leaves growing from a strip of brown tilled soil",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "carried_wild_ginseng_s35": {
-  "prompt": "a wild ginseng plant with green leaves and a red berry cluster growing in a tuft of green grass",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "icon_incense_burner_s35": {
-  "prompt": "a jade green incense burner on three golden legs with a golden lid and smoke",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "burnt_dregs_s35": {
-  "prompt": "a shallow grey ceramic dish holding a heap of black burnt herb dregs with orange embers and a wisp of smoke",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "dried_cordyceps_s35": {
-  "prompt": "a bundle of dried brown cordyceps sticks tied with a red string",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "carried_reishi_spawn_s35": {
-  "prompt": "a short cut wooden log seen from the front with white mycelium patches and a small red mushroom, a cloth cover on top",
-  "strength": 0.35,
-  "cost_usd": 0.0
- },
- "icon_hanging_gourd_s35": {
-  "prompt": "a golden yellow calabash gourd bottle with a red tassel on top",
-  "strength": 0.35,
   "cost_usd": 0.0
  }
 }

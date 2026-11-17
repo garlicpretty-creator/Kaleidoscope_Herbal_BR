@@ -55,7 +55,7 @@ test('the pack entry loads, registers its components and announces the API',asyn
   assert.ok(parts.flatMap(p=>p.items).length>=(kind==='decoctions'?7:11),kind);
  }
 });
-// ---- v1.2.0 (A9/A11): the real clay pot and harvest handlers, driven with stand-in blocks and players.
+// ---- v1.1.0 (A9/A11): the real clay pot and harvest handlers, driven with stand-in blocks and players.
 const kh=name=>'kaleidoscope_herbal:'+name;
 async function potWorld(){
  const {system,world}=await import('@minecraft/server');

@@ -27,7 +27,6 @@ export const MIN_POWDERS=2,MAX_POWDERS=3,STROKES=3,DOSES=2;
 export const mixKey=items=>[...items].sort().join('|');
 const BY_KEY=new Map(POWDER_FORMULAS.map(f=>[mixKey(f.ingredients),f]));
 export const matchPowder=items=>BY_KEY.get(mixKey(items));
-export const isPowderFormula=result=>POWDER_FORMULAS.some(f=>f.result===result);
 // Which strange effect a wrong mix gives in a world with this salt.
 export function strangeIndex(items,salt){
  let h=2166136261;const text=salt+'#'+mixKey(items);
