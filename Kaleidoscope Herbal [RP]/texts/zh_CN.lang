@@ -311,7 +311,6 @@ kh.item.reishi_spawn=段木灵芝菌种\n§9§o森罗物语：草本§r
 kh.block.reishi_spawn=段木灵芝菌种\n§9§o森罗物语：草本§r
 item.kaleidoscope_herbal:reishi_spawn.name=段木灵芝菌种\n§9§o森罗物语：草本§r
 tile.kaleidoscope_herbal:reishi_spawn.name=段木灵芝菌种\n§9§o森罗物语：草本§r
-kh.message.no_cookery=未检测到「森罗物语：厨房」，晾晒、切片、药膳与凉茶配方暂停。
 kh.block.herb_counter=药柜台\n§9§o森罗物语：草本§r
 item.kaleidoscope_herbal:herb_counter.name=药柜台\n§9§o森罗物语：草本§r
 tile.kaleidoscope_herbal:herb_counter.name=药柜台\n§9§o森罗物语：草本§r

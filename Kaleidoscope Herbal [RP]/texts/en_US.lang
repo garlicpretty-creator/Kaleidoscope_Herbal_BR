@@ -311,7 +311,6 @@ kh.item.reishi_spawn=Reishi Log Spawn\n§9§oKaleidoscope Herbal§r
 kh.block.reishi_spawn=Reishi Log Spawn\n§9§oKaleidoscope Herbal§r
 item.kaleidoscope_herbal:reishi_spawn.name=Reishi Log Spawn\n§9§oKaleidoscope Herbal§r
 tile.kaleidoscope_herbal:reishi_spawn.name=Reishi Log Spawn\n§9§oKaleidoscope Herbal§r
-kh.message.no_cookery=Kaleidoscope Cookery was not detected; drying, slicing, herbal dishes and tea recipes are paused.
 kh.block.herb_counter=Apothecary Counter\n§9§oKaleidoscope Herbal§r
 item.kaleidoscope_herbal:herb_counter.name=Apothecary Counter\n§9§oKaleidoscope Herbal§r
 tile.kaleidoscope_herbal:herb_counter.name=Apothecary Counter\n§9§oKaleidoscope Herbal§r
