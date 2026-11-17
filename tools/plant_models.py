@@ -3,10 +3,10 @@ Usage: python3 tools/plant_models.py
 
 The old models were a thin stem with a few small leaf planes and filled about a third of the block.
 Each plant is now its own sprite (tools/icon_src/, the same drawings the item icons use) on two crossed
-planes at one texture pixel per model unit, like a vanilla flower, and every flower, berry and fruit in the
-sprite is also built as a small box standing out of the planes, so the plant has depth from every side.
+planes at one texture pixel per model unit, like a vanilla flower. Flowers, berries and fruit stay flat on the
+planes: the 3D boxes that used to stand out of them were dropped to match vanilla and Cookery's crops.
 
-  full plant   crossed 16x16 planes + a box for every flower / fruit cluster of the sprite
+  full plant   crossed 16x16 planes
   wild plant   the same, standing in a tuft of grass
   young crop   the sprite without flowers or fruit, on smaller planes
   sprout       a two-leaf seedling
@@ -110,13 +110,10 @@ if __name__=='__main__':
     atlas.save()
     X=(45,-45)
     for herb,(crop,wild,stages) in HERBS.items():
-        def full(s): return planes(slot[s][:2],(16,16),16,16,X)+boxes(slot[s][:2],clusters(slot[s][2]),X)
+        def full(s): return planes(slot[s][:2],(16,16),16,16,X)   # flat crossed planes only, like vanilla and Cookery crops
         bones=[('stage0',planes(sprout,(8,8),6,6,X))]
         sizes=[11] if stages==3 else [8,12]
         for n,size in enumerate(sizes,1): bones.append(('stage%d'%n,planes(young[herb],(16,16),size,size,X)))
         bones.append(('stage%d'%(stages-1),full(crop)))
-        def full(s,full=full):   # a plant without flowers or fruit (mugwort) gets two more planes so it is a bush from every side
-            return full(s)+([] if clusters(slot[s][2]) else planes(slot[s][:2],(16,16),13,13,(0,90)))
-        bones[-1]=(bones[-1][0],full(crop))
         write(herb+'_crop',bones);write('wild_'+herb,[('plant',full(wild)+planes(grass,(16,6),16,6,(0,90)))])
         print(herb,'flowers/fruit:',len(clusters(slot[crop][2])),'farmed,',len(clusters(slot[wild][2])),'wild')
