@@ -47,12 +47,12 @@ test('the pack entry loads, registers its components and announces the API',asyn
  assert.equal(JSON.parse(ready.message).version,VERSION);
  // The real catalogs fit the 2048-character script event limit.
  const host=system.subs.find(s=>s.options?.namespaces?.[0]==='kaleidoscope_herbal'&&s.fn.toString().includes('host.handle'));
- for(const kind of ['herbs','foods','decoctions']){
+ for(const kind of ['herbs','foods','decoctions','pills']){
   system.sent.length=0;
   host.fn({id:'kaleidoscope_herbal:catalog_request',message:JSON.stringify({api:1,source:'test_pack',kind}),sourceType:'Server'});
   const parts=system.sent.map(e=>(assert.ok(e.message.length<=2048),JSON.parse(e.message)));
   assert.ok(parts.length>=1&&parts.every(p=>p.ok&&p.kind===kind));
-  assert.ok(parts.flatMap(p=>p.items).length>=(kind==='decoctions'?7:11),kind);
+  assert.ok(parts.flatMap(p=>p.items).length>=({decoctions:7,pills:8}[kind]??11),kind);
  }
 });
 // ---- v1.1.0 (A9/A11): the real clay pot and harvest handlers, driven with stand-in blocks and players.

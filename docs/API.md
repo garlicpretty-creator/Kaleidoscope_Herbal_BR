@@ -57,6 +57,8 @@
 | `heat_source_tag` | 砂鍋認得方塊標籤 `kaleidoscope_herbal:heat_sources` |
 | `external_recipes` | 可註冊由草本砂鍋煎煮的湯劑方（v1.1.0 新增） |
 | `external_adjuvants` | 可註冊能替湯劑加份數的佐使（v1.1.0 新增） |
+| `pills` | 有蜜丸；`catalog` 可查 `pills`（v1.2.0 新增） |
+| `environment_heat` | 環境會推動寒熱，並廣播 `constitution_env`（v1.2.0 新增） |
 
 新功能只會**增加** capability，不會改動既有訊息的欄位意義；破壞性變更才會升 `api`。
 
@@ -76,8 +78,9 @@
 | `foods` | `{id, heat, effects:[[效果名, ticks, amplifier], ...], clear?:[效果名...]}` |
 | `decoctions` | `{id, ingredients:[[物品 ID, 份數], ...], servings, time, source?}`：`id` 為成品，`time` 為文火下的煎煮 tick；草本內建的方子沒有 `source`，外部註冊的帶註冊者的 `source`（v1.1.0 新增） |
 | `adjuvants` | `{id, servings, source?}`：佐使與它加的份數，`source` 規則同上（v1.1.0 新增） |
+| `pills` | `{id, from, heat, effects:[[效果名, ticks, amplifier], ...], clear?}`：`id` 為蜜丸，`from` 為搓成它的散劑；只列效果，不列散劑的配方（v1.2.0 新增） |
 
-未知的 `kind` 回 `{"ok":false,"code":"UNKNOWN_KIND","kinds":["herbs","foods","decoctions","adjuvants"]}`。
+未知的 `kind` 回 `{"ok":false,"code":"UNKNOWN_KIND","kinds":["herbs","foods","decoctions","adjuvants","pills"]}`。
 
 ## 寒熱（體質）
 
@@ -216,11 +219,12 @@
 | `ginseng_dug` | `whole`（是否用藥鋤完整挖起） | 挖起人參 |
 | `incense_lit` | `fuel` | 點燃香爐 |
 | `constitution` | `state`: `overheat` \| `chill` | 玩家上火或受寒（v1.1.0 新增） |
-| `powder_mixed` | `id`（成品，配錯時為 `kaleidoscope_herbal:strange_powder`） | 在藥缽配出散劑（v1.1.0 新增） |
+| `powder_mixed` | `id`（成品，配錯時為 `kaleidoscope_herbal:strange_powder`）；搓丸時另有 `from`（散劑）與 `pill: true` | 在藥缽配出散劑或搓出蜜丸（v1.1.0 新增；搓丸 v1.2.0） |
 | `formula_learned` | `id`（藥方成品） | 玩家用藥方籤學會一個藥方（v1.1.0 新增） |
 | `herb_harvested` | `herb`（藥材 `key`，同 `catalog` 的 `herbs`）, `wild`（是否為野生） | 玩家採收成熟的栽培藥材，或在生存模式採下野生藥材（v1.1.0 新增） |
 | `decoction_burnt` | `id`（燒掉的成品；配錯時為 `kaleidoscope_herbal:bitter_dregs`） | 砂鍋裡煎好的湯劑沒盛出而燒焦（v1.1.0 新增） |
 | `decoction_bitter` | 無 | 配錯的一鍋煎成了苦藥渣（v1.1.0 新增） |
+| `constitution_env` | `state`: `warm` \| `cold` | 環境（雪地、冷水、地獄、沙漠）把玩家的寒熱推過 ±60 的徵兆線（v1.2.0 新增） |
 
 `decoction_burnt` 與 `decoction_bitter` 的 `p` 是**點火的玩家**，當下不一定在線上；v1.1.0 之前就點火的鍋不會送出這兩個事件。
 挖野生人參會同時送出 `ginseng_dug` 與 `herb_harvested`。原木上的靈芝不分野生或接種，一律 `wild: true`。
@@ -232,7 +236,7 @@
 | `kaleidoscope_cookery:api_ready` / `guidebook_ready` | Cookery | 註冊竹篩、砧板、石磨、茶壺等配方；發布圖鑑 |
 | `kaleidoscope_tavern:api_ready` | Tavern | 註冊藥酒配方，圖鑑補上藥酒頁 |
 | `aww:evt` `autofed` / `sky` / `reaction` | A Witch Way | 自動餵食套用藥效；天象期間作物加速；催化使附近作物成長 |
-| `senluo_link:evt` `week` | 魔女手札 | 豐收週作物與曬籃 1.5 倍；薰香週香爐每份燃燒 9000 tick |
+| `senluo_link:evt` `week` | 魔女手札 | `harvest` 豐收週作物 1.5 倍；`incense` 薰香週香爐每份燃燒 9000 tick；`diet` 藥膳週湯劑與藥膳的寒熱減半、`tea` 涼茶週茶的效果時間 ×1.5（v1.2.0，需要魔女手札廣播這兩個主題） |
 
 ## 草本會主動找的附加包
 

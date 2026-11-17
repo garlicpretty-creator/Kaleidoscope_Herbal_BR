@@ -15,6 +15,7 @@ blocks={};items={}
 for p in files(BP,'blocks'):b=load(p)['minecraft:block'];blocks[b['description']['identifier']]=b
 for p in files(BP,'items'):i=load(p)['minecraft:item'];items[i['description']['identifier']]=i
 known=set(blocks)|set(items)
+entities={load(p)['minecraft:entity']['description']['identifier'] for p in files(BP,'entities')} if os.path.isdir(os.path.join(BP,'entities')) else set()
 terrain=load(os.path.join(RP,'textures/terrain_texture.json'))['texture_data']
 itex=load(os.path.join(RP,'textures/item_texture.json'))['texture_data']
 geos=set()
@@ -98,13 +99,16 @@ for p in files(BP,'scripts','.js'):
         if m.endswith(('/items','/ui','/blocks','/models')):continue
         tex_files.add(m)
         if not os.path.exists(os.path.join(RP,m+'.png')):err(os.path.relpath(p,root),'texture missing',m)
+# textures a client entity draws
+for p in files(RP,'entity'):
+    tex_files|=set(load(p)['minecraft:client_entity']['description'].get('textures',{}).values())
 particles=set()
 for p in files(RP,'particles'):
     t=text(p);particles|=set(re.findall(r'"identifier"\s*:\s*"kaleidoscope_herbal:([a-z_]+)"',t));tex_files|=set(re.findall(r'textures/kaleidoscope_herbal/[a-z_/0-9]+',t))
 state_names={s.split(':')[1] for b in blocks.values() for s in b['description'].get('states',{})}
 component_names=set(re.findall(r'"kaleidoscope_herbal:([a-z_]+)"',''.join(json.dumps(b.get('components',{}))+json.dumps(b.get('permutations',[])) for b in blocks.values())))
 for s in set(re.findall(r"\bid\('([a-z_/]+)'\)",script)):
-    if NS+s not in known and s not in state_names and s not in component_names and s not in particles and '/' not in s and s not in('heat','heat_hint','formula','salt','learned','sealed_prescription','herb','herbal_trowel','ginseng','four_herb','reishi','cordyceps','four_gentlemen','mugwort_angelica','licorice_jujube'):err('script id() names missing',s)
+    if NS+s not in known and s not in state_names and s not in component_names and s not in particles and '/' not in s and NS+s not in entities and s not in('heat','heat_hint','formula','salt','learned','sealed_prescription','pill_of','huts','herb','herbal_trowel','ginseng','four_herb','reishi','cordyceps','four_gentlemen','mugwort_angelica','licorice_jujube'):err('script id() names missing',s)
 for key in set(re.findall(r"'(kh\.[a-z_]+\.[a-z_.]*[a-z_])'",script)):need_key(key,'script')
 for m in re.finditer(r"`(kh\.[a-z_.]+)\$\{",script):
     for k in list(langs[next(iter(langs))]):
