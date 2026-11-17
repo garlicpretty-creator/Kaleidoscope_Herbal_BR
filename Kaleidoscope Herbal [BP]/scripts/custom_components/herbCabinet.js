@@ -4,9 +4,16 @@ import {shownStates} from '../data/displayItems.js';
 import {isPlain,depositAmount,nextWithdrawal,applyWithdrawal,isEmpty,spillStacks} from '../data/cabinet.js';
 import {getRecord,newRecord,saveRecord,removeRecord,setStates,isRedraw} from '../utils/blockStore.js';
 import {hand,refuse} from '../utils/items.js';
+import {playFrames} from '../utils/frames.js';
 // The cabinet is a plain block. Its stock is a block record (one herb and a count) and the middle drawer's
 // picture is the `shown` block state.
-const SHOWN=id('shown'),PAGE=id('shown_page');
+const SHOWN=id('shown'),PAGE=id('shown_page'),DRAWER=id('drawer');
+// v1.1.0: the middle drawer slides out, stays a moment, and slides back.
+const drawerSound=(block,sound)=>{try{block.dimension.playSound(sound,block.center(),{volume:.35,pitch:1.5});}catch{}};
+function openDrawer(block){
+ playFrames(block,[{at:0,states:{[DRAWER]:1},then:b=>drawerSound(b,'block.barrel.open')},{at:2,states:{[DRAWER]:2}},
+  {at:12,states:{[DRAWER]:1}},{at:14,states:{[DRAWER]:0},then:b=>drawerSound(b,'block.barrel.close')}]);
+}
 const maxOf=typeId=>{try{return new ItemStack(typeId).maxAmount??64;}catch{return 64;}};
 function sync(block,r){
  const {shown,page}=shownStates(r?.item);
@@ -45,7 +52,7 @@ export const herbCabinet={
    }
   }
   sync(block,getRecord(block));
-  if(moved)try{block.dimension.playSound('random.wood_click',block.center(),{volume:.3,pitch:1});}catch{}
+  if(moved)openDrawer(block);
  },
  onPlayerBreak({block}){spillCabinet(block);},
  onBreak({block}){spillCabinet(block);},

@@ -1,13 +1,24 @@
-import {ItemStack,world} from '@minecraft/server';
+import {ItemStack,MolangVariableMap,system,world} from '@minecraft/server';
 import {id} from '../data/herbs.js';
-import {POWDER_ITEMS,MIN_POWDERS,MAX_POWDERS,STROKES,DOSES,mixResult,strangeMark} from '../data/powders.js';
+import {POWDER_ITEMS,MIN_POWDERS,MAX_POWDERS,STROKES,DOSES,mixResult,strangeMark,mixColor} from '../data/powders.js';
 import {SLIP,FORMULA,slipLore} from '../data/prescription.js';
 import {getRecord,newRecord,saveRecord,removeRecord,blockKey,setStates,isRedraw} from '../utils/blockStore.js';
 import {hand,heldId,takeOne,give,drop,feedback,refuse} from '../utils/items.js';
 import {emitEvt} from '../utils/bus.js';
+import {playFrames} from '../utils/frames.js';
 // v1.1.0 藥缽: the mixing bowl. Put in two or three powders, pound three times with an empty hand, and take
 // two doses of what they make. It no longer grinds herbs; Cookery's millstone does that.
-const FILLED=id('filled'),SALT=id('salt');
+const FILLED=id('filled'),SALT=id('salt'),PESTLE=id('pestle');
+// v1.1.0: one stroke. The pestle rises, strikes (a knock and a puff in the powders' colour) and settles; ticks from the click.
+const STRIKE=3,SETTLE=7;
+function pound(block,powders,pitch){
+ const color=mixColor(powders);
+ playFrames(block,[{at:0,states:{[PESTLE]:1}},{at:STRIKE,states:{[PESTLE]:2},then:b=>{
+  const at={x:b.x+.5,y:b.y+.4,z:b.z+.5};
+  try{const v=new MolangVariableMap();v.setColorRGB('variable.color',{red:color[0],green:color[1],blue:color[2]});b.dimension.spawnParticle(id('powder_puff'),at,v);}catch{}
+  try{b.dimension.playSound('dig.stone',at,{volume:.5,pitch});}catch{}
+ }},{at:SETTLE,states:{[PESTLE]:0}}]);
+}
 // The formula of the last good mix in each mortar, kept until the next powder goes in or the server restarts.
 const lastMix=new Map();
 function sync(block,r){try{setStates(block,{[FILLED]:!!r?.powders?.length});}catch{}}
@@ -23,14 +34,19 @@ export function spillMortar(block){
  removeRecord(r.key);
 }
 function mix(block,player,r){
- const result=mixResult(r.powders,worldSalt());
+ const result=mixResult(r.powders,worldSalt());pound(block,r.powders,1.25);
  const stack=new ItemStack(result.item,DOSES);
  if(result.mark!==undefined)stack.setLore([strangeMark(result.mark)]);
  // The record goes first: a crash after this point loses the doses, never duplicates the powders.
  removeRecord(r.key);sync(block,undefined);
- block.dimension.spawnItem(stack,{x:block.location.x+.5,y:block.location.y+.55,z:block.location.z+.5});
  if(result.formula)lastMix.set(blockKey(block),result.formula);else lastMix.delete(blockKey(block));
- feedback(block,'minecraft:crop_growth_emitter',result.formula?'random.orb':'random.fizz');
+ // The doses appear as the last stroke lands and settle on the mortar instead of bouncing away. This runs even
+ // if the mortar is broken meanwhile: the powders are already used up.
+ const dimension=block.dimension,at={x:block.location.x+.5,y:block.location.y+.45,z:block.location.z+.5};
+ system.runTimeout(()=>{
+  try{const entity=dimension.spawnItem(stack,at);try{entity.clearVelocity();}catch{}}catch(error){console.warn('[Herbal] mortar: '+error);return;}
+  try{dimension.spawnParticle('minecraft:crop_growth_emitter',at);dimension.playSound(result.formula?'random.orb':'random.fizz',at,{volume:.45,pitch:1});}catch{}
+ },STRIKE+1);
  emitEvt('powder_mixed',player,{id:result.item});
 }
 export const mortar={
@@ -61,7 +77,7 @@ export const mortar={
   }
   if(r.powders.length<MIN_POWDERS){refuse(block,'fizz');return;}
   r.strokes=(r.strokes??0)+1;
-  if(r.strokes<STROKES){saveRecord(r);feedback(block,'minecraft:basic_smoke_particle','dig.stone',.8+r.strokes*.15);return;}
+  if(r.strokes<STROKES){saveRecord(r);pound(block,r.powders,.8+r.strokes*.15);return;}
   mix(block,player,r);
  },
  onPlayerBreak({block}){spillMortar(block);},
