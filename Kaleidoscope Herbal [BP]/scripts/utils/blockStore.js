@@ -18,6 +18,8 @@ export function saveRecord(record){
 }
 export function removeRecord(key){world.setDynamicProperty(PREFIX+key,undefined);records.delete(key);}
 export function newRecord(block,type){return {key:blockKey(block),dimension:block.dimension.id,location:{...block.location},type};}
+// The block at a location, or undefined when its chunk is not loaded or the location is outside the world.
+export function blockAt(dimension,location){try{return dimension.getBlock(location);}catch{return undefined;}}
 export function loadedBlock(record){
  try{return world.getDimension(record.dimension).getBlock(record.location);}catch{return undefined;}
 }

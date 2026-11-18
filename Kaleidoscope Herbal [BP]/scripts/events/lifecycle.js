@@ -19,12 +19,11 @@ import {spillMortar} from '../custom_components/mortar.js';
 import {STRANGE,STRANGE_EFFECTS,parseMark} from '../data/powders.js';
 import {isPill,powderOf,pillEffects} from '../data/pills.js';
 import {teaFactor} from '../utils/senluoWeek.js';
-// 涼茶週 (v1.2.0): teas last longer.
-const TEAS=new Set(['goji_tea','honeysuckle_tea','honeysuckle_tea_dew','jujube_tea','chrysanthemum_tea'].map(id));
+
 import {startFormulaBook} from '../utils/formulaBook.js';
 import {handleHoneysuckleHarvest,handleHoneysuckleExplosion} from '../custom_components/wildHoneysuckle.js';
 import {spillExplodedWine} from '../custom_components/herbalWine.js';
-import {spillExplodedTea} from '../utils/teaDrops.js';
+import {spillExplodedTea,TEAS} from '../utils/teaDrops.js'; // TEAS: 涼茶週 (v1.2.0) makes teas last longer
 export {isDawn} from '../custom_components/wildHoneysuckle.js';
 // The effects of eating or drinking one of our foods: clears, potion effects and constitution heat.
 // Shared by real eating (itemCompleteUse) and A Witch Way's backpack auto-feed. Bowls and cups are returned

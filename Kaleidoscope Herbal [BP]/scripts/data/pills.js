@@ -1,4 +1,3 @@
-import {id} from './herbs.js';
 import {POWDER_FORMULAS} from './powders.js';
 // v1.2.0 丸劑: two doses of one medicinal powder and a bottle of honey, rolled in the mortar, make four honey
 // pills. A pill keeps its powder's effects at the same level, lasts 1.5 times as long and carries half the heat;
