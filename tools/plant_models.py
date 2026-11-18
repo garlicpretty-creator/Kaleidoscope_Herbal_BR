@@ -11,7 +11,7 @@ planes: the 3D boxes that used to stand out of them were dropped to match vanill
   young crop   the sprite without flowers or fruit, on smaller planes
   sprout       a two-leaf seedling
 
-Sprites, the grass tuft and the seedling are painted into free rows of models/plants(.png|_normal|_mer).
+Sprites, the grass tuft and the seedling are painted into free rows of models/plants(.png|_normal|_mers); run tools/subsurface.py afterwards to refresh the leaf translucency.
 Geometry identifiers and bone names (stage0..stageN, plant) are unchanged, so no block file changes.
 Not touched: wild cordyceps, wild poria, wild reishi and reishi spawn, which are not leafy plants."""
 import os,json
@@ -52,7 +52,7 @@ def clusters(im):
 class Atlas:
     def __init__(self):
         self.col=Image.open(os.path.join(TEX,'plants.png')).convert('RGBA')
-        self.nor=Image.open(os.path.join(TEX,'plants_normal.png'));self.mer=Image.open(os.path.join(TEX,'plants_mer.png'))
+        self.nor=Image.open(os.path.join(TEX,'plants_normal.png'));self.mer=Image.open(os.path.join(TEX,'plants_mers.png'))
         self.modes=(self.nor.mode,self.mer.mode);self.nor=self.nor.convert('RGBA');self.mer=self.mer.convert('RGBA')
     def paint(self,im,x0,y0):
         for y in range(im.height):
@@ -63,7 +63,7 @@ class Atlas:
                 self.mer.putpixel((x0+x,y0+y),(0,0,185 if hexof(p) in BODY else 200,255) if solid else (0,0,255,255))
     def save(self):
         self.col.save(os.path.join(TEX,'plants.png'));self.nor.convert(self.modes[0]).save(os.path.join(TEX,'plants_normal.png'))
-        self.mer.convert(self.modes[1]).save(os.path.join(TEX,'plants_mer.png'))
+        self.mer.convert(self.modes[1]).save(os.path.join(TEX,'plants_mers.png'))  # then run tools/subsurface.py
 def art(rows):
     im=Image.new('RGBA',(len(rows[0]),len(rows)),(0,0,0,0))
     for y,r in enumerate(rows):

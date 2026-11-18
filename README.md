@@ -18,11 +18,12 @@
 | `sdk/herbal-client.js` | 給其他模組用的握手 SDK，複製單檔即可 |
 | `docs/改善企劃書.md` | 重製版改善企劃書（1.1） |
 | `docs/1.2企劃書.md` | 1.2 企劃書 |
+| `docs/美術需求.md` | 1.2 美術需求（給美術） |
 | `docs/API.md` | 對外 API 契約 |
 | `docs/測試表.md` | 進遊戲測試表 |
 | `docs/待測清單.md` | 還沒在遊戲裡確認的項目 |
 | `docs/PBR.md` | PBR 貼圖規範與檢查結果 |
-| `tools/` | 物品圖示與 banner 繪製、引用與 PBR 檢查、打包 |
+| `tools/` | 物品圖示、模型、PBR 貼圖與 banner 繪製，引用與 PBR 檢查，打包 |
 | `tests/` | 測試 |
 
 需求：Minecraft 基岩版 1.26.1 以上，以及森羅物語：廚房（Cookery）——晾曬、切片、研磨、藥膳與茶都在 Cookery 的器具上完成。

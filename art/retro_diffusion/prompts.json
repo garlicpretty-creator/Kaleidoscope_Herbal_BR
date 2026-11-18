@@ -53,5 +53,10 @@
   "prompt": "a round glass bottle with a cork, filled with dark crimson liquor with a red reishi mushroom inside",
   "style": "rd_plus__mc_item",
   "cost_usd": 0.06
+ },
+ "pill": {
+  "prompt": "three round glossy traditional chinese honey pills in a small pile, smooth spheres, warm amber brown",
+  "style": "rd_plus__mc_item",
+  "cost_usd": 0.0
  }
 }

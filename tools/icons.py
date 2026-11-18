@@ -4,7 +4,7 @@ Usage: python3 tools/icons.py            writes every icon
        python3 tools/icons.py --sheet F  also writes a contact sheet of them to F
 
 Every icon is a sprite in tools/icon_src/rd/ (Retro Diffusion output, put together by tools/rd_assemble.py,
-tools/tea_cups.py and tools/decoction_bowls.py). RD gives each icon its material, which sets the MER map
+tools/tea_cups.py, tools/decoction_bowls.py and tools/honey_pills.py). RD gives each icon its material, which sets the MER map
 (metalness, emissive, roughness) and how much the pixels are raised in the normal map; RD_PARTS picks out
 parts of an icon that are a different material.
 
@@ -167,11 +167,13 @@ RD.update({n:'herb' for n in ['angelica_seeds','chrysanthemum_seeds','ginseng_se
  'fresh_poria','dried_poria','reishi','dried_reishi','chrysanthemum','dried_chrysanthemum','honeysuckle','dewy_honeysuckle','dried_honeysuckle',
  'carried_wild_cordyceps','carried_wild_poria']})
 RD.update({'formula_notebook':'paper','prescription_slip':'paper','icon_herbal_curtain':'cloth'})
+# The eight honey pills: one shared sprite with a coating per kind, drawn by tools/honey_pills.py.
+RD.update({k+'_pill':'wax' for k in ('ming_mu','qing_re','an_shen','xing_qi','shen_chong','qing_shen','yin_xi','hui_chun')})
 # Parts of a redrawn icon that are a different material from the rest, picked out by colour: (test on r,g,b) -> material.
 gold=lambda r,g,b:r>165 and g>120 and b<120 and r-b>70
 RD_PARTS={'icon_paper_lantern':[(lambda r,g,b:r>170 and g<130,'glow')],          # the lit paper
  'burnt_dregs':[(lambda r,g,b:r>190 and 60<g<180 and b<100,'glow')],             # embers
- 'icon_incense_burner':[(gold,'brass')],'icon_steelyard':[(gold,'brass')],
+ 'icon_steelyard':[(gold,'brass')],  # the incense burner is clay (decided 2026-11-18): no metal on it
  'herbal_trowel':[(lambda r,g,b:abs(r-g)<22 and abs(g-b)<30 and r>110,'iron')]}  # the blade
 def from_rd(name,mat):
     img=Image.open(os.path.join(SRC,'rd',name+'.png')).convert('RGBA');assert img.size==(16,16),(name,img.size)

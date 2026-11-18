@@ -22,5 +22,6 @@
  "licorice_jujube_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
  "mugwort_angelica_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
  "reishi_decoction": "bowl/ (shared bowl, tools/decoction_bowls.py)",
- "reishi_wine": "round3 (a ceramic jar with a paper label and a cloth-tied mouth, as the placed block is)"
+ "reishi_wine": "round3 (a ceramic jar with a paper label and a cloth-tied mouth, as the placed block is)",
+ "pill": "pill/ (shared by the eight honey pills, tools/honey_pills.py)"
 }

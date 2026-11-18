@@ -122,7 +122,7 @@ for l,table in langs.items():
             if m.group(2) not in known:err('text',k,'in',l,'is for a missing id')
 unused=sorted(k for k in langs[next(iter(langs))] if k not in used_keys and not k.startswith('pack.'))
 print('unused text keys:',len(unused),unused[:60])
-on_disk={os.path.relpath(p,RP)[:-4].replace(os.sep,'/') for p in files(RP,'textures','.png') if not p.endswith(('_normal.png','_mer.png'))}
+on_disk={os.path.relpath(p,RP)[:-4].replace(os.sep,'/') for p in files(RP,'textures','.png') if not p.endswith(('_normal.png','_mer.png','_mers.png'))}
 print('unused texture files:',sorted(on_disk-tex_files))
 if errors:
     print('FAIL',len(errors));[print(' ',e) for e in errors];sys.exit(1)
