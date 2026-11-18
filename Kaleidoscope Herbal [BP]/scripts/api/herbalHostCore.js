@@ -11,7 +11,7 @@ export const EVENTS=Object.freeze({
  adjuvantRegister:NS+':adjuvant_register',adjuvantAck:NS+':adjuvant_ack',
  evt:NS+':evt',
 });
-export const CAPABILITIES=Object.freeze(['events','catalog','constitution','constitution_write','external_heat','heat_source_tag','external_recipes','external_adjuvants']);
+export const CAPABILITIES=Object.freeze(['events','catalog','constitution','constitution_write','external_heat','heat_source_tag','external_recipes','external_adjuvants','pills','environment_heat']);
 export const LIMITS=Object.freeze({externalHeat:256,itemsPerMessage:32,heatMax:100,heatAddMax:50,heatAddCooldown:20,packetBytes:1800,
  // v1.1.0: recipeIngredients and recipeServingsMax mirror the clay pot (MAX_INGREDIENTS, MAX_SERVINGS in data/decoctions.js).
  externalRecipes:64,recipesPerMessage:8,recipeIngredients:6,recipeServingsMax:4,recipeTimeMin:200,recipeTimeMax:2400,recipeTimeDefault:600,

@@ -9,12 +9,18 @@ import {readStore} from '../utils/blockStore.js';
 import {activePots,startPotLoop,spillPot,restorePotVisual} from '../custom_components/clayPot.js';
 import {trackBurner,startIncenseLoop,spillBurner} from '../custom_components/incenseBurner.js';
 import {startReishiInoculation} from '../custom_components/reishiSpawn.js';
-import {applyHeat,startConstitution} from '../utils/constitution.js';
+import {startPoriaInoculation} from '../custom_components/poriaSpawn.js';
+import {startHerbalist} from '../utils/herbalist.js';
+import {applyHeat,shiftHeat,startConstitution} from '../utils/constitution.js';
 import {startStoreSweep} from '../utils/storeSweep.js';
 import {handleGinsengBreak,handleWildHarvest} from '../utils/ginsengHarvest.js';
 import {spillCabinet} from '../custom_components/herbCabinet.js';
 import {spillMortar} from '../custom_components/mortar.js';
 import {STRANGE,STRANGE_EFFECTS,parseMark} from '../data/powders.js';
+import {isPill,powderOf,pillEffects} from '../data/pills.js';
+import {teaFactor} from '../utils/senluoWeek.js';
+// 涼茶週 (v1.2.0): teas last longer.
+const TEAS=new Set(['goji_tea','honeysuckle_tea','honeysuckle_tea_dew','jujube_tea','chrysanthemum_tea'].map(id));
 import {startFormulaBook} from '../utils/formulaBook.js';
 import {handleHoneysuckleHarvest,handleHoneysuckleExplosion} from '../custom_components/wildHoneysuckle.js';
 import {spillExplodedWine} from '../custom_components/herbalWine.js';
@@ -30,11 +36,20 @@ export function applyFood(source,typeId){
   applyHeat(source,typeId);return true;
  }
  for(const effect of data.clear??[])source.removeEffect(effect);
- for(const e of data.effects)source.addEffect(e.name,e.ticks,{amplifier:e.amplifier,showParticles:true});
+ const time=TEAS.has(typeId)?teaFactor():1;
+ for(const e of data.effects)source.addEffect(e.name,Math.round(e.ticks*time),{amplifier:e.amplifier,showParticles:true});
  if(source.typeId==='minecraft:player')applyHeat(source,typeId);
  return true;
 }
 // 奇怪藥散: the packet's mark names its effect; a packet without one (given by command, auto-fed) picks at random.
+// v1.2.0 蜜丸: its powder's effects, longer, with half the heat (data/pills.js).
+export function applyPill(source,typeId){
+ const data=source&&pillEffects(powderOf(typeId));if(!data)return false;
+ for(const name of data.clear??[])source.removeEffect(name);
+ for(const e of data.effects)source.addEffect(e.name,e.ticks,{amplifier:e.amplifier,showParticles:true});
+ if(source.typeId==='minecraft:player'&&data.heat)shiftHeat(source,data.heat);
+ return true;
+}
 export function applyStrange(source,lore){
  if(!source)return false;
  const e=STRANGE_EFFECTS[parseMark(lore)??Math.floor(Math.random()*STRANGE_EFFECTS.length)];
@@ -50,13 +65,15 @@ export function onAwwEvent(event){
   if(m.t==='reaction'){onReaction(m);return;}
   if(m.t!=='autofed'||typeof m.id!=='string'||!(m.id.startsWith('kaleidoscope_herbal:')||hasExternalHeat(m.id)))return;
   const player=world.getEntity(m.p);
-  if(player?.isValid&&player.typeId==='minecraft:player'){if(m.id===STRANGE)applyStrange(player);else applyFood(player,m.id);}
+  if(player?.isValid&&player.typeId==='minecraft:player'){if(m.id===STRANGE)applyStrange(player);else if(isPill(m.id))applyPill(player,m.id);else applyFood(player,m.id);}
  }catch{} // malformed message or player gone: ignore quietly
 }
 export function startEvents(){
- startReishiInoculation();
+ startReishiInoculation();startPoriaInoculation();startHerbalist();
  world.afterEvents.itemCompleteUse.subscribe(({source,itemStack})=>{
-  if(itemStack.typeId===STRANGE)applyStrange(source,itemStack.getLore());else applyFood(source,itemStack.typeId);
+  if(itemStack.typeId===STRANGE)applyStrange(source,itemStack.getLore());
+  else if(isPill(itemStack.typeId))applyPill(source,itemStack.typeId);
+  else applyFood(source,itemStack.typeId);
  });
  startFormulaBook();
  // v1.2.11 (B047): A Witch Way's backpack auto-feed does not really eat (it gives Saturation directly), so
