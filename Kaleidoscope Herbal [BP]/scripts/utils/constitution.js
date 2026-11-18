@@ -3,6 +3,7 @@ import {id} from '../data/herbs.js';
 import {emitEvt} from './bus.js';
 import {HEAT_DECAY_TICKS,HINT_CLEAR,heatDelta,stepHeat,envStep,heatHint} from '../data/constitution.js';
 import {heatOf} from './heat.js';
+import {blockAt} from './blockStore.js';
 import {dietFactor} from './senluoWeek.js';
 import {SOUPS} from '../data/placeableSoups.js';
 const KEY=id('heat'),HINT=id('heat_hint');
@@ -52,10 +53,9 @@ export function shiftHeat(player,delta){
 const COLD_BLOCKS=new Set(['minecraft:snow','minecraft:snow_layer','minecraft:powder_snow','minecraft:ice','minecraft:packed_ice','minecraft:blue_ice','minecraft:frosted_ice']);
 const WATER=new Set(['minecraft:water','minecraft:flowing_water']);
 const COLD_BIOME=/frozen|snowy|ice|cold|grove|peaks/,HOT_BIOME=/desert|badlands|mesa/;
-const block=(dim,location)=>{try{return dim.getBlock(location);}catch{return undefined;}};
 function nearFire(dim,feet){
  for(let dx=-3;dx<=3;dx++)for(let dy=-1;dy<=1;dy++)for(let dz=-3;dz<=3;dz++)
-  if(heatOf(block(dim,{x:feet.x+dx,y:feet.y+dy,z:feet.z+dz})))return true;
+  if(heatOf(blockAt(dim,{x:feet.x+dx,y:feet.y+dy,z:feet.z+dz})))return true;
  return false;
 }
 export function senseEnv(player){
@@ -63,7 +63,7 @@ export function senseEnv(player){
  if(dim.id==='minecraft:nether')return {nether:true};
  if(dim.id!=='minecraft:overworld')return {};
  const loc=player.location,feet={x:Math.floor(loc.x),y:Math.floor(loc.y),z:Math.floor(loc.z)};
- const here=block(dim,feet)?.typeId,under=block(dim,{...feet,y:feet.y-1})?.typeId;
+ const here=blockAt(dim,feet)?.typeId,under=blockAt(dim,{...feet,y:feet.y-1})?.typeId;
  let time=6000;try{time=world.getTimeOfDay();}catch{}
  const night=time>=13000&&time<23000;
  // The biome lookup is not in every Script API version; without it only the ground and water count.

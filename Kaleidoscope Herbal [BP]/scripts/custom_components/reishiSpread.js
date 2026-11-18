@@ -1,4 +1,5 @@
 import {world,BlockPermutation,BlockVolume,WeatherType} from '@minecraft/server';
+import {blockAt} from '../utils/blockStore.js';
 import {id,isLog,LOGS} from '../data/herbs.js';
 // face = the log side the mushroom grows on; matches worldgen features and player placement.
 export const LOG_FACES=[{x:1,z:0,face:'east'},{x:-1,z:0,face:'west'},{x:0,z:1,face:'south'},{x:0,z:-1,face:'north'}];
@@ -11,7 +12,7 @@ function* blocksIn(dimension,base,filter){
  try{for(const p of dimension.getBlocks(volume,filter,false).getBlockLocationIterator())yield p;return;}catch{}
  // Fallback for engines without filtered getBlocks.
  for(let x=-4;x<=4;x++)for(let y=-4;y<=4;y++)for(let z=-4;z<=4;z++){
-  let b;try{b=dimension.getBlock({x:base.x+x,y:base.y+y,z:base.z+z});}catch{continue;}
+  const b=blockAt(dimension,{x:base.x+x,y:base.y+y,z:base.z+z});if(!b)continue;
   if(b&&(filter.includeTypes.includes(b.typeId)||(filter.includeTypes===LOGS&&isLog(b))))yield b.location;
  }
 }
@@ -25,7 +26,7 @@ export function trySpread(block,source=id('wild_reishi')){
   for(const side of LOG_FACES){
    const q={x:p.x+side.x,y:p.y,z:p.z+side.z};
    if(!near(q))continue;
-   try{if(dimension.getBlock(q)?.isAir)candidates.push({q,face:side.face});}catch{}
+   if(blockAt(dimension,q)?.isAir)candidates.push({q,face:side.face});
   }
   if(candidates.length>=12)break;
  }

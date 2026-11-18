@@ -3,6 +3,7 @@ import {id} from '../data/herbs.js';
 import {isRaining} from './reishiSpread.js';
 import {spawnTarget} from './reishiSpawn.js';
 import {hand,heldId,takeOne,feedback} from '../utils/items.js';
+import {blockAt} from '../utils/blockStore.js';
 // v1.2.0 茯苓段木: poria powder on the side of a spruce log that stands on soil starts a culture there. In dry
 // weather the culture now and then puts up a wild poria on the soil around the log: within PORIA_RADIUS blocks,
 // at most PORIA_MAX at a time. The culture stays until broken (it returns the powder).
@@ -10,9 +11,8 @@ export const PORIA_CHANCE=.12,PORIA_RADIUS=4,PORIA_MAX=3;
 export const SPRUCE=new Set(['minecraft:spruce_log','minecraft:stripped_spruce_log','minecraft:spruce_wood','minecraft:stripped_spruce_wood']);
 export const SOIL=new Set(['minecraft:podzol','minecraft:dirt','minecraft:grass_block','minecraft:coarse_dirt']); // what wild poria may stand on
 const OPPOSITE={north:'south',south:'north',east:'west',west:'east'};
-const at=(dim,location)=>{try{return dim.getBlock(location);}catch{return undefined;}};
 // A culture works only on a spruce log whose bottom rests on soil.
-export function logReady(log){return !!log&&SPRUCE.has(log.typeId)&&SOIL.has(at(log.dimension,{...log.location,y:log.location.y-1})?.typeId);}
+export function logReady(log){return !!log&&SPRUCE.has(log.typeId)&&SOIL.has(blockAt(log.dimension,{...log.location,y:log.location.y-1})?.typeId);}
 // Where a new poria may go, given a lookup of block ids around the log: an air block on soil, near the log's foot.
 export function poriaSpots(lookup,log,radius=PORIA_RADIUS){
  const spots=[];let grown=0;
@@ -28,10 +28,10 @@ export const poriaSpawn={
   if(Math.random()>=PORIA_CHANCE||isRaining(block.dimension))return;
   const face=String(block.permutation.getState(/** @type {any} */('minecraft:block_face'))??'south');
   const back=spawnTarget(block.location,OPPOSITE[face]);if(!back)return;
-  const log=at(block.dimension,back.location);if(!logReady(log))return;
-  const {spots,grown}=poriaSpots(p=>at(block.dimension,p)?.typeId,log.location);
+  const log=blockAt(block.dimension,back.location);if(!logReady(log))return;
+  const {spots,grown}=poriaSpots(p=>blockAt(block.dimension,p)?.typeId,log.location);
   if(grown>=PORIA_MAX||!spots.length)return;
-  const spot=at(block.dimension,spots[Math.floor(Math.random()*spots.length)]);if(!spot)return;
+  const spot=blockAt(block.dimension,spots[Math.floor(Math.random()*spots.length)]);if(!spot)return;
   try{spot.setType(id('wild_poria'));feedback(spot,'minecraft:crop_growth_emitter','dig.grass');}catch{}
  },
 };

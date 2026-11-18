@@ -1,7 +1,7 @@
 import {system} from '@minecraft/server';
 import {HERB_ITEMS,NS,id} from '../data/herbs.js';
 import {matchDecoction,advancePot,contentsOnBreak,burnLimit,potEvent,isExternalIngredient,MAX_INGREDIENTS} from '../data/decoctions.js';
-import {getRecord,newRecord,saveRecord,removeRecord,loadedBlock,setStates,isRedraw} from '../utils/blockStore.js';
+import {blockAt,getRecord,newRecord,saveRecord,removeRecord,loadedBlock,setStates,isRedraw} from '../utils/blockStore.js';
 import {hand,heldId,takeOne,exchangeOne,drop,feedback,countItems,removeItems,refuse} from '../utils/items.js';
 import {heatBelow} from '../utils/heat.js';
 import {startSetLoop,onBeat,CHECKPOINT_TICKS,StationSet} from '../utils/loops.js';
@@ -33,7 +33,7 @@ function rattle(block,heat){
  if(!heat){if(look===LOOK.BOIL_BOB)setStates(block,{[POT]:LOOK.BOIL});return;}
  setStates(block,{[POT]:look===LOOK.BOIL?LOOK.BOIL_BOB:LOOK.BOIL});
  if(heat==='strong')system.runTimeout(()=>{
-  let b;try{b=block.dimension.getBlock(block.location);}catch{}
+  const b=blockAt(block.dimension,block.location);
   const now=b?.typeId===id('clay_pot')?b.permutation.getState(POT):undefined;
   if(boiling(now))setStates(b,{[POT]:now===LOOK.BOIL?LOOK.BOIL_BOB:LOOK.BOIL});
  },10);

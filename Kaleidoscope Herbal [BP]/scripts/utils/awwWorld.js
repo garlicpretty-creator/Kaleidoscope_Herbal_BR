@@ -1,4 +1,5 @@
 import {system,world} from '@minecraft/server';
+import {blockAt} from './blockStore.js';
 import {HERBS,id} from '../data/herbs.js';
 import {harvestFactor} from './senluoWeek.js';
 // v1.2.12 (森羅×AWW phase 3a, contract §10.3): A Witch Way's world events reach our crops.
@@ -49,7 +50,7 @@ function* scan(dimension,cx,cy,cz,day){
  const r=CATALYZE_RADIUS;let n=0;
  for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)for(let dz=-r;dz<=r;dz++){
   if(dx*dx+dy*dy+dz*dz>r*r)continue;
-  let block;try{block=dimension.getBlock({x:cx+dx,y:cy+dy,z:cz+dz});}catch{block=undefined;} // unloaded or out of the world
+  const block=blockAt(dimension,{x:cx+dx,y:cy+dy,z:cz+dz});
   if(block&&catalyzeBlock(block,day))try{dimension.spawnParticle('minecraft:crop_growth_emitter',block.center());}catch{}
   if(++n%256===0)yield;
  }

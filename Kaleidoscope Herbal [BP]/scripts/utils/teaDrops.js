@@ -1,14 +1,15 @@
 import {ItemStack} from '@minecraft/server';
 import {id} from '../data/herbs.js';
 
-const teas=new Set(['goji_tea','honeysuckle_tea','honeysuckle_tea_dew','jujube_tea','chrysanthemum_tea'].map(id));
+// The placed teas (Cookery cup stacks); also used for 涼茶週.
+export const TEAS=new Set(['goji_tea','honeysuckle_tea','honeysuckle_tea_dew','jujube_tea','chrysanthemum_tea'].map(id));
 const count=(value,fallback,min,max)=>{
  const number=Number(value??fallback);
  return Math.max(min,Math.min(max,Number.isFinite(number)?Math.floor(number):fallback));
 };
 
 export function teaContentsOnExplosion(permutation){
- if(!teas.has(permutation.type.id))return [];
+ if(!TEAS.has(permutation.type.id))return [];
  const cups=count(permutation.getState('kaleidoscope_cookery:cup_count'),1,1,4);
  const filled=count(permutation.getState('kaleidoscope_cookery:tea_count'),1,0,cups);
  const items=[];

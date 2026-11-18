@@ -1,5 +1,6 @@
 import {system,world} from '@minecraft/server';
 import {id} from '../data/herbs.js';
+import {blockAt} from './blockStore.js';
 // v1.2.0 走方郎中: a wandering herbalist who trades near the wild herb huts by day and is gone at night.
 // The huts tell us where they are: each hut's structure holds one invisible hut_marker block, which records its
 // position the first time its chunk ticks. So he only ever appears at real huts, never in a player's house.
@@ -42,7 +43,7 @@ function pass(){
   if(near.length||Math.random()>=APPEAR_CHANCE)continue;
   let players=[];try{players=dimension.getPlayers({location:at,maxDistance:PLAYER_RANGE});}catch{}
   if(!players.length)continue;
-  let spot;try{spot=dimension.getBlock(hut);}catch{}
+  const spot=blockAt(dimension,hut);
   if(!spot||!(spot.isAir||spot.typeId===id('hut_marker')))continue; // unloaded, or the hut was built over
   try{const e=dimension.spawnEntity(HERBALIST,at);poof(e);}catch(error){console.warn('[Herbal] herbalist: '+error);}
  }
