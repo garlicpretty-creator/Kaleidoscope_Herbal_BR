@@ -15,7 +15,7 @@
 ### 1.2 美術與 Vibrant Visuals
 
 - **八種蜜丸圖示**：三顆藥丸，丸衣是對應散劑藥包的標籤色（明目藍、清熱青、安神紫、行氣綠、參蟲紅、輕身黃、隱息灰、回春粉）。八種共用一張 Retro Diffusion 畫的藥丸（`art/retro_diffusion/pill/`），由 `tools/honey_pills.py` 換色。
-- **走方郎中**：斗笠、麻布長袍與交領、深色腰帶、背上竹編藥簍、腰間葫蘆，手持畫著葫蘆（懸壺）的幌子。128×128 貼圖附法線與 MER。由 `tools/herbalist_model.py` 產生；Blockbench 專案在 `art/blockbench/`。
+- **走方郎中**：斗笠、麻布長袍與交領、深色腰帶、背上竹編藥簍、腰間葫蘆，手持畫著葫蘆（懸壺）的幌子。128×128 貼圖附法線與 MER。由 `tools/herbalist_model.py` 產生；Blockbench 專案在 `art/blockbench/`。進遊戲測試時發現幌子和右袖重疊處閃爍，已把幌子往前移開。
 - **段木茯苓菌種**：有了自己的模型，白色粉狀菌絲加幾塊深褐色外皮的小茯苓，和段木靈芝菌種（白色細網）分得出來（`tools/poria_spawn.py`）。
 - **香爐**：陶製，不帶金屬感。沒上釉的陶身粗糙度 205–232，青色釉帶與赭色飾邊 105–125。點燃時蓋子一圈通氣孔都透出火光；原本把手上有一格誤發光，已拿掉（`tools/incense_burner_pbr.py`）。
 - **葉片透光**：藥草的共用圖集與葉片貼圖改用含次表面散射的 MERS 格式（texture set 1.21.30），葉子 150、花果 100、菌類 40（`tools/subsurface.py`）。
