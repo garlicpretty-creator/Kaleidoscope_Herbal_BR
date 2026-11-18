@@ -15,6 +15,7 @@ blocks={};items={}
 for p in files(BP,'blocks'):b=load(p)['minecraft:block'];blocks[b['description']['identifier']]=b
 for p in files(BP,'items'):i=load(p)['minecraft:item'];items[i['description']['identifier']]=i
 known=set(blocks)|set(items)
+entities={load(p)['minecraft:entity']['description']['identifier'] for p in files(BP,'entities')} if os.path.isdir(os.path.join(BP,'entities')) else set()
 terrain=load(os.path.join(RP,'textures/terrain_texture.json'))['texture_data']
 itex=load(os.path.join(RP,'textures/item_texture.json'))['texture_data']
 geos=set()
@@ -47,6 +48,19 @@ for name,b in blocks.items():
         if d and d.startswith('%'):need_key(d[1:],name)
         loot=c.get('minecraft:loot')
         if loot and not os.path.exists(os.path.join(BP,loot)):err('block',name,'loot table',loot,'not found')
+# model poses: every bone a block shows or hides exists in its model, every state it reads is declared
+geo_bones={}
+for p in files(RP,'models'):
+    for g in load(p).get('minecraft:geometry',[]):geo_bones[g['description']['identifier']]={b['name'] for b in g['bones']}
+for name,b in blocks.items():
+    declared=set(b['description'].get('states',{}))|set(b['description'].get('traits',{}).get('minecraft:placement_direction',{}).get('enabled_states',[]))
+    for c in [b.get('components',{})]+[p.get('components',{}) for p in b.get('permutations',[])]:
+        g=c.get('minecraft:geometry')
+        if not isinstance(g,dict):continue
+        for bone_name,rule in g.get('bone_visibility',{}).items():
+            if bone_name not in geo_bones.get(g['identifier'],set()):err('block',name,'shows bone',bone_name,'missing from',g['identifier'])
+            for state in re.findall(r"q\.block_state\('([^']+)'\)",str(rule)):
+                if state not in declared:err('block',name,'reads undeclared state',state)
 # items
 for name,i in items.items():
     c=i['components'];icon=c.get('minecraft:icon');icon=icon.get('textures',{}).get('default') if isinstance(icon,dict) else icon
@@ -85,15 +99,18 @@ for p in files(BP,'scripts','.js'):
         if m.endswith(('/items','/ui','/blocks','/models')):continue
         tex_files.add(m)
         if not os.path.exists(os.path.join(RP,m+'.png')):err(os.path.relpath(p,root),'texture missing',m)
+# textures a client entity draws
+for p in files(RP,'entity'):
+    tex_files|=set(load(p)['minecraft:client_entity']['description'].get('textures',{}).values())
 particles=set()
 for p in files(RP,'particles'):
     t=text(p);particles|=set(re.findall(r'"identifier"\s*:\s*"kaleidoscope_herbal:([a-z_]+)"',t));tex_files|=set(re.findall(r'textures/kaleidoscope_herbal/[a-z_/0-9]+',t))
 state_names={s.split(':')[1] for b in blocks.values() for s in b['description'].get('states',{})}
 component_names=set(re.findall(r'"kaleidoscope_herbal:([a-z_]+)"',''.join(json.dumps(b.get('components',{}))+json.dumps(b.get('permutations',[])) for b in blocks.values())))
 for s in set(re.findall(r"\bid\('([a-z_/]+)'\)",script)):
-    if NS+s not in known and s not in state_names and s not in component_names and s not in particles and '/' not in s and s not in('heat','heat_hint','formula','salt','learned','sealed_prescription','herb','herbal_trowel','ginseng','four_herb','reishi','cordyceps','four_gentlemen','mugwort_angelica','licorice_jujube'):err('script id() names missing',s)
+    if NS+s not in known and s not in state_names and s not in component_names and s not in particles and '/' not in s and NS+s not in entities and s not in('heat','heat_hint','formula','salt','learned','sealed_prescription','pill_of','huts','herb','herbal_trowel','ginseng','four_herb','reishi','cordyceps','four_gentlemen','mugwort_angelica','licorice_jujube'):err('script id() names missing',s)
 for key in set(re.findall(r"'(kh\.[a-z_]+\.[a-z_.]*[a-z_])'",script)):need_key(key,'script')
-for m in re.finditer(r"translate:`(kh\.[a-z_.]+)\$\{",script):
+for m in re.finditer(r"`(kh\.[a-z_.]+)\$\{",script):
     for k in list(langs[next(iter(langs))]):
         if k.startswith(m.group(1)):used_keys.add(k)
 # every placed block and item needs its fallback game keys too

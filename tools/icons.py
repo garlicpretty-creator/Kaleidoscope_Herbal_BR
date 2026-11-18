@@ -150,7 +150,7 @@ PLANTS['carried_ginseng_crop']=lambda:layer(PODZOL,PODZOL_PAL,layer(BERRIES,BERR
 RD={**{n:'cer' for n in ('ginseng_decoction','four_herb_decoction','reishi_decoction','cordyceps_decoction','four_gentlemen_decoction',
  'mugwort_angelica_decoction','licorice_jujube_decoction','ginseng_chicken_soup','goji_chicken_soup','goji_jujube_soup','jujube_sweet_soup',
  'angelica_mutton_soup','four_herb_chicken','chrysanthemum_tea','goji_tea','honeysuckle_tea','honeysuckle_tea_dew','jujube_tea')},
- **{n:'glass' for n in ('ginseng_wine','goji_wine','angelica_wine','jujube_wine','reishi_wine')},'bitter_dregs':'herb'}
+ **{n:'cer' for n in ('ginseng_wine','goji_wine','angelica_wine','jujube_wine','reishi_wine')},'bitter_dregs':'herb'}
 # The other 55 icons: redrawn by Retro Diffusion from the drawings this file used to make, put together by tools/rd_assemble.py.
 RD.update({n:'herb' for n in ['burnt_dregs','dried_cordyceps','fresh_cordyceps','dried_jujube','jujube_seeds','mugwort_floss']+[h+'_powder' for h in
  ('angelica','chrysanthemum','cordyceps','ginseng','goji','honeysuckle','jujube','licorice','poria','reishi')]+['carried_%s_crop'%h for h in

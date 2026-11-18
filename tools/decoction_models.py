@@ -1,6 +1,6 @@
 """Builds the placed-bowl models of the four v1.1 decoctions (cordyceps, four gentlemen, mugwort-angelica,
 licorice-jujube), which used to borrow the ginseng / four-herb / reishi bowls.
-Usage: python3 tools/decoction_models.py
+Usage: python3 tools/decoction_models.py, then python3 tools/anim_models.py (which adds the sipping poses back)
 Each model is the shared bowl (taken from ginseng_decoction.geo.json) with its own soup surface and toppings.
 The new surface tiles and topping swatches are painted into free rows of models/bowls(.png|_normal|_mer),
 and the four block files are pointed at the new geometry. Safe to run again: it repaints the same cells."""

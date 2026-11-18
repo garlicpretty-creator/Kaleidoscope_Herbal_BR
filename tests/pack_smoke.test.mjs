@@ -47,12 +47,12 @@ test('the pack entry loads, registers its components and announces the API',asyn
  assert.equal(JSON.parse(ready.message).version,VERSION);
  // The real catalogs fit the 2048-character script event limit.
  const host=system.subs.find(s=>s.options?.namespaces?.[0]==='kaleidoscope_herbal'&&s.fn.toString().includes('host.handle'));
- for(const kind of ['herbs','foods','decoctions']){
+ for(const kind of ['herbs','foods','decoctions','pills']){
   system.sent.length=0;
   host.fn({id:'kaleidoscope_herbal:catalog_request',message:JSON.stringify({api:1,source:'test_pack',kind}),sourceType:'Server'});
   const parts=system.sent.map(e=>(assert.ok(e.message.length<=2048),JSON.parse(e.message)));
   assert.ok(parts.length>=1&&parts.every(p=>p.ok&&p.kind===kind));
-  assert.ok(parts.flatMap(p=>p.items).length>=(kind==='decoctions'?7:11),kind);
+  assert.ok(parts.flatMap(p=>p.items).length>=({decoctions:7,pills:8}[kind]??11),kind);
  }
 });
 // ---- v1.1.0 (A9/A11): the real clay pot and harvest handlers, driven with stand-in blocks and players.
@@ -135,4 +135,23 @@ test('scripts and both manifests carry the same version',async()=>{
  const {GUIDEBOOK}=await import(pathToFileURL(resolve(bp,'scripts/data/guidebook.js')).href);
  assert.equal(GUIDEBOOK.version,VERSION);
  assert.ok(r.capabilities.includes('pbr'));
+});
+test('clay pot: one pot state draws every phase, within the permutation budget',async()=>{
+ const w=await potWorld(),{clayPot,tickPot}=await w.script('custom_components/clayPot.js'),{getRecord}=await w.script('utils/blockStore.js');
+ const look=()=>w.block.permutation.getState(kh('pot'));
+ const use=item=>{w.hold(item);clayPot.onPlayerInteract({block:w.block,player:w.player});};
+ const simmer=until=>{for(let i=0;i<400&&getRecord(w.block)?.stage!==until;i++)tickPot(getRecord(w.block).key);};
+ const pot=w.newPot();pot.location.x=pot.x=9001;w.system.currentTick=5000; // a spot and a tick no other test used
+ clayPot.onPlace({block:pot});assert.equal(look(),0); // empty
+ use('minecraft:water_bucket');assert.equal(look(),1); // plain water
+ for(const item of ['ginseng_slices','ginseng_slices','licorice_slices'])use(kh(item));
+ assert.equal(look(),2);assert.ok(w.block.permutation.getState(kh('shown'))>0||w.block.permutation.getState(kh('shown_page'))>0); // herbs float
+ w.player.isSneaking=true;use(undefined);w.player.isSneaking=false;assert.equal(look(),3); // lit, lid down
+ const key=getRecord(w.block).key;tickPot(key);assert.equal(look(),4);tickPot(key);assert.equal(look(),3); // the lid rattles
+ simmer(3);assert.equal(look(),5); // ready, lid on
+ simmer(4);assert.equal(look(),7); // burnt
+ const block=JSON.parse(readFileSync(resolve(bp,'blocks/stations/clay_pot.json'),'utf8'))['minecraft:block'];
+ const states=block.description.states,size=v=>Array.isArray(v)?v.length:v.values.max-v.values.min+1;
+ assert.deepEqual(Object.keys(states),['pot','shown','shown_page'].map(kh));
+ assert.equal(Object.values(states).reduce((n,v)=>n*size(v),4),1536); // x4 facings; was 7,680
 });

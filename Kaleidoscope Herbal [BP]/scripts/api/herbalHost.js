@@ -5,12 +5,16 @@ import {FOOD_EFFECTS,EXTERNAL_RECIPES,EXTERNAL_ADJUVANTS,matchBuiltin,sameMix,de
 import {HEAT_VALUES,EXTERNAL_HEAT} from '../data/constitution.js';
 import {getHeat,shiftHeat} from '../utils/constitution.js';
 import {createHerbalHost} from './herbalHostCore.js';
+import {POWDER_FORMULAS} from '../data/powders.js';
+import {pillFor,pillEffects} from '../data/pills.js';
 // v1.1.0: wires the host API (herbalHostCore.js, docs/API.md) to the world.
 const catalogs={
  herbs:()=>HERBS.map(h=>({key:h.key,fresh:id(h.fresh),dry:id(h.dry),...(h.processed?{processed:id(h.processed)}:{}),wild:id(h.wild),cultivable:h.cultivable})),
  foods:()=>Object.entries(FOOD_EFFECTS).map(([item,data])=>({id:item,heat:HEAT_VALUES.get(item)??0,
   effects:data.effects.map(e=>[e.name,e.ticks,e.amplifier]),...(data.clear?.length?{clear:data.clear}:{})})),
  decoctions:decoctionCatalog,adjuvants:adjuvantCatalog, // v1.1.0
+ // v1.2.0: one row per honey pill; effects only, never the powder's formula.
+ pills:()=>POWDER_FORMULAS.map(f=>{const p=pillEffects(f.result);return {id:pillFor(f.result),from:f.result,heat:p.heat,effects:p.effects.map(e=>[e.name,e.ticks,e.amplifier]),...(p.clear?.length?{clear:p.clear}:{})};}),
 };
 // A recipe whose output no installed pack defines would leave the pot holding nothing; if the lookup itself fails, trust the sender.
 function itemExists(item){try{return !!ItemTypes.get(item);}catch{return true;}}

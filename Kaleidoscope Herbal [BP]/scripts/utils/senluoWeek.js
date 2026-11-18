@@ -3,7 +3,9 @@
 // Herbal reacts to two themes; without the broadcast (no 魔女手札, or an older one) nothing changes.
 //  - harvest: crops grow 1.5x (combined with sky events, crops cap at 2x)
 //  - incense: a burner loaded this week burns 9,000 ticks a portion instead of 6,000
-export const WEEK_HARVEST=1.5,WEEK_INCENSE_TICKS=9000;
+//  - diet (v1.2.0, 藥膳週): decoctions and herbal dishes carry half their 寒熱
+//  - tea (v1.2.0, 涼茶週): teas last 1.5x as long
+export const WEEK_HARVEST=1.5,WEEK_INCENSE_TICKS=9000,WEEK_DIET_HEAT=.5,WEEK_TEA=1.5;
 let theme,until=0;
 const nowSeconds=()=>Date.now()/1000;
 export function onWeek(m){
@@ -22,6 +24,8 @@ export function weekTheme(){
 }
 export const harvestFactor=()=>weekTheme()==='harvest'?WEEK_HARVEST:1;
 export const incenseWeek=()=>weekTheme()==='incense';
+export const dietFactor=()=>weekTheme()==='diet'?WEEK_DIET_HEAT:1;
+export const teaFactor=()=>weekTheme()==='tea'?WEEK_TEA:1;
 export function onSenluoEvent(event){
  if(event.id!=='senluo_link:evt')return;
  try{const m=JSON.parse(event.message);if(m?.v===1&&m.t==='week')onWeek(m);}catch{} // malformed: ignore quietly

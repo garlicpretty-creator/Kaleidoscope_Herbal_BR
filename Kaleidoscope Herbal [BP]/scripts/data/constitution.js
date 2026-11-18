@@ -19,8 +19,8 @@ for(const [key,value] of Object.entries(table)){
 // Our own table always wins; nothing here is saved, clients register again after every api_ready.
 export const EXTERNAL_HEAT=new Map();
 export const hasExternalHeat=typeId=>EXTERNAL_HEAT.has(typeId);
-export function heatDelta(typeId,inNether=false){
- const value=HEAT_VALUES.get(typeId)??EXTERNAL_HEAT.get(typeId)?.heat??0;
+export function heatDelta(typeId,inNether=false,factor=1){
+ const value=Math.trunc((HEAT_VALUES.get(typeId)??EXTERNAL_HEAT.get(typeId)?.heat??0)*factor);
  return inNether&&value>0?value*2:value;
 }
 export function stepHeat(current,delta){
@@ -30,6 +30,16 @@ export function stepHeat(current,delta){
  return {heat,effect:undefined};
 }
 export const decayHeat=heat=>heat>0?Math.max(0,heat-HEAT_DECAY):Math.min(0,heat+HEAT_DECAY);
+// v1.2.0 寒熱與環境: every HEAT_DECAY_TICKS the surroundings push a player's 寒熱 instead of letting it settle.
+// env: {nether, cold, hot, nearFire}. Cold means snow or ice underfoot, cold water at night, or the open sky of
+// a snowy biome; hot means the open sky of a desert or badlands by day. A fire within reach cancels both, so
+// the body settles as usual; the Nether keeps pushing regardless.
+export const ENV_COLD=-2,ENV_NETHER=2,ENV_HOT=1;
+export function envStep(heat,env={}){
+ if(env.nether)return {push:ENV_NETHER};
+ if(!env.nearFire){if(env.cold)return {push:ENV_COLD};if(env.hot)return {push:ENV_HOT};}
+ return {next:decayHeat(heat)};
+}
 // Early warning, still without text: crossing ±60 shows one bodily cue (flushed / shivering); it re-arms
 // once the body is back within ±40. A full overheat/chill already gave its own cue, so it only arms.
 export const HINT_AT=60,HINT_CLEAR=40;

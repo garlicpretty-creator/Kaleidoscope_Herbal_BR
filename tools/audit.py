@@ -107,8 +107,11 @@ for bid in blocks:
 for bid in sounds:
     if bid.startswith(NS) and bid not in blocks: bad('leftover','RP blocks.json lists %s, which is not a block'%bid)
 # ---------------------------------------------------------------- geometry: every face inside its texture
+# geometries a client entity draws count as used (os.listdir: glob would read the [RP] in the folder name as a pattern)
+_ent=os.path.join(RP,'entity')
+entity_geo={g for f in (os.listdir(_ent) if os.path.isdir(_ent) else []) if f.endswith('.json') for g in json.load(open(os.path.join(_ent,f),encoding='utf-8'))['minecraft:client_entity']['description'].get('geometry',{}).values()}
 for gid,(p,g) in geos.items():
-    if gid not in used_geo: bad('leftover','geometry %s is used by no block'%gid)
+    if gid not in used_geo and gid not in entity_geo: bad('leftover','geometry %s is used by no block or entity'%gid)
     tw=g['description'].get('texture_width',64);th=g['description'].get('texture_height',64)
     for b in g.get('bones',[]):
         for c in b.get('cubes',[]):
