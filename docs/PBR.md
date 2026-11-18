@@ -11,6 +11,7 @@
 | `foo.png` | 顏色（RGBA 8-bit） |
 | `foo_normal.png` | 法線貼圖，與顏色同尺寸 |
 | `foo_mer.png` | R = 金屬度、G = 自發光、B = 粗糙度，與顏色同尺寸 |
+| 或 `foo_mers.png` | 同上，另加 A = 次表面散射（葉片透光）；texture set 要 `1.21.30`，和 `_mer` 二選一 |
 | `foo.texture_set.json` | `color` 必須等於檔名 `foo`；`normal` 與 `heightmap` 不可並存 |
 
 不需要 texture set 的：`ui/`、`particle/`、物品欄平面圖示 `items/icon_*`。
@@ -46,12 +47,12 @@ python3 tools/pbr_audit.py
 
 | # | 貼圖 | 現況 | 建議 |
 |---|---|---|---|
-| 1 | `models/clay_pot_water` | 平均粗糙度 235，與空鍋 `clay_pot` 完全相同 | 水面區域降到 15–60 |
-| 2 | `models/teas` | 平均粗糙度 224 | 茶湯面降到 15–60，杯身維持 |
+| 1 | `models/clay_pot_water` | 已確認：水面與湯面粗糙度 17–39（舊的 235 是含透明格的整張平均） | 不用改 |
+| 2 | `models/teas` | 已確認：茶湯面 9–25，杯身 40–57（舊的 224 同上） | 不用改 |
 | 3 | 新湯劑的擺放模型；10 種單味藥粉圖示 | 已完成：四種湯劑各有模型（`tools/decoction_models.py`，湯面粗糙度 32）；藥粉圖示由 `tools/icons.py` 繪製 | 實機確認外觀 |
-| 4 | `models/incense_burner`、`_lit` | 點燃版只有 2 個自發光像素 | 香爐是陶製（2026-11-18 決定），金屬度維持 0；香頭自發光加到 6–10 像素 |
-| 5 | `models/plants`、`blocks/leaf`、作物與野生藥草 | 無次表面散射 | texture set 升到 `1.21.30` 改用 `metalness_emissive_roughness_subsurface`，葉片透光 |
+| 4 | `models/incense_burner`、`_lit` | 已完成（`tools/incense_burner_pbr.py`）：陶身 205–232、釉 105–125、金屬度 0；點燃版通氣孔兩格都發光，整圈約 16 格；把手誤發光的一格已移除 | 實機確認 |
+| 5 | `models/plants`、`blocks/leaf`、作物與野生藥草 | 已完成（`tools/subsurface.py`）：texture set `1.21.30`，`metalness_emissive_roughness_subsurface`（`_mers.png`，A 通道＝次表面），葉 150、花果 100、菌 40 | 實機確認 |
 | 6 | 全部方塊（355 個 material instance） | 一律 `alpha_test` | 貼圖無透明像素的面改 `opaque`；液面評估 `blend` |
-| 7 | 紙燈籠（亮度 13）、香爐（亮度 5） | 僅方塊亮度 | 評估 Vibrant Visuals 的區域光源設定，給暖色點光 |
+| 7 | 紙燈籠（亮度 13）、香爐（亮度 5） | 已完成：`local_lighting/local_lighting.json`（格式 `1.21.120`），兩者 `point_light`，燈籠 `#F2A65A`、香爐 `#E8823C` | 實機確認 |
 
-第 5、7 項用到較新的格式，動工前先對照官方文件確認欄位名稱與最低版本。
+第 5、7 項的格式已對照官方文件（2026-11-18）：[Texture Set 參考](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/texturesetsreference/texturesetsconcepts/texturesetsintroduction)（MERS 與 MER 不可並存；次表面與金屬度互斥）、[Light Sources](https://learn.microsoft.com/en-us/minecraft/creator/documents/vibrantvisuals/lightingcustomization)（`point_lights/global.json` 在 1.21.120 改名為 `local_lighting/local_lighting.json`，資源包最低引擎版本要 1.21.120 以上，本包是 1.26.1）。

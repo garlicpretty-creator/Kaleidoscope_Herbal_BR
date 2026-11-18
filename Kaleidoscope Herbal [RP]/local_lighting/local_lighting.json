@@ -1,0 +1,13 @@
+{
+  "format_version": "1.21.120",
+  "minecraft:local_light_settings": {
+    "kaleidoscope_herbal:paper_lantern": {
+      "light_color": "#F2A65A",
+      "light_type": "point_light"
+    },
+    "kaleidoscope_herbal:incense_burner": {
+      "light_color": "#E8823C",
+      "light_type": "point_light"
+    }
+  }
+}
