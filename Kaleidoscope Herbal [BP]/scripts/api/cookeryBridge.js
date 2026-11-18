@@ -8,8 +8,7 @@ const warned=new Set();
 function warn(player){
  if(warned.has(player.id))return;warned.add(player.id);
  console.warn('[Herbal] Cookery was not detected; host recipes are disabled.');
- // Planning rule 3: one actionbar notice per player, nothing persistent on screen.
- try{player.onScreenDisplay.setActionBar({translate:'kh.message.no_cookery'});}catch{}
+ // Immersion rule: no text on screen. The missing host shows only in the content log above.
 }
 export function recipesFor(info){const capabilities=new Set(info.capabilities??[]);return COOKERY_RECIPES.filter(recipe=>capabilities.has(recipe.kind));}
 export function startCookeryBridge(){

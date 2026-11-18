@@ -311,7 +311,6 @@ kh.item.reishi_spawn=段木靈芝菌種\n§9§o森羅物語：草本§r
 kh.block.reishi_spawn=段木靈芝菌種\n§9§o森羅物語：草本§r
 item.kaleidoscope_herbal:reishi_spawn.name=段木靈芝菌種\n§9§o森羅物語：草本§r
 tile.kaleidoscope_herbal:reishi_spawn.name=段木靈芝菌種\n§9§o森羅物語：草本§r
-kh.message.no_cookery=未偵測到「森羅物語：廚房」，晾曬、切片、藥膳與涼茶配方暫停。
 kh.block.herb_counter=藥櫃檯\n§9§o森羅物語：草本§r
 item.kaleidoscope_herbal:herb_counter.name=藥櫃檯\n§9§o森羅物語：草本§r
 tile.kaleidoscope_herbal:herb_counter.name=藥櫃檯\n§9§o森羅物語：草本§r
