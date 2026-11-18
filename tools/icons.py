@@ -171,7 +171,7 @@ RD.update({'formula_notebook':'paper','prescription_slip':'paper','icon_herbal_c
 gold=lambda r,g,b:r>165 and g>120 and b<120 and r-b>70
 RD_PARTS={'icon_paper_lantern':[(lambda r,g,b:r>170 and g<130,'glow')],          # the lit paper
  'burnt_dregs':[(lambda r,g,b:r>190 and 60<g<180 and b<100,'glow')],             # embers
- 'icon_incense_burner':[(gold,'brass')],'icon_steelyard':[(gold,'brass')],
+ 'icon_steelyard':[(gold,'brass')],  # the incense burner is clay (decided 2026-11-18): no metal on it
  'herbal_trowel':[(lambda r,g,b:abs(r-g)<22 and abs(g-b)<30 and r>110,'iron')]}  # the blade
 def from_rd(name,mat):
     img=Image.open(os.path.join(SRC,'rd',name+'.png')).convert('RGBA');assert img.size==(16,16),(name,img.size)
