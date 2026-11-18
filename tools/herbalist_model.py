@@ -45,7 +45,7 @@ CUBES=[
  ('gourd','gourd_hi',[4.8,10,-1],[2,2,2],'gourd',0),
  ('staff','pole',[-6.5,2,-2.5],[1,29,1],'wood',0),
  ('staff','bar',[-12.5,29,-2.5],[7,1,1],'wood',0),
- ('staff','banner',[-12,17,-2],[6,12,0],'banner',0),
+ ('staff','banner',[-12,17,-2.6],[6,12,0],'banner',0),   # in front of the pole and the sleeve (z -2): no z-fighting
 ]
 
 def foot(size):
