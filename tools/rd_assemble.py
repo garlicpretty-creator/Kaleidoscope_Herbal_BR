@@ -22,6 +22,21 @@ def clean(im):
         for x in range(16):
             p=im.getpixel((x,y));im.putpixel((x,y),p[:3]+(255,) if p[3]>=128 else (0,0,0,0))
     return im
+ROUND4={'angelica_seeds':'angelica_seeds_3','licorice_seeds':'licorice_seeds_3','ginseng_seeds':'ginseng_seeds_0',
+ 'honeysuckle_seeds':'honeysuckle_seeds_3','angelica_slices':'angelica_slices_0','ginseng_slices':'ginseng_slices_0',
+ 'licorice_slices':'licorice_slices_2','poria_slices':'poria_slices_2','dried_angelica':'dried_angelica_1',
+ 'dried_broken_ginseng':'dried_broken_ginseng_3','fresh_cordyceps':'fresh_cordyceps_2','dried_cordyceps':'dried_cordyceps_0',
+ 'dried_chrysanthemum':'dried_chrysanthemum_1','dried_honeysuckle':'dried_honeysuckle_0','jujube_sweet_soup':'jujube_sweet_soup_2'}
+def ginseng_label(im):
+    """The red mark becomes a pale ginseng root."""
+    for y in range(16):
+        for x in range(16):
+            r,g,b,a=im.getpixel((x,y))
+            if a and r>180 and g<130: im.putpixel((x,y),((240,214,156) if g>100 else (214,176,108) if g>60 else (160,118,64))+(255,))
+def goji_label(im):
+    """Goji berries keep the red mark and get a leaf."""
+    im.putpixel((7,8),(84,150,58,255));im.putpixel((7,9),(58,112,40,255))
+WINE_LABELS={'ginseng_wine':ginseng_label,'goji_wine':goji_label}
 if __name__=='__main__':
     names=sorted({f.rsplit('_s',1)[0] for f in os.listdir(SRC) if f.endswith('.png')});out={n:clean(redraw(n)) for n in names}
     for n in names:                                   # farmed plants: the drawn soil strip
@@ -63,5 +78,12 @@ if __name__=='__main__':
         for x in range(16):
             p=dew.getpixel((x,y))
             if p[3] and p[2]>p[0]+30: out['dewy_honeysuckle'].putpixel((x,y),p[:3]+(255,))
+    # Round 4 (2026-11-19): every icon compared side by side; the ones too like another or unlike the real thing were
+    # drawn again from a prompt (art/retro_diffusion/round4/, prompts.json there) and the chosen candidate replaces them.
+    R4=os.path.join(ROOT,'art','retro_diffusion','round4')
+    for n,f in ROUND4.items(): out[n]=clean(Image.open(os.path.join(R4,f+'.png')).convert('RGBA'))
+    # Ginseng and goji wine came out as the same jar with the same red mark: the label shows the herb, as on the placed jar.
+    for n,fix in WINE_LABELS.items():
+        im=clean(Image.open(os.path.join(ROOT,'art','retro_diffusion',n+'.png')).convert('RGBA'));fix(im);out[n]=im
     for n,im in out.items(): im.save(os.path.join(OUT,n+'.png'))
     print(len(out),'sprites')
