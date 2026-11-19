@@ -6,8 +6,9 @@ collar and a dark sash, a bamboo herb basket (藥簍) on his back, a gourd (葫�
 vanilla wandering trader.
 
 Writes models/entity/wandering_herbalist.geo.json and textures/kaleidoscope_herbal/entity/wandering_herbalist
-(.png, _normal.png, _mer.png, .texture_set.json). The bones head, body, rightArm, leftArm, rightLeg and leftLeg
-must keep their names: the walk animation swings the four limbs and the look animation turns the head.
+(.png, _normal.png, _mer.png, .texture_set.json). Every bone must keep its name: the walk animation swings the
+four limbs and the gourd, the idle animation breathes through the head, arms, basket, gourd and staff, and the look
+animation turns the head.
 """
 import json,os,random
 from PIL import Image
