@@ -1,0 +1,66 @@
+{
+ "angelica_seeds": {
+  "prompt": "four flat oval pale tan seeds with thin papery wings and fine ridges",
+  "style": "rd_plus__mc_item"
+ },
+ "licorice_seeds": {
+  "prompt": "a short curved brown seed pod split open, with small dark olive kidney shaped seeds spilling out",
+  "style": "rd_plus__mc_item"
+ },
+ "ginseng_seeds": {
+  "prompt": "a cluster of small bright red round ginseng berries on the end of a thin green stalk",
+  "style": "rd_plus__mc_item"
+ },
+ "honeysuckle_seeds": {
+  "prompt": "three pairs of small glossy black round berries",
+  "style": "rd_plus__mc_item"
+ },
+ "angelica_slices": {
+  "prompt": "two thin long lengthwise slices of angelica root, creamy yellow white inside with a brown skin edge and forked tails",
+  "style": "rd_plus__mc_item"
+ },
+ "ginseng_slices": {
+  "prompt": "three round thin slices of ginseng root, pale cream with a thin light brown rim and a faint ring in the middle",
+  "style": "rd_plus__mc_item"
+ },
+ "licorice_slices": {
+  "prompt": "three slanted oval slices of licorice root, bright yellow inside with radial cracks and a dark reddish brown bark rim",
+  "style": "rd_plus__mc_item"
+ },
+ "poria_slices": {
+  "prompt": "a small stack of thin flat square chalk white slices",
+  "style": "rd_plus__mc_item"
+ },
+ "dried_angelica": {
+  "prompt": "a dried angelica root, dull brown, a thick round head with many thin twisted tails hanging down",
+  "style": "rd_plus__mc_item"
+ },
+ "dried_broken_ginseng": {
+  "prompt": "a small bundle of thin dried pale yellow ginseng root hairs tied with a red string",
+  "style": "rd_plus__mc_item"
+ },
+ "fresh_cordyceps": {
+  "prompt": "a cordyceps fungus: a plump curved golden yellow caterpillar with a thin dark brown stalk growing up from its head, a little soil",
+  "style": "rd_plus__mc_item"
+ },
+ "dried_cordyceps": {
+  "prompt": "a bundle of four dried golden brown curved caterpillars with short dark tips, tied in the middle with red thread",
+  "style": "rd_plus__mc_item"
+ },
+ "dried_chrysanthemum": {
+  "prompt": "three dried white chrysanthemum flower heads with yellow centres, no stems, in a small pile",
+  "style": "rd_plus__mc_item"
+ },
+ "dried_honeysuckle": {
+  "prompt": "a small pile of dried slender pale yellow green honeysuckle flower buds",
+  "style": "rd_plus__mc_item"
+ },
+ "jujube_sweet_soup": {
+  "prompt": "a white porcelain bowl of clear amber brown sweet soup with three whole wrinkled red jujube dates floating",
+  "style": "rd_plus__mc_item"
+ },
+ "pillb": {
+  "prompt": "three round glossy dark brown pills sitting on a flat square of white paper, top down view",
+  "style": "rd_plus__mc_item"
+ }
+}
