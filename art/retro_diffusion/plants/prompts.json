@@ -1,0 +1,26 @@
+{
+ "goji_i_0": {
+  "prompt": "a goji berry shrub, mostly green leaves, thin arching branches, narrow leaves, small elongated orange red berries hanging in pairs, tiny purple flowers",
+  "style": "rd_plus__mc_item",
+  "init_image": "tools/icon_src/carried_goji_crop.png (1.3.0)",
+  "strength": 0.55,
+  "size": 16,
+  "remove_bg": true
+ },
+ "jujube_i_2": {
+  "prompt": "a jujube bush, glossy oval green leaves on zigzag brown twigs, small oval dates, half of them pale yellow green and half shiny dark red brown",
+  "style": "rd_plus__mc_item",
+  "init_image": "tools/icon_src/carried_jujube_crop.png (1.3.0)",
+  "strength": 0.55,
+  "size": 16,
+  "remove_bg": true
+ },
+ "ginseng_i_3": {
+  "prompt": "a ginseng plant, a whorl of five fingered palmate green leaves on long stems spreading out, a thin central stalk with a round cluster of bright red berries on top",
+  "style": "rd_plus__mc_item",
+  "init_image": "tools/icon_src/carried_wild_ginseng.png (1.3.0)",
+  "strength": 0.55,
+  "size": 16,
+  "remove_bg": true
+ }
+}

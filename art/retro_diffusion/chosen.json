@@ -37,5 +37,11 @@
  "licorice_seeds": "round4/licorice_seeds_3 (redrawn 2026-11-19: too like another icon or unlike the real herb)",
  "dried_broken_ginseng": "round4/dried_broken_ginseng_3 (redrawn 2026-11-19: too like another icon or unlike the real herb)",
  "dried_cordyceps": "round4/dried_cordyceps_0 (redrawn 2026-11-19: too like another icon or unlike the real herb)",
- "dried_chrysanthemum": "round4/dried_chrysanthemum_1 (redrawn 2026-11-19: too like another icon or unlike the real herb)"
+ "dried_chrysanthemum": "round4/dried_chrysanthemum_1 (redrawn 2026-11-19: too like another icon or unlike the real herb)",
+ "carried_goji_crop": "plants/goji_i_0 (redrawn 2026-11-20 image-to-image from the old plant: goji and jujube were alike, ginseng a thin stalk; also the placed plant)",
+ "carried_wild_goji": "plants/goji_i_0 (redrawn 2026-11-20 image-to-image from the old plant: goji and jujube were alike, ginseng a thin stalk; also the placed plant)",
+ "carried_jujube_crop": "plants/jujube_i_2 (redrawn 2026-11-20 image-to-image from the old plant: goji and jujube were alike, ginseng a thin stalk; also the placed plant)",
+ "carried_wild_jujube": "plants/jujube_i_2 (redrawn 2026-11-20 image-to-image from the old plant: goji and jujube were alike, ginseng a thin stalk; also the placed plant)",
+ "carried_ginseng_crop": "plants/ginseng_i_3 (redrawn 2026-11-20 image-to-image from the old plant: goji and jujube were alike, ginseng a thin stalk; also the placed plant)",
+ "carried_wild_ginseng": "plants/ginseng_i_3 (redrawn 2026-11-20 image-to-image from the old plant: goji and jujube were alike, ginseng a thin stalk; also the placed plant)"
 }
