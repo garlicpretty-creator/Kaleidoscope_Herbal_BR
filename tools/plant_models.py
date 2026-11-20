@@ -9,7 +9,7 @@ planes: the 3D boxes that used to stand out of them were dropped to match vanill
   full plant   crossed 16x16 planes
   wild plant   the same, standing in a tuft of grass
   young crop   the sprite without flowers or fruit, on smaller planes
-  sprout       a two-leaf seedling
+  sprout       the herb's own seedling (SPROUTS)
 
 Sprites, the grass tuft and the seedling are painted into free rows of models/plants(.png|_normal|_mers); run tools/subsurface.py afterwards to refresh the leaf translucency.
 Geometry identifiers and bone names (stage0..stageN, plant) are unchanged, so no block file changes.
@@ -27,7 +27,23 @@ HERBS={'angelica':('carried_angelica_crop','carried_wild_angelica',3),'chrysanth
        'ginseng':('carried_wild_ginseng','carried_wild_ginseng',4),'goji':('carried_goji_crop','carried_wild_goji',3),
        'honeysuckle':('carried_honeysuckle_crop','carried_wild_honeysuckle',3),'jujube':('carried_jujube_crop','carried_wild_jujube',3),
        'licorice':('carried_licorice_crop','carried_wild_licorice',3),'mugwort':('carried_wild_mugwort','carried_wild_mugwort',3)}
+# Goji, jujube and ginseng were redrawn by Retro Diffusion in 1.3.1 with colours of their own: their leaves, stems and
+# branches (green, or a dull brown) join BODY; their berries and dates (bright red, orange, red-brown) stay fruit.
+def _plain(p): r,g,b=p[:3];return g>=r or not ((r>=150 and b<r*.5) or g<r*.5)
+for _s in ('carried_goji_crop','carried_jujube_crop','carried_wild_ginseng'):
+    BODY|={'%02x%02x%02x'%q[:3] for q in Image.open(os.path.join(SRC,_s+'.png')).convert('RGBA').getdata() if q[3] and _plain(q)}
 SPROUT=['........','.g....g.','gGg..gGg','.gG..Gg.','..gddg..','...dd...','...dd...','...dd...']
+# Seedlings (1.3.1): each herb's own first leaves, in the greens of its grown plant, instead of one shared sprout.
+SPROUTS={
+ 'angelica':     ['.G.G..G.','gGgGggGg','.gdg.gd.','..dg.d..','...dd...','...dd...','...d....','...d....'],  # divided leaf
+ 'chrysanthemum':['.g.gg.g.','gGgGGgGg','.gGddGg.','g.gddg.g','.g.dd.g.','...dd...','...dd...','...dd...'],  # toothed rosette
+ 'ginseng':      ['.g.G.g..','gGgGgGg.','.gGdGg..','...d....','...d....','...d....','...d....','...d....'],  # one palm of leaflets
+ 'goji':         ['......G.','.G...gG.','.gG.gd..','..gdd.G.','...d.gG.','..Gd....','.gGd....','...d....'],  # thin twig, narrow leaves
+ 'honeysuckle':  ['...GG...','..gGGg..','...dd...','.Gg.d.gG','.gGgdgGg','....d...','....d...','....d...'],  # paired oval leaves
+ 'jujube':       ['..GG....','.gGGg.G.','..gd.gGg','...d.dg.','...dd...','...d....','...d....','...d....'],  # woody twig, glossy leaves
+ 'licorice':     ['...G....','..gGg...','.G.d.G..','gG.d.Gg.','.G.d.G..','gG.d.Gg.','...d....','...d....'],  # pinnate leaf
+ 'mugwort':      ['..G.G...','.GgGgG..','G.gdg.G.','gGgdgGg.','.g.d.g..','...d....','...d....','...d....'],  # lobed grey leaf
+}
 GRASS=['................','..g......g...g..','.gG..g..gG..gG.g','.dG.gGd.dG.gGd.G','gdGgdGdgdGgdGdgG','dGddGdGdGddGdGdG']
 PAL={'g':(130,198,61),'G':(183,232,92),'d':(77,146,48)}
 def hexof(p): return '%02x%02x%02x'%p[:3]
@@ -107,11 +123,20 @@ if __name__=='__main__':
                 if im.getpixel((x,y))[3] and hexof(im.getpixel((x,y))) not in BODY: im.putpixel((x,y),leaf+(255,))  # a bud, still green
         young[herb]=(1+18*(i%7),92+18*(i//7));atlas.paint(im,*young[herb])
     sprout=(37,110);grass=(55,110);atlas.paint(art(SPROUT),*sprout);atlas.paint(art(GRASS),*grass)
+    seedling={}
+    for i,herb in enumerate(HERBS):                       # seedlings: 8x8 cells in the free corners of rows y=110 and y=119
+        im=slot[HERBS[herb][0]][2];greens=sorted({q[:3] for q in im.getdata() if q[3] and hexof(q) in BODY and q[1]>=q[0]},key=lambda c:sum(c))
+        pal={'d':greens[0],'g':greens[len(greens)//2],'G':greens[-1]}
+        cell=Image.new('RGBA',(8,8),(0,0,0,0))
+        for y,r in enumerate(SPROUTS[herb]):
+            for x,ch in enumerate(r):
+                if ch!='.': cell.putpixel((x,y),pal[ch]+(255,))
+        seedling[herb]=((73,82,91,118)[i%4],110+9*(i//4));atlas.paint(cell,*seedling[herb])
     atlas.save()
     X=(45,-45)
     for herb,(crop,wild,stages) in HERBS.items():
         def full(s): return planes(slot[s][:2],(16,16),16,16,X)   # flat crossed planes only, like vanilla and Cookery crops
-        bones=[('stage0',planes(sprout,(8,8),6,6,X))]
+        bones=[('stage0',planes(seedling[herb],(8,8),6,6,X))]
         sizes=[11] if stages==3 else [8,12]
         for n,size in enumerate(sizes,1): bones.append(('stage%d'%n,planes(young[herb],(16,16),size,size,X)))
         bones.append(('stage%d'%(stages-1),full(crop)))

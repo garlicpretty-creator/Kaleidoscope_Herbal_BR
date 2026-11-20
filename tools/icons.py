@@ -144,7 +144,7 @@ for herb in ('chrysanthemum','mugwort'):
     PLANTS['carried_wild_'+herb]=lambda h=herb:layer(GRASS,GRASS_PAL,from_src('carried_wild_'+h),top=12)
     PLANTS['carried_%s_crop'%herb]=lambda h=herb:layer(SOIL,SOIL_PAL,from_src('carried_wild_'+h),top=13)
 PLANTS['carried_wild_ginseng']=lambda:layer(GRASS,GRASS_PAL,from_src('carried_wild_ginseng'),top=12)
-PLANTS['carried_ginseng_crop']=lambda:layer(PODZOL,PODZOL_PAL,layer(BERRIES,BERRY_PAL,from_src('carried_wild_ginseng'),top=0),top=13)
+PLANTS['carried_ginseng_crop']=lambda:layer(PODZOL,PODZOL_PAL,from_src('carried_wild_ginseng'),top=13)   # the sprite has its own berries since 1.3.1
 
 # Every icon and its material (tools/icon_src/rd/<name>.png, 16x16, hard-edged alpha).
 RD={**{n:'cer' for n in ('ginseng_decoction','four_herb_decoction','reishi_decoction','cordyceps_decoction','four_gentlemen_decoction',

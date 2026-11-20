@@ -37,6 +37,23 @@ def goji_label(im):
     """Goji berries keep the red mark and get a leaf."""
     im.putpixel((7,8),(84,150,58,255));im.putpixel((7,9),(58,112,40,255))
 WINE_LABELS={'ginseng_wine':ginseng_label,'goji_wine':goji_label}
+# Round 5 (2026-11-20): the placed plants compared side by side. Goji and jujube were both green bushes hung with big red
+# blobs, and ginseng a thin stalk; each was redrawn image-to-image from its old sprite (art/retro_diffusion/plants/,
+# prompts.json there). The chosen sprite is the plant on the crossed planes (tools/plant_models.py) and, on grass or
+# soil, the icon of the wild plant and of the crop.
+PLANT_SPRITES={'goji':'goji_i_0','jujube':'jujube_i_2','ginseng':'ginseng_i_3'}
+PLANT_FILES={'goji':('carried_goji_crop','carried_wild_goji'),'jujube':('carried_jujube_crop','carried_wild_jujube'),'ginseng':('carried_wild_ginseng',)}
+def ginseng_berries(im):
+    """The berries came out pink: ginseng berries are bright red."""
+    for y in range(16):
+        for x in range(16):
+            r,g,b,a=im.getpixel((x,y))
+            if a and r>180 and g<140: im.putpixel((x,y),((236,64,52) if g>115 else (204,40,38) if g>85 else (150,26,28))+(255,))
+def plant_sprites():
+    for herb,f in PLANT_SPRITES.items():
+        im=clean(Image.open(os.path.join(ROOT,'art','retro_diffusion','plants',f+'.png')).convert('RGBA'))
+        if herb=='ginseng': ginseng_berries(im)
+        for n in PLANT_FILES[herb]: im.save(os.path.join(ROOT,'tools','icon_src',n+'.png'))
 if __name__=='__main__':
     names=sorted({f.rsplit('_s',1)[0] for f in os.listdir(SRC) if f.endswith('.png')});out={n:clean(redraw(n)) for n in names}
     for n in names:                                   # farmed plants: the drawn soil strip
@@ -85,5 +102,10 @@ if __name__=='__main__':
     # Ginseng and goji wine came out as the same jar with the same red mark: the label shows the herb, as on the placed jar.
     for n,fix in WINE_LABELS.items():
         im=clean(Image.open(os.path.join(ROOT,'art','retro_diffusion',n+'.png')).convert('RGBA'));fix(im);out[n]=im
+    plant_sprites()                                   # round 5: the new plant on its strip of grass or soil
+    for n in ['carried_%s_crop'%h for h in PLANT_SPRITES]+['carried_wild_'+h for h in PLANT_SPRITES]:
+        im=Image.new('RGBA',(16,16),(0,0,0,0))
+        for xy,(rgba,mat) in icons.PLANTS[n]().items(): im.putpixel(xy,rgba[:3]+(255,))
+        out[n]=im
     for n,im in out.items(): im.save(os.path.join(OUT,n+'.png'))
     print(len(out),'sprites')
