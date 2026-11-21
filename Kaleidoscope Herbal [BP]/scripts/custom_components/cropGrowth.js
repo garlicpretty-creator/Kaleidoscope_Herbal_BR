@@ -41,7 +41,7 @@ export const cropGrowth={
   if(age!==2)return;
   const herb=HERBS.find(h=>block.typeId===id(h.key+'_crop'));if(!herb)return;
   if(!player.isSneaking||!isAreaTool(heldId(slot))){harvest(block,herb,player);return;}
-  // v1.3.2: one sweep, one wear on the tool.
+  // v1.4.0: one sweep, one wear on the tool.
   for(const b of ripeAround(block,2))harvest(b,herb,player);
   damageTool(player,slot);
  },

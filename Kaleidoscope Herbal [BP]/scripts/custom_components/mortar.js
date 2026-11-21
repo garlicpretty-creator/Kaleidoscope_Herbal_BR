@@ -22,7 +22,7 @@ function pound(block,powders,pitch,sound='dig.stone'){
  const color=mixColor(powders);
  playFrames(block,[{at:0,states:{[PESTLE]:1}},{at:STRIKE,states:{[PESTLE]:2},then:b=>strike(b,color,sound,pitch)},{at:SETTLE,states:{[PESTLE]:0}}]);
 }
-// v1.3.2: a sneak batch pounds stroke after stroke, BATCH_STEP ticks apart, each with its knock and puff.
+// v1.4.0: a sneak batch pounds stroke after stroke, BATCH_STEP ticks apart, each with its knock and puff.
 // Returns the tick of the last strike, when the doses appear.
 export const BATCH_STEP=4;
 export function batchFrames(count,strikeAt){
@@ -80,7 +80,7 @@ function roll(block,player,r,powder,sets=1,delay=STRIKE+1){
 }
 // A full mortar: enough herb powders to mix, or a complete set of pill makings.
 const complete=powders=>isPillMaking(powders)?!!pillReady(powders):powders.length>=MIN_POWDERS;
-// v1.3.2: sneak-use a full mortar holding one of its makings and it works that set and up to three more of the
+// v1.4.0: sneak-use a full mortar holding one of its makings and it works that set and up to three more of the
 // same from the inventory, every stroke in a row, and gives all the doses at once.
 function batch(block,player,r){
  const making=isPillMaking(r.powders),powder=making?pillReady(r.powders):undefined;

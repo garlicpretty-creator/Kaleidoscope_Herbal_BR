@@ -66,7 +66,7 @@ export function addPortion(r,fuel){
  r.remaining=Math.max(0,r.remaining??0)+portionTicks(r);
  return 'added';
 }
-// v1.3.2: sneaking with incense in hand keeps adding portions from the hand until the burner is full.
+// v1.4.0: sneaking with incense in hand keeps adding portions from the hand until the burner is full.
 function topUp(player,slot,r,fuel){
  for(let i=0;i<64&&heldId(slot)===fuel&&addPortion(r,fuel)==='added';i++){saveRecord(r);takeOne(player,slot);}
 }
@@ -139,7 +139,7 @@ export const incenseBurner={
    showRing(block,r);return;
   }
   if(r?.type==='incense_burner'&&r.lit&&!held){showRing(block,r);return;}
-  // v1.3.2: flint and steel on an empty or already burning burner fizzes instead of doing nothing.
+  // v1.4.0: flint and steel on an empty or already burning burner fizzes instead of doing nothing.
   if(held==='minecraft:flint_and_steel'&&(!r||r.type==='incense_burner')){refuse(block,'fizz');return;}
  },
  onPlayerBreak({block}){spillBurner(block);},

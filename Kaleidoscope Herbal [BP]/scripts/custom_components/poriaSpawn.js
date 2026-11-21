@@ -43,7 +43,7 @@ export function startPoriaInoculation(){
   event.cancel=true;
   system.run(()=>{
    try{
-    const spot=block.dimension.getBlock(target.location);if(!spot?.isAir){refuse(block,'full');return;} // v1.3.2: that side is taken
+    const spot=block.dimension.getBlock(target.location);if(!spot?.isAir){refuse(block,'full');return;} // v1.4.0: that side is taken
     // A log not standing on soil cannot feed a culture; say so with the refusal fizz instead of wasting powder.
     if(!logReady(block)){feedback(spot,'minecraft:basic_smoke_particle','random.fizz');return;}
     spot.setPermutation(BlockPermutation.resolve(id('poria_spawn'),{'minecraft:block_face':target.face}));

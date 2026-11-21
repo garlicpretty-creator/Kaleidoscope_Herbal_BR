@@ -100,7 +100,7 @@ export const clayPot={
    if(!HERB_ITEMS.has(held)&&!isPlain(slot.getItem())){refuse(block,'wrong');return;}
    r.ingredients.push(held);saveRecord(r);sync(block,r);takeOne(player,slot);feedback(block);return;
   }
-  // v1.3.2: things that clearly cannot go in right now are turned away instead of ignored: herbs before the water
+  // v1.4.0: things that clearly cannot go in right now are turned away instead of ignored: herbs before the water
   // or after the boil starts, a second bucket of water, a bowl before the brew is done.
   if(HERB_ITEMS.has(held)){refuse(block,r.stage===0?'fizz':'full');return;}
   if(held==='minecraft:water_bucket'){refuse(block,'full');return;}
@@ -114,7 +114,7 @@ export const clayPot={
   }
   if((r.stage===3||r.stage===4)&&held==='minecraft:bowl'){
    // Output must spawn successfully before consuming the bowl or reducing the serving.
-   // v1.3.2: sneaking ladles out every serving left, one bowl from the hand each.
+   // v1.4.0: sneaking ladles out every serving left, one bowl from the hand each.
    for(let n=player.isSneaking?r.servings:1;n>0&&r.servings>0&&heldId(slot)==='minecraft:bowl';n--){
     const served=dropOutput(block,r.output);takeOne(player,slot);r.servings--;emitEvt('decoction_served',player,{id:served});
    }

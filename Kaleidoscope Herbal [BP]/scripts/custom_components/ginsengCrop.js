@@ -24,12 +24,12 @@ export const ginsengCrop={
  onPlayerInteract({block,player=undefined}){
   if(!player)return;
   const age=Number(block.permutation.getState(GROWTH)??0),slot=hand(player),held=heldId(slot);
-  // v1.3.2: bone meal is turned away with the low note and a grey puff, and stays in the hand.
+  // v1.4.0: bone meal is turned away with the low note and a grey puff, and stays in the hand.
   if(held==='minecraft:bone_meal'){refuse(block,'wrong');return;}
   if(age<MATURE)return;
   // A ripe root will not come up for the bare hand or any other tool.
   if(held!==TROWEL){refuse(block,'wrong');return;}
-  // v1.3.2: sneaking digs every ripe root in the 3x3, each wearing the trowel as one dig would.
+  // v1.4.0: sneaking digs every ripe root in the 3x3, each wearing the trowel as one dig would.
   const roots=player.isSneaking?ripeAround(block,MATURE):[block];
   for(const root of roots){if(heldId(slot)!==TROWEL)break;dig(root,player,slot);}
  },

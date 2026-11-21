@@ -62,7 +62,7 @@ export function mixResult(items,salt){
  const found=matchPowder(items);
  return found?{item:found.result,formula:{result:found.result,ingredients:[...found.ingredients],via:'mortar'}}:{item:STRANGE,mark:strangeIndex(items,salt)};
 }
-// v1.3.2: sneak-using a full mortar with one of its makings in hand works the set in the mortar and every further
+// v1.4.0: sneak-using a full mortar with one of its makings in hand works the set in the mortar and every further
 // full set the player carries, up to BATCH_MAX sets in all. `have`: typeId -> count on hand. Returns the sets in all.
 export const BATCH_MAX=4;
 export function batchSets(set,have,max=BATCH_MAX){

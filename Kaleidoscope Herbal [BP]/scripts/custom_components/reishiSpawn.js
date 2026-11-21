@@ -26,7 +26,7 @@ export function startReishiInoculation(){
   event.cancel=true;
   system.run(()=>{
    try{
-    const spot=block.dimension.getBlock(target.location);if(!spot?.isAir){refuse(block,'full');return;} // v1.3.2: that side is taken
+    const spot=block.dimension.getBlock(target.location);if(!spot?.isAir){refuse(block,'full');return;} // v1.4.0: that side is taken
     spot.setPermutation(BlockPermutation.resolve(id('reishi_spawn'),{'minecraft:block_face':target.face}));
     const slot=hand(player);
     if(heldId(slot)===id('reishi_powder'))takeOne(player,slot);
