@@ -2,7 +2,7 @@ import {system,world,BlockPermutation} from '@minecraft/server';
 import {id} from '../data/herbs.js';
 import {isRaining} from './reishiSpread.js';
 import {spawnTarget} from './reishiSpawn.js';
-import {hand,heldId,takeOne,feedback} from '../utils/items.js';
+import {hand,heldId,takeOne,feedback,refuse} from '../utils/items.js';
 import {blockAt} from '../utils/blockStore.js';
 // v1.2.0 茯苓段木: poria powder on the side of a spruce log that stands on soil starts a culture there. In dry
 // weather the culture now and then puts up a wild poria on the soil around the log: within PORIA_RADIUS blocks,
@@ -43,7 +43,7 @@ export function startPoriaInoculation(){
   event.cancel=true;
   system.run(()=>{
    try{
-    const spot=block.dimension.getBlock(target.location);if(!spot?.isAir)return;
+    const spot=block.dimension.getBlock(target.location);if(!spot?.isAir){refuse(block,'full');return;} // v1.3.2: that side is taken
     // A log not standing on soil cannot feed a culture; say so with the refusal fizz instead of wasting powder.
     if(!logReady(block)){feedback(spot,'minecraft:basic_smoke_particle','random.fizz');return;}
     spot.setPermutation(BlockPermutation.resolve(id('poria_spawn'),{'minecraft:block_face':target.face}));

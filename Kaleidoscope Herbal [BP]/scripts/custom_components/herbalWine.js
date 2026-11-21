@@ -3,7 +3,7 @@ import {id} from '../data/herbs.js';
 import {FOOD_EFFECTS} from '../data/decoctions.js';
 import {HERBAL_WINES} from '../data/tavernRecipes.js';
 import {blockKey} from '../utils/blockStore.js';
-import {hand,heldId,takeOne,giveStack,creative} from '../utils/items.js';
+import {hand,heldId,takeOne,giveStack,creative,refuse} from '../utils/items.js';
 import {applyHeat} from '../utils/constitution.js';
 import {emitEvt} from '../utils/bus.js';
 const WINE_IDS=new Set(HERBAL_WINES.map(w=>id(w.key))),pending=new Map();
@@ -24,7 +24,7 @@ export const herbalWine={
  onPlayerInteract({block,player=undefined}){
   if(!player||!WINE_IDS.has(block.typeId))return;
   const count=Number(block.permutation.getState(COUNT)??1),slot=hand(player),held=heldId(slot);
-  if(held===block.typeId){if(count>=4)return;block.setPermutation(block.permutation.withState(COUNT,count+1));takeOne(player,slot);return;}
+  if(held===block.typeId){if(count>=4){refuse(block,'full');return;}block.setPermutation(block.permutation.withState(COUNT,count+1));takeOne(player,slot);return;}
   if(held)return;
   if(player.isSneaking){giveStack(player,new ItemStack(block.typeId));removeOne(block,count);return;}
   const data=FOOD_EFFECTS[block.typeId];if(!data)return;

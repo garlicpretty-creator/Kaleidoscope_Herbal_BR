@@ -66,6 +66,10 @@ export function addPortion(r,fuel){
  r.remaining=Math.max(0,r.remaining??0)+portionTicks(r);
  return 'added';
 }
+// v1.3.2: sneaking with incense in hand keeps adding portions from the hand until the burner is full.
+function topUp(player,slot,r,fuel){
+ for(let i=0;i<64&&heldId(slot)===fuel&&addPortion(r,fuel)==='added';i++){saveRecord(r);takeOne(player,slot);}
+}
 export function trackBurner(r){
  activeBurners.add(r.key);
  if(isMugwort(r)){mugwortBurners.set(r.key,{dimension:r.dimension,center:{x:r.location.x+.5,y:r.location.y+.5,z:r.location.z+.5}});wardSpawns();}
@@ -121,12 +125,13 @@ export const incenseBurner={
   if(!r&&FUELS[held]){
    // v1.2.13: a burner first loaded in 森羅週曆's incense week keeps 9,000-tick portions until it burns out
    const per=incenseWeek()?WEEK_INCENSE_TICKS:FUELS[held].remaining;
-   saveRecord({...newRecord(block,'incense_burner'),fuel:held,lit:false,remaining:per,per,pulse:0,beats:0});takeOne(player,slot);feedback(block);return;
+   const fresh={...newRecord(block,'incense_burner'),fuel:held,lit:false,remaining:per,per,pulse:0,beats:0};
+   saveRecord(fresh);takeOne(player,slot);if(player.isSneaking)topUp(player,slot,fresh,held);feedback(block);return;
   }
   if(r?.type==='incense_burner'&&FUELS[held]){
    // Topping up, lit or not: the record is saved before the powder leaves the hand.
    const added=addPortion(r,held);if(added!=='added'){refuse(block,added==='full'?'full':'wrong');return;}
-   saveRecord(r);takeOne(player,slot);feedback(block);return;
+   saveRecord(r);takeOne(player,slot);if(player.isSneaking)topUp(player,slot,r,held);feedback(block);return;
   }
   if(r&&!r.lit&&held==='minecraft:flint_and_steel'){
    r.lit=true;saveRecord(r);trackBurner(r);setStates(block,{[id('lit')]:true});damageTool(player,slot);feedback(block,'minecraft:basic_smoke_particle','fire.ignite');
@@ -134,6 +139,8 @@ export const incenseBurner={
    showRing(block,r);return;
   }
   if(r?.type==='incense_burner'&&r.lit&&!held){showRing(block,r);return;}
+  // v1.3.2: flint and steel on an empty or already burning burner fizzes instead of doing nothing.
+  if(held==='minecraft:flint_and_steel'&&(!r||r.type==='incense_burner')){refuse(block,'fizz');return;}
  },
  onPlayerBreak({block}){spillBurner(block);},
 };

@@ -52,7 +52,8 @@ export const herbCabinet={
    }
   }
   sync(block,getRecord(block));
-  if(moved)openDrawer(block);
+  // v1.3.2: an empty hand at an empty cabinet gets the fizz instead of nothing.
+  if(moved)openDrawer(block);else refuse(block,'fizz');
  },
  onPlayerBreak({block}){spillCabinet(block);},
  onBreak({block}){spillCabinet(block);},

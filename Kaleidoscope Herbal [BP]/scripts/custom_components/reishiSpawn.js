@@ -1,7 +1,7 @@
 import {system,world,BlockPermutation} from '@minecraft/server';
 import {id,isLog} from '../data/herbs.js';
 import {isRaining} from './reishiSpread.js';
-import {hand,heldId,takeOne,feedback} from '../utils/items.js';
+import {hand,heldId,takeOne,feedback,refuse} from '../utils/items.js';
 const FACE=/** @type {any} */('minecraft:block_face');
 export const SPAWN_CHANCE=.15;
 const SIDES={north:{x:0,z:-1},south:{x:0,z:1},east:{x:1,z:0},west:{x:-1,z:0}};
@@ -26,7 +26,7 @@ export function startReishiInoculation(){
   event.cancel=true;
   system.run(()=>{
    try{
-    const spot=block.dimension.getBlock(target.location);if(!spot?.isAir)return;
+    const spot=block.dimension.getBlock(target.location);if(!spot?.isAir){refuse(block,'full');return;} // v1.3.2: that side is taken
     spot.setPermutation(BlockPermutation.resolve(id('reishi_spawn'),{'minecraft:block_face':target.face}));
     const slot=hand(player);
     if(heldId(slot)===id('reishi_powder'))takeOne(player,slot);
